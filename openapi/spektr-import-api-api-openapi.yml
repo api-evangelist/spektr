@@ -1,0 +1,379 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Import API API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Import API
+paths:
+  /v1/data:
+    post:
+      description: Create a new dataset with a specified schema that allows to be used in processes. The schema defines the structure of data entries. Once created, the dataset becomes available in the platform and can be connected to spektr processes. Optionally, provide a "parentDatasetId" to create the dataset as a child of an existing dataset, used for related entities.
+      operationId: DataImportController_create_v1
+      parameters:
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.'
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportCreateInput'
+            examples:
+              example:
+                value:
+                  name: dataset name
+                  dataType:
+                    first_name: string
+                    age: number
+                    passport: file
+      responses:
+        '201':
+          description: Dataset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataImportResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+        '500':
+          description: Dataset creation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Create dataset
+      tags:
+      - Import API
+  /v1/data/{datasetId}:
+    put:
+      description: 'This endpoint allows clients to submit data entries for a dataset, including fields that require file uploads. When a data entry includes a file field (e.g., "passport": "file.jpg"), the API responds with a unique id for the entry and a presigned URL for uploading the file directly to AWS S3.
+
+
+        Upsert by "reference": records are matched to existing client records only by their "reference". If a data entry includes a "reference" that already exists in the workspace, that record is updated in place and keeps its original "spektrId"; otherwise a new record is created with a newly generated "spektrId". A "reference" must be a non-empty string, cannot be the literal value "root", and must be unique across the workspace — duplicate references (repeated within the same batch or already assigned to another record) are rejected with 409 Conflict. Entries sent without a "reference" are always created as new.'
+      operationId: DataImportController_update_v1
+      parameters:
+      - name: datasetId
+        required: true
+        in: path
+        description: The ID of the dataset
+        schema:
+          type: string
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.'
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The request body should be a JSON object containing a "data" array. Each item in the array represents a data entry and should include fields as defined in your dataset schema ("first_name", "age", "passport") or workspace fields. For file fields like "passport", include the key with a string value. Each item may also include an optional top-level "reference" string. The "reference" field is reserved and may be sent even if it is not declared in the dataset schema; it is always accepted and stored. Any other field that is not part of the dataset schema or workspace fields is rejected.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataUpdateInput'
+            examples:
+              example:
+                value:
+                  data:
+                  - first_name: John
+                    last_name: Doe
+                    email: john.doe@email.com
+                    passport: passport.jpg
+                  - first_name: Jane
+                    last_name: Smith
+                    email: jane.smt@email.com
+      responses:
+        '201':
+          description: Entries created successfuly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUpdateResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Dataset with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+        '500':
+          description: Dataset update failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Import records
+      tags:
+      - Import API
+    delete:
+      description: Delete a dataset from the platform.
+      operationId: DataImportController_delete_v1
+      parameters:
+      - name: datasetId
+        required: true
+        in: path
+        description: The ID of the dataset
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Dataset deleted successfully
+        '404':
+          description: Dataset with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Dataset is currently used by a process and cannot be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataConflictError'
+        '500':
+          description: Dataset deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Delete dataset
+      tags:
+      - Import API
+components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataImportResponse:
+      type: object
+      properties:
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+      required:
+      - datasetId
+    ImportCreateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the dataset
+        dataType:
+          type: object
+          additionalProperties:
+            type: string
+            enum:
+            - number
+            - string
+            - boolean
+            - date
+            - file
+            - country
+            - stringList
+          example:
+            name: dataset name
+            dataType:
+              first_name: string
+              age: number
+              passport: file
+          description: A dictionary that represents your schema, where each property is a key with a value type
+        parentDatasetId:
+          type: string
+          description: The ID of the parent dataset. When provided, the new dataset is created as a child dataset linked to the parent, used for related entities.
+      required:
+      - name
+      - dataType
+    DataUpdateResponseDataItem:
+      type: object
+      properties:
+        spektrId:
+          type: string
+          description: The spektr unique identifier for one entry
+        files:
+          description: An array of files if set on the request
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
+      required:
+      - spektrId
+      - files
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataUpdateInput:
+      type: object
+      properties:
+        data:
+          additionalProperties:
+            type: string
+            enum:
+            - number
+            - string
+            - boolean
+            - date
+            - file
+            - stringList
+          example:
+          - first_name: John
+            last_name: Doe
+            email: john.doe@email.com
+            passport: passport.jpg
+          - first_name: Jane
+            last_name: Smith
+            email: jane.smt@email.com
+          description: ' A list of records, where each record represents an individual entry. Each record is a dictionary with specific key-value pairs.'
+          type: array
+          items:
+            type: object
+      required:
+      - data
+    DataUpdateResponseDataFileItem:
+      type: object
+      properties:
+        file:
+          type: string
+          description: The file name
+        url:
+          type: string
+          description: A presigned URL for uploading the file associated with the file field.
+        fields:
+          description: An array of headers needed for the file upload
+          type: array
+          items:
+            type: object
+      required:
+      - file
+      - url
+      - fields
+    DataUpdateResponse:
+      type: object
+      properties:
+        data:
+          example:
+          - spektrId: UUID
+            files:
+            - file: passport
+              url: https://spektr.com/presigned-url
+              fields:
+                header1: value1
+                header2: value2
+          - spektrId: UUID
+          description: The API responds with an array of objects corresponding to each data entry submitted. Each object includes "spektrId" and "files" array if the entry includes file fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataItem'
+      required:
+      - data
+    DataConflictError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Cannot delete dataset that is linked to processes
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - dataset_linked_to_process
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

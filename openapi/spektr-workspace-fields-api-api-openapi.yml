@@ -1,0 +1,1147 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Workspace Fields API API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Workspace Fields API
+paths:
+  /v1/fields:
+    post:
+      description: 'Create a new workspace field definition. Field names must be unique within the workspace.
+
+
+        **Flat fields** (e.g. `input`, `select`, `checkbox`, `file`) store a single scalar value per customer record (string, number, boolean, date, etc.). They do not use the `subFields` property.
+
+
+        **Object fields** (`type: "object"`) store structured, nested data as a JSON array of objects. They **must** include a non-empty `subFields` array defining the schema for each entry. Sub-fields can themselves be of type `object`, enabling recursive nesting.
+
+
+        '
+      operationId: WorkspaceFieldsController_create_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: The workspace field definition to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkspaceFieldBody'
+            examples:
+              Flat field (input):
+                summary: Simple text input field
+                value:
+                  type: input
+                  category:
+                  - company
+                  attributes:
+                    name: company_name
+                    label: Company Name
+                    type: text
+                    placeholder: Acme Inc.
+                  config:
+                    spektrDataField: company_name
+                  validation:
+                  - type: required
+                    value: true
+                    message: Company name is required
+                  locked: false
+              Object field (nested):
+                summary: Structured field with nested sub-fields
+                value:
+                  type: object
+                  category:
+                  - individual
+                  attributes:
+                    name: employers
+                    label: Employers
+                  config:
+                    spektrDataField: employers
+                  validation: []
+                  locked: false
+                  subFields:
+                  - fieldName: full_name
+                    fieldLabel: Full name
+                    required: true
+                    type: input
+                    attributes:
+                      name: full_name
+                      label: Full name
+                      type: text
+                    validation:
+                    - type: required
+                      value: true
+                      message: Required
+                  - fieldName: address
+                    fieldLabel: Address
+                    required: false
+                    type: object
+                    subFields:
+                    - fieldName: line1
+                      fieldLabel: Address line 1
+                      required: false
+                      type: input
+                      attributes:
+                        name: line1
+                        label: Address line 1
+                        type: text
+                    - fieldName: country
+                      fieldLabel: Country
+                      required: false
+                      type: select
+                      attributes:
+                        name: country
+                        label: Country
+                        options:
+                        - value: RO
+                          label: Romania
+                        - value: GB
+                          label: United Kingdom
+      responses:
+        '201':
+          description: Workspace field created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Flat field:
+                  summary: Flat field response (input)
+                  value:
+                    id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+                Object field:
+                  summary: Object field response (nested)
+                  value:
+                    id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                      validation:
+                      - type: required
+                        value: true
+                        message: Required
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+        '400':
+          description: Payload validation failed (e.g. duplicate field name, invalid sub-field configuration)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Unauthorized — missing or invalid API key
+      security:
+      - x-api-key: []
+      summary: Create workspace field
+      tags:
+      - Workspace Fields API
+    get:
+      description: Retrieve all workspace field definitions. The response includes both flat fields (scalar values) and object fields (nested structures with sub-fields).
+      operationId: WorkspaceFieldsController_getAll_v1
+      parameters:
+      - name: fieldType
+        required: false
+        in: query
+        description: Filter by entity category
+        schema:
+          enum:
+          - individual
+          - company
+          type: string
+      - name: source
+        required: false
+        in: query
+        description: Filter by field origin
+        schema:
+          enum:
+          - workspace
+          - spektr
+          type: string
+      - name: includeProtected
+        required: false
+        in: query
+        description: Include protected (system) fields. Defaults to true.
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: List of workspace fields
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Mixed list:
+                  summary: List containing flat and object fields
+                  value:
+                  - id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+                  - id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                      validation:
+                      - type: required
+                        value: true
+                        message: Required
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+        '401':
+          description: Unauthorized — missing or invalid API key
+      security:
+      - x-api-key: []
+      summary: List workspace fields
+      tags:
+      - Workspace Fields API
+  /v1/fields/{id}:
+    get:
+      description: Retrieve a single workspace field definition by its ID
+      operationId: WorkspaceFieldsController_getById_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the workspace field
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Workspace field fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Flat field:
+                  summary: Flat field response (input)
+                  value:
+                    id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+                Object field:
+                  summary: Object field response (nested)
+                  value:
+                    id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                      validation:
+                      - type: required
+                        value: true
+                        message: Required
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+        '401':
+          description: Unauthorized — missing or invalid API key
+        '404':
+          description: Workspace field not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Get workspace field by ID
+      tags:
+      - Workspace Fields API
+    patch:
+      description: 'Update an existing workspace field definition by its ID. '
+      operationId: WorkspaceFieldsController_update_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the workspace field to update
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The fields to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkspaceFieldBody'
+            examples:
+              Update label and validation:
+                summary: Change the label and add a max-length rule
+                value:
+                  attributes:
+                    name: company_name
+                    label: Company Legal Name
+                    type: text
+                    placeholder: Acme Inc.
+                  validation:
+                  - type: required
+                    value: true
+                    message: Company name is required
+                  - type: maxLength
+                    value: 200
+                    message: Maximum 200 characters
+              Added a new nested sub-field:
+                summary: Adding `city` requires sending the complete `subFields` tree
+                value:
+                  subFields:
+                  - fieldName: full_name
+                    fieldLabel: Full name
+                    required: true
+                    type: input
+                    attributes:
+                      name: full_name
+                      label: Full name
+                      type: text
+                  - fieldName: address
+                    fieldLabel: Address
+                    required: false
+                    type: object
+                    subFields:
+                    - fieldName: line1
+                      fieldLabel: Address line 1
+                      required: false
+                      type: input
+                      attributes:
+                        name: line1
+                        label: Address line 1
+                        type: text
+                    - fieldName: city
+                      fieldLabel: City
+                      required: false
+                      type: input
+                      attributes:
+                        name: city
+                        label: City
+                        type: text
+                    - fieldName: country
+                      fieldLabel: Country
+                      required: false
+                      type: select
+                      attributes:
+                        name: country
+                        label: Country
+                        options:
+                        - value: RO
+                          label: Romania
+                        - value: GB
+                          label: United Kingdom
+      responses:
+        '200':
+          description: Workspace field updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Updated flat field:
+                  summary: Field after label and validation update
+                  value:
+                    id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Legal Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    - type: maxLength
+                      value: 200
+                      message: Maximum 200 characters
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000060000
+                Updated object field:
+                  summary: Object field after adding a new nested sub-field
+                  value:
+                    id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: city
+                        fieldLabel: City
+                        required: false
+                        type: input
+                        attributes:
+                          name: city
+                          label: City
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000060000
+        '400':
+          description: Payload validation failed (e.g. invalid sub-field configuration)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Unauthorized — missing or invalid API key
+        '404':
+          description: Workspace field not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Update workspace field
+      tags:
+      - Workspace Fields API
+    delete:
+      description: Delete a workspace field definition by its ID. Protected fields cannot be deleted.
+      operationId: WorkspaceFieldsController_delete_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the workspace field to delete
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Workspace field deleted successfully
+        '401':
+          description: Unauthorized — missing or invalid API key
+        '403':
+          description: Cannot delete a protected field
+        '404':
+          description: Workspace field not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Delete workspace field
+      tags:
+      - Workspace Fields API
+components:
+  schemas:
+    UpdateWorkspaceFieldBody:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example:
+          - basic_info
+          type: array
+          items:
+            type: string
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules to apply to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        subFields:
+          description: 'Sub-field definitions. The whole array is **replaced** when this key is present, so to add/remove/reorder a single entry you must send the full desired array (recursively).
+
+
+            Required when the effective `type` is `"object"` (a non-empty array); must be omitted for all other types. If `type` is being switched away from `"object"`, omit `subFields` entirely.'
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+    FieldValidationDto:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of validation rule
+          example: required
+          enum:
+          - required
+          - regex
+          - age
+          - maxNumberOfEntries
+          - maxNumberOfSignatories
+          - minNumberOfSignatories
+          - maxLength
+          - maxFileSize
+          - fileType
+          - maxFileNameLength
+        message:
+          type: string
+          description: Error message when validation fails
+          example: This field is required
+        value:
+          type: object
+          description: Validation value (type depends on validation type)
+          example: true
+        preset:
+          type: string
+          description: Regex preset identifier
+          example: email
+        minimumAge:
+          type: number
+          description: Minimum age (for age validation)
+          example: 18
+        maximumAge:
+          type: number
+          description: Maximum age (for age validation)
+          example: 65
+      required:
+      - type
+      - message
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    FieldAttributesDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the field
+          example: Company Name
+        label:
+          type: string
+          description: Label shown to users
+          example: Company Name
+        helperText:
+          type: string
+          description: Helper text providing additional guidance
+          example: Enter the registered company name
+        placeholder:
+          type: string
+          description: Placeholder text for the input
+          example: Acme Inc.
+        type:
+          type: string
+          description: Input type (e.g. text, number, date, country)
+          example: text
+        fileType:
+          type: string
+          description: Accepted file types for file fields
+        options:
+          description: Options for select/radio fields
+          example:
+          - value: option1
+            label: Option 1
+          - value: option2
+            label: Option 2
+          type: array
+          items:
+            type: object
+        internalId:
+          type: string
+          description: Internal identifier for the field
+          example: company_name_field
+        currency:
+          type: object
+          description: Currency configuration
+          example:
+            symbol: $
+            code: USD
+        minDate:
+          type: string
+          description: Minimum allowed date for date fields (ISO format)
+          example: '1900-01-01'
+        maxDate:
+          type: string
+          description: Maximum allowed date for date fields (ISO format)
+          example: '2100-12-31'
+        maxDaysInPast:
+          type: number
+          description: Maximum number of days in the past allowed
+          example: 3650
+        maxDaysInFuture:
+          type: number
+          description: Maximum number of days in the future allowed
+          example: 30
+      required:
+      - name
+      - label
+    SubFieldDefinitionDto:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Unique name identifier of the sub-field
+          example: street_address
+        fieldLabel:
+          type: string
+          description: Display label for the sub-field
+          example: Street Address
+        fieldHelp:
+          type: string
+          description: Help text for the sub-field
+          example: Enter the full street address including number
+        required:
+          type: boolean
+          description: Whether the sub-field is required
+          example: true
+        type:
+          type: string
+          description: Input type of the sub-field
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        attributes:
+          description: Attributes for the sub-field
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules for the sub-field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        subFields:
+          description: Nested sub-fields for recursive object structures. Required when the sub-field type is "object", must be omitted otherwise. On PATCH this array is **replaced wholesale** — partial merges are not supported.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+      required:
+      - fieldName
+      - fieldLabel
+      - required
+      - type
+    FieldConfigDto:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr data field key this field maps to
+          example: company_name
+        prefillDefaultValue:
+          type: boolean
+          description: Whether to prefill the default value
+          example: true
+        source:
+          type: string
+          description: Source field for prefilling
+          example: workspace
+        prefillSpektrDataField:
+          type: string
+          description: Spektr data field to use for prefilling
+          example: company_name
+        hideRoleDropdown:
+          type: boolean
+          description: Whether to hide the role dropdown
+          example: false
+        value:
+          type: object
+          description: Default or current value of the field
+          example: Acme Inc.
+        defaultValue:
+          type: object
+          description: Default value for the field
+          example: Default Company
+        prefillPreference:
+          type: object
+          description: Prefill preference configuration. `processSourceNodeIds` is optional; when omitted or empty, prefill considers all eligible upstream vendor nodes (current behavior). When set, prefill is restricted to the listed vendor node ids.
+          example:
+            process: true
+            record: true
+            processSourceNodeIds:
+            - 507f1f77bcf86cd799439011
+      required:
+      - spektrDataField
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    WorkspaceFieldResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the workspace field
+          example: 507f1f77bcf86cd799439011
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        validation:
+          description: Validation rules applied to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example: []
+          type: array
+          items:
+            type: string
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        protectedField:
+          type: boolean
+          description: Whether the field is protected from deletion
+          example: false
+        source:
+          type: string
+          description: Source of the field definition
+          example: workspace
+          enum:
+          - workspace
+          - spektr
+        spektrFieldKey:
+          type: string
+          description: Spektr field key for system-defined fields
+          example: company_name
+        subFields:
+          description: Sub-field definitions — present only when `type` is `"object"`. Defines the schema for each entry in the object array. Sub-fields can themselves be of type `"object"` for recursive nesting.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+        createdBy:
+          type: string
+          description: Identifier of the user or API key that created this field
+          example: 507f1f77bcf86cd799439012
+        createdAt:
+          type: number
+          description: Creation timestamp (Unix milliseconds)
+          example: 1700000000000
+        updatedAt:
+          type: number
+          description: Last update timestamp (Unix milliseconds)
+          example: 1700000000000
+      required:
+      - id
+      - type
+      - attributes
+      - config
+      - category
+      - groups
+      - locked
+      - createdBy
+      - createdAt
+      - updatedAt
+    CreateWorkspaceFieldBody:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example:
+          - basic_info
+          type: array
+          items:
+            type: string
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules to apply to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        subFields:
+          description: Sub-field definitions — required when `type` is `"object"`, must be omitted for all other types. Defines the schema for each entry in the object array. Sub-fields can themselves be of type `"object"` for recursive nesting.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+      required:
+      - type
+      - category
+      - attributes
+      - config
+      - locked
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

@@ -1,0 +1,1068 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Records API API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Records API
+paths:
+  /v1/record/listOpenLoops:
+    post:
+      description: Get process pending runs for a given list of spektr IDs and/or reference IDs.
+      operationId: RecordController_listOpenLoops_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: An object containing an array of spektr IDs and reference IDs.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRecordIds'
+      responses:
+        '200':
+          description: Process runs fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessRunResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process runs not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Get pending process runs
+      tags:
+      - Records API
+  /v1/record/{spektrId}:
+    get:
+      description: Fetch a customer record by its spektr ID
+      operationId: RecordController_fetchRecord_v1
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The spektr ID of the customer record
+        schema:
+          type: string
+      - name: appendEntities
+        required: false
+        in: query
+        description: Appends the ownership graph entities to the response
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Customer record fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+      security:
+      - x-api-key: []
+      summary: Fetch customer record
+      tags:
+      - Records API
+    patch:
+      description: Update a customer record by its spektr ID
+      operationId: RecordController_updateRecord_v1
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The ID of the customer record
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The data to update the customer record with. Optional createdAt/updatedAt (Unix ms) are applied only when they differ from stored values.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInput'
+      responses:
+        '200':
+          description: Customer record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+        '400':
+          description: Payload validation or parsing failed, or attempted to update restricted fields
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Customer record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Reference already exists; must be unique across client records
+      security:
+      - x-api-key: []
+      summary: Update customer record
+      tags:
+      - Records API
+  /v2/record/{spektrId}:
+    patch:
+      description: Update a customer record by its spektr ID. The ID can be a spektr ID or a reference ID. The type of the ID is specified in the type query parameter. Provide at least one of a non-empty data object, status, or a timestamp field (createdAt / updatedAt in Unix ms).
+      operationId: RecordController_updateRecordV2_v2
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The ID of the customer record
+        schema:
+          type: string
+      - name: type
+        required: true
+        in: query
+        description: The type of the customer record id. Either spektrId or reference
+        schema:
+          enum:
+          - spektrId
+          - reference
+          type: string
+      requestBody:
+        required: true
+        description: 'Fields to update: optional golden-record data, optional workflow status, optional createdAt/updatedAt (Unix ms; applied only when changed).'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInputV2'
+      responses:
+        '200':
+          description: Customer record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+        '400':
+          description: Payload validation or parsing failed, or attempted to update restricted fields
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Customer record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Reference already exists; must be unique across client records
+      security:
+      - x-api-key: []
+      summary: Update customer record v2
+      tags:
+      - Records API
+  /v1/record/reference/{reference}:
+    get:
+      description: "Fetch a customer record by a client reference. \n\nUsage: \n - on the first onboarding init request, pass the reference in the data\n - whenever the spektrId is needed, use this endpoint to fetch the \n   record using your reference"
+      operationId: RecordController_fetchRecordByReference_v1
+      parameters:
+      - name: reference
+        required: true
+        in: path
+        description: The customer reference
+        schema:
+          type: string
+      - name: appendFiles
+        required: false
+        in: query
+        description: Appends the presigned file URLs to the response
+        schema:
+          type: boolean
+      - name: appendEntities
+        required: false
+        in: query
+        description: Appends the ownership graph entities to the response
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Customer record fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+      security:
+      - x-api-key: []
+      summary: Fetch customer record by reference
+      tags:
+      - Records API
+  /v1/record/{spektrId}/timeline:
+    get:
+      description: Get form submits for a given record by its ID. If the ID is not found, an empty array is returned.
+      operationId: RecordController_getClientRecordFormSubmits_v1
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The ID of the customer record
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Customer form submits fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordFormSubmitsResponse'
+      security:
+      - x-api-key: []
+      summary: Get form submits for a given record
+      tags:
+      - Records API
+  /v1/record/bulk/fetch/api:
+    get:
+      description: Fetch multiple customer records and return them directly in the API response. Optimized for smaller datasets. Max 5000 records at a time
+      operationId: RecordController_fetchRecordsApi_v1
+      parameters:
+      - name: createdAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created after this date
+        schema:
+          type: number
+      - name: createdBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created before this date
+        schema:
+          type: number
+      - name: updatedAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated after this date
+        schema:
+          type: number
+      - name: updatedBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated before this date
+        schema:
+          type: number
+      - name: maxCount
+        required: true
+        in: query
+        description: Maximum number of records to fetch (limited to 5000)
+        schema:
+          type: number
+      - name: token
+        required: false
+        in: query
+        description: Pagination token for cursor-based pagination. Use the token from the response to fetch the next page of results.
+        schema:
+          example: 1769448798254_6977a55d0507d9fe9c85a90f
+          type: string
+      responses:
+        '200':
+          description: Returns records array with customer data directly in the response. Includes a token field for pagination if more records are available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordsResponse'
+      security:
+      - x-api-key: []
+      summary: Fetch records in bulk via API
+      tags:
+      - Records API
+  /v1/record/bulk/fetch/s3:
+    get:
+      description: Fetch multiple customer records and return signed URLs to download them from S3. Handles large datasets by chunking data into multiple files. Max 300,000 records at a time. Data will be split into files of max 10,000 records.
+      operationId: RecordController_fetchRecordsS3_v1
+      parameters:
+      - name: createdAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created after this date
+        schema:
+          type: number
+      - name: createdBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created before this date
+        schema:
+          type: number
+      - name: updatedAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated after this date
+        schema:
+          type: number
+      - name: updatedBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated before this date
+        schema:
+          type: number
+      - name: maxCount
+        required: true
+        in: query
+        description: Maximum number of records to fetch (up to 300,000).
+        schema:
+          type: number
+      - name: token
+        required: false
+        in: query
+        description: Pagination token for cursor-based pagination. Use the token from the response to fetch the next page of results.
+        schema:
+          example: 1769448798254_6977a55d0507d9fe9c85a90f
+          type: string
+      responses:
+        '200':
+          description: Returns an array of presigned S3 URLs for downloading record chunks as JSON files
+          content:
+            application/json:
+              schema:
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          description: Presigned URL to download the file
+                  token:
+                    type: string
+                    description: Pagination token for fetching the next page of results. Present only when more records are available.
+      security:
+      - x-api-key: []
+      summary: Fetch records in bulk via S3
+      tags:
+      - Records API
+  /v1/record/relations:
+    post:
+      description: 'Links two or more client records together (e.g. a company and its beneficial owners). Pass an array of relation items where each side (`from`, `to`) is identified by `spektrId` or `reference`. Each item must specify `relationRole` (one of the supported role keys such as `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`, `senior_management`, `board_of_directors`, `controlling_entities`, `subsidiaries`, `authorized_signatories`, `signatories`, `contact_info`, `person_with_significant_control`) and may include optional `data` metadata, `positions`, and a `direct` boolean. The legacy `roles` array is no longer accepted - send `relationRole` directly instead. The request is atomic: all relations are created together or none are, if any validation fails. Validation rules: both records must exist, `from` and `to` cannot be the same record, duplicate relations are rejected, and the resulting graph must remain acyclic.'
+      operationId: RecordController_createClientRecordRelations_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: Array of relations to create
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClientRecordRelationItemDto'
+      responses:
+        '201':
+          description: Relations created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateClientRecordRelationsResponseDto'
+        '400':
+          description: Payload validation failed or business rule violated (e.g. missing record, invalid role, cycle, from === to)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+      security:
+      - x-api-key: []
+      summary: Create client record relations
+      tags:
+      - Records API
+    patch:
+      description: Updates mutable fields on existing v2 client record relations identified by `(from, to, relationRole)`. Only `direct`, `positions`, and `data` may be modified; `from`, `to`, `relationRole`, `createdAt`, and `updatedAt` are immutable. The `data` field is shallow-merged with the stored value (provided keys overwrite, existing unspecified keys are preserved). Each item must include at least one of `direct`, `positions`, or `data`. All relations in the batch are verified to exist before any updates are applied; if any relation is missing, the entire request is rejected without persisting changes. Updates then run sequentially (best-effort after verification).
+      operationId: RecordController_updateClientRecordRelations_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: Array of relations to update
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClientRecordRelationItemDto'
+      responses:
+        '200':
+          description: Relations updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateClientRecordRelationsResponseDto'
+        '400':
+          description: Payload validation failed or business rule violated (e.g. relation not found, duplicate key within the payload, no update fields provided, from === to, invalid role)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+      security:
+      - x-api-key: []
+      summary: Update client record relations
+      tags:
+      - Records API
+  /v1/record/vendor-searches/{vendorSearchId}:
+    get:
+      description: Fetch the raw, unmodified response of a single vendor search (e.g. a Kyckr lookup) by its ID. The `vendorSearchId` is the reference carried on the customer's timeline service-run events and outbound webhook payloads.
+      operationId: RecordController_getVendorSearch_v1
+      parameters:
+      - name: vendorSearchId
+        required: true
+        in: path
+        description: The ID of the vendor search to fetch
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Vendor search fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSearchResponse'
+        '404':
+          description: Vendor search not found for this customer record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Fetch a vendor search
+      tags:
+      - Records API
+components:
+  schemas:
+    VendorSearchResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The vendor search ID
+        vendor:
+          type: string
+          enum:
+          - websiteChecker
+          - licenseAi
+          - addressAi
+          - industryAi
+          - aiResearch
+          - entityResolution
+          - openCorporates
+          - complyAdvantage
+          - openCorporatesMonitoring
+          - openCorporatesRisk
+          - complyAdvantageKyc
+          - complyAdvantageKyb
+          - kyckr
+          - dnbCompanyInfo
+          - dnbOwnershipInsights
+          - dnbPrincipalsAndContacts
+          - dnbHierarchyAndConnections
+          - dnbFilingAndEvents
+          - companyWeb
+          - moodys
+          - bodacc
+          - veriff
+          - veriffIdv
+          - mitId
+          - frejaId
+          - mitIdBusiness
+          - bankId
+          - virk
+          - documentOCR
+          - hitHorizons
+          - bolagsverket
+          - onfido
+          - hubspot
+          - creditSafe
+          - scrive
+          - uc
+          - pdfGeneration
+          - ofsaa
+          - ceidg
+          - krs
+          - crbr
+          - ceidgOwnershipInsights
+          - rkizw
+          - rspo
+          - regon
+          - spektrKyb
+          - spektrUboEngine
+          - companiesHouse
+          - cpr
+          - dowJonesScreening
+          - dowJonesScreeningPerson
+          - dowJonesScreeningRps
+          - dowJonesScreeningRpsPerson
+          - ticCompany
+          - ticPerson
+          description: The vendor that produced this data
+        spektrId:
+          type: string
+          description: The spektr ID of the customer record this search belongs to
+        status:
+          type: string
+          enum:
+          - pending
+          - completed
+          - failed
+          - polling
+          description: The status of the vendor search
+        createdAt:
+          type: number
+          description: Unix timestamp (ms) when the search was created
+        updatedAt:
+          type: number
+          description: Unix timestamp (ms) when the search was last updated
+        response:
+          type: object
+          description: The raw, unmodified vendor API response, as stored at search time
+      required:
+      - id
+      - vendor
+      - status
+      - createdAt
+      - updatedAt
+      - response
+    RecordFormSubmitResponse:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: Process ID
+        processType:
+          type: string
+          description: Process type, e.g. "onboarding"
+        processName:
+          type: string
+          description: Process name
+        spektrId:
+          type: string
+          description: ID of the record
+        eventType:
+          type: string
+          description: Type of the event, e.g. "form_submit"
+        stepName:
+          type: string
+          description: Name of the step in the process
+        stepId:
+          type: string
+          description: ID of the step in the process
+        formData:
+          type: object
+          description: Form data
+        createdAt:
+          type: number
+          description: Moment in time when the event happened, in milliseconds since epoch
+    ProcessRunResponse:
+      type: object
+      properties:
+        executionContextId:
+          type: string
+          description: The ID of the execution context
+        spektrId:
+          type: string
+          description: The Spektr ID
+        processId:
+          type: string
+          description: The ID of the process
+        processName:
+          type: string
+          description: The name of the process
+        processType:
+          type: string
+          description: The type of the process
+        version:
+          description: The version information of the process
+          allOf:
+          - $ref: '#/components/schemas/ProcessVersion'
+        status:
+          type: string
+          description: The status of the execution context
+        reference:
+          type: string
+          description: The reference of the process run
+        token:
+          type: string
+          description: The token of the process run
+        header:
+          type: string
+          description: The header of the process run
+        description:
+          type: string
+          description: The description of the process run
+        triggerSource:
+          description: The source that triggered the process
+          allOf:
+          - $ref: '#/components/schemas/ProcessTriggerSource'
+        triggerTime:
+          type: number
+          description: The timestamp when the process was triggered
+        isExpired:
+          type: boolean
+          description: Whether the process run is expired
+      required:
+      - executionContextId
+      - spektrId
+      - processId
+      - processName
+      - processType
+      - version
+      - status
+      - isExpired
+    ClientRecordRelationEndpointDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - spektrId
+          - reference
+          description: Type of the record identifier
+        value:
+          type: string
+          description: Spektr ID or client reference value
+      required:
+      - type
+      - value
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    RecordProperties:
+      type: object
+      properties:
+        directOrIndirect:
+          type: string
+          description: The reference of the record
+        role:
+          type: string
+          description: The role of the record in the relation
+        percentage:
+          type: string
+          description: The percentage of ownership in the relation
+        ownership:
+          type: string
+          description: The ownership type of the record
+    ProcessVersion:
+      type: object
+      properties:
+        currentVersion:
+          type: number
+          description: The current version of the process
+          example: 9
+        latestVersion:
+          type: number
+          description: The latest version of the process
+          example: 11
+      required:
+      - currentVersion
+      - latestVersion
+    CreateClientRecordRelationsResponseDto:
+      type: object
+      properties:
+        relations:
+          description: Created relations
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateClientRecordRelationsResponseItemDto'
+      required:
+      - relations
+    RecordsResponse:
+      type: object
+      properties:
+        records:
+          description: The records
+          type: array
+          items:
+            type: string
+        files:
+          type: object
+          description: The file details of the files containing the records
+        token:
+          type: string
+          description: Pagination token for fetching the next page
+    CreateClientRecordRelationsResponseItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Relation ID
+        subject:
+          type: string
+          description: Subject record ID
+        interestedParty:
+          type: string
+          description: Interested party record ID
+        directOrIndirect:
+          type: string
+          enum:
+          - direct
+          - indirect
+          description: Relation type
+        relationRole:
+          type: string
+          description: Role of the interested party in the relation
+        data:
+          type: object
+          description: Arbitrary relation metadata
+        positions:
+          description: Entity positions associated with the relation
+          type: array
+          items:
+            type: string
+        entityRoles:
+          deprecated: true
+          description: '@deprecated Not present on v2 relations. Use `relationRole` instead.'
+          type: array
+          items:
+            type: string
+        entityPositions:
+          deprecated: true
+          description: '@deprecated Not present on v2 relations. Use `positions` instead.'
+          type: array
+          items:
+            type: string
+        hasSignatoryPower:
+          type: boolean
+          deprecated: true
+          description: '@deprecated Not present on v2 relations.'
+        createdAt:
+          type: number
+          description: Creation timestamp
+        updatedAt:
+          type: number
+          description: Last update timestamp
+      required:
+      - id
+      - subject
+      - interestedParty
+      - directOrIndirect
+      - relationRole
+      - data
+      - positions
+      - createdAt
+      - updatedAt
+    UpdateClientRecordRelationItemDto:
+      type: object
+      properties:
+        from:
+          description: Subject of the relation to update (from). Immutable.
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        to:
+          description: Interested party of the relation to update (to). Immutable.
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        relationRole:
+          type: string
+          enum:
+          - beneficial_owners
+          - shareholders
+          - ultimate_beneficial_owners
+          - senior_management
+          - board_of_directors
+          - controlling_entities
+          - subsidiaries
+          - authorized_signatories
+          - signatories
+          - contact_info
+          - person_with_significant_control
+          description: Role of the interested party in the relation. Used together with `from` and `to` to identify the relation. Immutable.
+        direct:
+          type: boolean
+          description: Whether the relation is direct. Optional.
+        positions:
+          description: Entity positions. Replaces the stored array when provided.
+          type: array
+          items:
+            type: string
+        data:
+          type: object
+          description: Arbitrary relation metadata. Shallow-merged with the stored value when provided.
+      required:
+      - from
+      - to
+      - relationRole
+    CreateClientRecordRelationItemDto:
+      type: object
+      properties:
+        from:
+          description: Subject of the relation (from)
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        to:
+          description: Interested party of the relation (to)
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        relationRole:
+          type: string
+          enum:
+          - beneficial_owners
+          - shareholders
+          - ultimate_beneficial_owners
+          - senior_management
+          - board_of_directors
+          - controlling_entities
+          - subsidiaries
+          - authorized_signatories
+          - signatories
+          - contact_info
+          - person_with_significant_control
+          description: Role of the interested party in the relation. Must be one of the supported role keys (e.g. `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`).
+        direct:
+          type: boolean
+          default: false
+          description: Whether the relation is direct
+        positions:
+          default: []
+          description: Entity positions
+          type: array
+          items:
+            type: string
+        data:
+          type: object
+          default: {}
+          description: Arbitrary metadata for the relation
+        hasSignatoryPower:
+          type: boolean
+          default: false
+          deprecated: true
+          description: '@deprecated No longer used. Signatory power should be expressed via `relationRole` or the `data` field.'
+      required:
+      - from
+      - to
+      - relationRole
+    RecordResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the record
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+        status:
+          type: string
+          description: The status of the record
+          enum:
+          - pending
+          - approved
+          - rejected
+        createdAt:
+          type: number
+          description: Creation timestamp
+        updatedAt:
+          type: number
+          description: Last update timestamp
+        tags:
+          description: Tags of the record
+          type: array
+          items:
+            type: string
+        reference:
+          type: string
+          description: Reference of the record
+        data:
+          type: object
+          description: Record data
+        files:
+          description: Files associated with the record
+          type: array
+          items:
+            type: string
+        entities:
+          description: Relations and UBOs associated with the record
+          type: array
+          items:
+            type: string
+        relationProps:
+          description: Relation properties of the record
+          allOf:
+          - $ref: '#/components/schemas/RecordProperties'
+      required:
+      - id
+      - datasetId
+      - status
+      - createdAt
+      - updatedAt
+      - tags
+    ClientRecordId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the customer record
+        type:
+          type: string
+          description: The type of the customer record ID. Either spektrId or reference.
+          enum:
+          - spektrId
+          - reference
+      required:
+      - id
+      - type
+    ClientRecordIds:
+      type: object
+      properties:
+        ids:
+          description: An array of spektr IDs and reference IDs. The type of the ID is specified in the type property.
+          example:
+            ids:
+            - id: spektr_id
+              type: spektrId
+            - id: reference_id
+              type: reference
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+      required:
+      - ids
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    RecordFormSubmitsResponse:
+      type: object
+      properties:
+        docs:
+          description: The form submits
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordFormSubmitResponse'
+    ProcessTriggerSource:
+      type: object
+      properties:
+        sourceType:
+          type: string
+          description: The source type that triggered the process
+          example: spektr_process
+          enum:
+          - spektr_process
+          - external
+          - manual
+          - unknown
+        processId:
+          type: string
+          description: The ID of the process (required for spektr_process source type)
+        userId:
+          type: string
+          description: The ID of the user who triggered the process (required for manual source type)
+        userName:
+          type: string
+          description: The name of the user who triggered the process (required for manual source type)
+      required:
+      - sourceType
+    UpdateInputV2:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+          description: Golden-record fields to merge into the customer. Optional when sending status. Must not be an empty object when provided.
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+          - archived
+          description: 'Workflow status: pending, approved, rejected, or archived. Optional when sending non-empty data.'
+        createdAt:
+          type: number
+          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
+        updatedAt:
+          type: number
+          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    UpdateInput:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+          description: A list of records, where each record represents an individual entry. Each record is a dictionary with specific key-value pairs. The value can be a string, number, boolean, or array of strings.
+        createdAt:
+          type: number
+          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
+        updatedAt:
+          type: number
+          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
+      required:
+      - data
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

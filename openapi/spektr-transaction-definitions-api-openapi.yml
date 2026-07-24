@@ -1,0 +1,197 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Transaction Definitions API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Transaction Definitions
+paths:
+  /v1/transaction-definitions:
+    post:
+      description: 'Create a new transaction definition with a nested field schema, customer link declarations, and optional non-client-scoped partitions. Leaf field values must be one of: "string", "number", "ipAddress", "date", "array". Array fields accept only primitive elements (string, number, boolean, null). Each link txPath and partition txPath must resolve to a declared leaf field (link and partition paths may not target array fields). Partition types must not collide with link types.'
+      operationId: TransactionDefinitionController_create_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              - type
+              - fields
+              - link
+              properties:
+                name:
+                  type: string
+                  example: payment-transaction
+                type:
+                  type: string
+                  description: Unique transaction type identifier
+                  example: payment
+                fields:
+                  type: object
+                  description: 'Nested structure where leaf values are "string", "number", "ipAddress", "date", or "array" (array elements must be primitives: string, number, boolean, or null)'
+                  example:
+                    amount: number
+                    currency: string
+                    sourceIp: ipAddress
+                    sender_iban: string
+                    recipient_iban: string
+                    tags: array
+                    location:
+                      city: string
+                      country: string
+                link:
+                  type: array
+                  description: How transactions of this type link to customers. At least one entry is required.
+                  minItems: 1
+                  maxItems: 16
+                  items:
+                    type: object
+                    required:
+                    - type
+                    - txPath
+                    - clientRecordPath
+                    - direction
+                    properties:
+                      type:
+                        type: string
+                        description: Stable label that identifies this link type (e.g. "iban", "spektrId")
+                        example: iban
+                      txPath:
+                        type: string
+                        description: Dot-notation path into the transaction payload that resolves to a leaf field declared in "fields"
+                        example: sender_iban
+                      clientRecordPath:
+                        type: string
+                        description: Declarative path on the client record this link matches (e.g. "data.iban", "_id")
+                        example: data.iban
+                      direction:
+                        type: string
+                        enum:
+                        - source
+                        - destination
+                        description: Which side of the transaction this link represents
+                        example: source
+                  example:
+                  - type: iban
+                    txPath: sender_iban
+                    clientRecordPath: data.iban
+                    direction: source
+                partitions:
+                  type: array
+                  description: Optional non-client-scoped aggregation partitions (e.g. device, IP). Each partition type must be distinct from every link type.
+                  maxItems: 16
+                  items:
+                    type: object
+                    required:
+                    - type
+                    - txPath
+                    properties:
+                      type:
+                        type: string
+                        description: Stable label that identifies this partition type. Must not collide with any link type.
+                        example: deviceId
+                      txPath:
+                        type: string
+                        description: Dot-notation path into the transaction payload that resolves to a leaf field declared in "fields"
+                        example: device_id
+                realTimeFields:
+                  type: array
+                  description: Optional whitelist of dot-notation paths into "fields". When present, only these fields are available for transaction monitoring rules. When absent, all declared fields are available.
+                  items:
+                    type: string
+                  example:
+                  - amount
+                  - currency
+      responses:
+        '201':
+          description: Transaction definition created successfully
+        '400':
+          description: Payload validation failed
+        '500':
+          description: Transaction definition creation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Create transaction definition
+      tags:
+      - Transaction Definitions
+  /v1/transaction-definitions/{id}:
+    delete:
+      description: Delete a transaction definition by ID.
+      operationId: TransactionDefinitionController_delete_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the transaction definition
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Transaction definition deleted successfully
+        '404':
+          description: Transaction definition with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Transaction definition deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Delete transaction definition
+      tags:
+      - Transaction Definitions
+components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

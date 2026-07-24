@@ -1,0 +1,282 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Events API API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Events API
+paths:
+  /v1/events:
+    get:
+      description: List all events
+      externalDocs:
+        description: Process Execution Webhooks Documentation
+        url: https://spektr.readme.io/reference/process-execution-webhooks
+      operationId: EventsController_list_v1
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Page number. Default is 1
+        schema:
+          type: number
+      - name: limit
+        required: false
+        in: query
+        description: Number of items per page. Default is 10. Min is 1. Max is 50
+        schema:
+          type: number
+      - name: delivered
+        required: false
+        in: query
+        description: Filter by delivery status
+        schema:
+          type: boolean
+      - name: createdBefore
+        required: false
+        in: query
+        description: Filter events created before timestamp (epoch, inclusive)
+        schema:
+          type: number
+      - name: createdAfter
+        required: false
+        in: query
+        description: Filter events created after timestamp (epoch, exclusive)
+        schema:
+          type: number
+      - name: sortBy
+        required: false
+        in: query
+        description: Field to sort by. Default is createdAt
+        schema:
+          enum:
+          - createdAt
+          type: string
+      - name: sortOrder
+        required: false
+        in: query
+        description: Sort order. Default is desc
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+      responses:
+        '200':
+          description: 'Returns a paginated list of events. Refer to the documentation for detailed event schemas: https://spektr.readme.io/reference/process-execution-webhooks'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    description: Array of event results. See external documentation for detailed event schema.
+                  totalResults:
+                    type: number
+                    description: Total number of results
+                  limit:
+                    type: number
+                    description: Number of items per page
+                  page:
+                    type: number
+                    nullable: true
+                    description: Current page number
+                  totalPages:
+                    type: number
+                    description: Total number of pages
+                  pagingCounter:
+                    type: number
+                    description: Current paging counter
+                  hasPrevPage:
+                    type: boolean
+                    description: Whether there is a previous page
+                  hasNextPage:
+                    type: boolean
+                    description: Whether there is a next page
+                  prevPage:
+                    type: number
+                    nullable: true
+                    description: Previous page number
+                  nextPage:
+                    type: number
+                    nullable: true
+                    description: Next page number
+      security:
+      - x-api-key: []
+      summary: List events
+      tags:
+      - Events API
+    post:
+      description: Imports a list of events
+      operationId: EventsController_import_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventsDto'
+            examples:
+              example:
+                value:
+                  events:
+                  - workspaceId: string
+                    spektrId: string
+                    eventData:
+                      changes:
+                      - type: street_updated
+                        field: street
+                        oldValue: s1
+                        newValue: s2
+                        changedBy: user
+                        note: optional random note
+                    type: recordUpdated
+      responses:
+        '201':
+          description: Events imported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsImportResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '500':
+          description: Events import failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Import events
+      tags:
+      - Events API
+components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    EventsImportResponse:
+      type: object
+      properties:
+        eventIds:
+          description: IDs of the created events, in the same order as the input.
+          example:
+          - 507f1f77bcf86cd799439011
+          - 507f1f77bcf86cd799439012
+          type: array
+          items:
+            type: string
+      required:
+      - eventIds
+    EventDto:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: The workspace ID.
+          nullable: true
+        spektrId:
+          type: string
+          description: The spektr ID, if available.
+          nullable: true
+        eventData:
+          type: object
+          description: The record of event data key/value properties
+          nullable: true
+        type:
+          type: string
+          description: The event type
+          nullable: true
+        createdAt:
+          type: number
+          description: Unix timestamp (milliseconds) that represents when the event was created
+        updatedAt:
+          type: number
+          description: Unix timestamp (milliseconds) that represents when the event was updated
+      required:
+      - workspaceId
+      - spektrId
+      - eventData
+      - type
+      - createdAt
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    EventsDto:
+      type: object
+      properties:
+        events:
+          example:
+          - workspaceId: string
+            spektrId: string
+            eventData:
+              changes:
+              - type: street_updated
+                field: street
+                oldValue: s1
+                newValue: s2
+                changedBy: user
+                note: optional random note
+            type: recordUpdated
+          description: The list of events to import
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDto'
+      required:
+      - events
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

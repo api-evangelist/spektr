@@ -1,0 +1,373 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Execution API API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Execution API
+paths:
+  /v1/execution:
+    post:
+      description: Excute a process for a list of spektr IDs. The processId can be found in the spektr platform. The spektr IDs are generated through the Import API.
+      operationId: ExecutionController_triggerProcess_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: Details needed to execute the process
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionInput'
+      responses:
+        '200':
+          description: Process excuted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Process trigger failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Execute process
+      tags:
+      - Execution API
+  /v2/execution:
+    post:
+      description: Execute a process for spektr IDs and/or reference IDs. Optionally provide email input and enable token refresh on version mismatch to ensure execution uses the latest process version.
+      operationId: ExecutionController_executionV2_v2
+      parameters: []
+      requestBody:
+        required: true
+        description: Details needed to execute the process. The ids can be a spektr ID or a reference ID. The type of the ID is specified in the type property.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionInputV2'
+      responses:
+        '200':
+          description: Process excuted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResponseV2'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Process trigger failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Execute process v2
+      tags:
+      - Execution API
+  /v3/execution:
+    post:
+      description: Execute a process for spektr IDs and/or reference IDs. Optionally provide email input and enable token refresh on version mismatch to ensure execution uses the latest process version.
+      operationId: ExecutionController_executionV3_v3
+      parameters: []
+      requestBody:
+        required: true
+        description: Details needed to execute the process. The ids can be a spektr ID or a reference ID. The type of the ID is specified in the type property.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionInputV3'
+      responses:
+        '200':
+          description: Process executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResponseV3'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Process trigger failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Execute process v3
+      tags:
+      - Execution API
+components:
+  schemas:
+    ExecutionResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The execution token
+          description: A record of spektr IDs and their corresponding execution tokens
+          example:
+            spektrId:
+              token: exec_token_1
+      required:
+      - data
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ClientRecordId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the customer record
+        type:
+          type: string
+          description: The type of the customer record ID. Either spektrId or reference.
+          enum:
+          - spektrId
+          - reference
+      required:
+      - id
+      - type
+    ExecutionInput:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        spektrIds:
+          description: An array spektr IDs
+          type: array
+          items:
+            type: string
+      required:
+      - processId
+      - spektrIds
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ExecutionInputV2:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        ids:
+          description: An array of spektr IDs and reference IDs
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+        refreshTokenOnVersionMismatch:
+          type: boolean
+          description: Whether to refresh the token on version mismatch
+        emailInput:
+          description: The email input
+          allOf:
+          - $ref: '#/components/schemas/EmailInput'
+      required:
+      - processId
+      - ids
+    ExecutionResponseV3:
+      type: object
+      properties:
+        data:
+          description: A list of execution results
+          example:
+          - id: '10307116'
+            token: exec_token
+            idType: reference
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionResponseDataItemV3'
+      required:
+      - data
+    ExecutionResponseV2:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The execution token
+              idType:
+                type: string
+                enum:
+                - spektrId
+                - reference
+                description: The type of ID
+          description: A record of spektr IDs and their corresponding execution tokens
+          example:
+            spektrId:
+              token: exec_token_1
+              idType: spektrId
+            reference:
+              token: exec_token_2
+              idType: reference
+      required:
+      - data
+    ExecutionResponseDataItemV3:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID
+        token:
+          type: string
+          description: The execution token
+        idType:
+          type: string
+          enum:
+          - spektrId
+          - reference
+          description: The type of ID
+      required:
+      - id
+      - idType
+    EmailInput:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email address
+        subject:
+          type: string
+          description: The email subject
+        body:
+          type: string
+          description: The email body
+      required:
+      - email
+    ExecutionInputV3:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        ids:
+          description: An array of spektr IDs and reference IDs
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+        refreshTokenOnVersionMismatch:
+          type: boolean
+          description: Whether to refresh the token on version mismatch
+        emailInput:
+          description: The email input
+          allOf:
+          - $ref: '#/components/schemas/EmailInput'
+      required:
+      - processId
+      - ids
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

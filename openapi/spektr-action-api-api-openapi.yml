@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Action API
+paths:
+  /v1/public/actions/processId/{processId}/workspaceId/{workspaceId}:
+    post:
+      description: 'Creates a new onboarding session for your client. You can optionally prefill client data by submitting a payload in the request body. The response includes a session token that you can append to the onboarding URL: https://actions.spektr.com/form?token={token} to direct your client to the onboarding flow. If using a custom domain, replace actions.spektr.com with your domain.'
+      operationId: ActionTicketController_createOnboarding_v1
+      parameters:
+      - name: processId
+        required: true
+        in: path
+        description: The ID of the onboarding process template
+        schema:
+          type: string
+      - name: workspaceId
+        required: true
+        in: path
+        description: The ID of your workspace
+        schema:
+          type: string
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.'
+        required: false
+        schema:
+          type: string
+      - name: x-spektr-block-until-ready
+        in: header
+        description: Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.
+        required: false
+        schema:
+          type: string
+      - name: reference
+        required: false
+        in: query
+        description: Your custom reference ID to track this onboarding session or it can be included in the data payload
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  description: Client information to prefill in the onboarding forms (optional)
+                  properties:
+                    first_name:
+                      type: string
+                      example: John
+                    last_name:
+                      type: string
+                      example: Doe
+                    email:
+                      type: string
+                      example: john.doe@example.com
+                    phone_number:
+                      type: string
+                      example: '+1234567890'
+                    reference:
+                      type: string
+                      example: '1234567890'
+                      description: Your custom reference ID to track this onboarding session
+      responses:
+        '201':
+          description: Onboarding session created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Session token to be used in the onboarding URL. This token is required for all subsequent API calls related to this onboarding session.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  availableLanguages:
+                    type: array
+                    description: Available translations
+                    example:
+                    - en-GB
+                    - da-DK
+                    - sv-SE
+                  spektrId:
+                    type: string
+                    description: Unique ID of the customer going through the onboarding process
+                    example: 68876fa58281009be64b58f7
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid input parameters
+                  error:
+                    type: string
+                    description: Error type
+                    example: Bad Request
+                  statusCode:
+                    type: number
+                    description: HTTP status code
+                    example: 400
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+      security:
+      - x-api-key: []
+      summary: Start Onboarding
+      tags:
+      - Action API
+components:
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

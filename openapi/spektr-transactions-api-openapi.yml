@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  title: Spektr Action API Transactions API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+tags:
+- name: Transactions
+paths:
+  /v1/transactions/batch:
+    post:
+      description: Ingests a batch of up to 1,000 transactions. Each transaction is validated against the workspace Transaction Definition for its type, linked to the relevant customer, persisted, and forwarded for transaction monitoring. Returns HTTP 200 regardless of per item outcome. Check the failed count and errors array in the response body.
+      operationId: TransactionsController_ingestBatch_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - transactions
+              properties:
+                transactions:
+                  type: array
+                  description: The list of transactions to ingest. Must contain between 1 and 1,000 items.
+                  minItems: 1
+                  maxItems: 1000
+                  items:
+                    type: object
+                    required:
+                    - type
+                    additionalProperties: true
+                    description: A single transaction in the batch. The three top level fields (type, transaction_id, transactionDate) are reserved by the platform. All other fields are validated dynamically against the Transaction Definition configured for the given type.
+                    properties:
+                      type:
+                        type: string
+                        minLength: 1
+                        description: The transaction type. Must match the name of a Transaction Definition configured in your workspace.
+                        example: payment
+                      transaction_id:
+                        type: string
+                        minLength: 1
+                        description: Your stable identifier for this transaction. Used for upsert deduplication. If a transaction with this ID already exists it is updated rather than duplicated. If omitted, the platform generates a random UUID and the transaction cannot be idempotently resubmitted.
+                        example: txn_abc123
+                      transactionDate:
+                        type: number
+                        description: Unix timestamp in milliseconds representing when the transaction occurred. Used for ordered rolling history in aggregation rules.
+                        example: 1748512800000
+            examples:
+              payment:
+                summary: Payment transaction
+                value:
+                  transactions:
+                  - type: payment
+                    transaction_id: txn_abc123
+                    transactionDate: 1748512800000
+                    amount: 1500
+                    currency: EUR
+                    source_account:
+                      iban: DE89370400440532013000
+                    destination_account:
+                      iban: GB29NWBK60161331926819
+                  - type: payment
+                    transaction_id: txn_def456
+                    transactionDate: 1748516400000
+                    amount: 250
+                    currency: USD
+                    source_account:
+                      iban: FR7630006000011234567890189
+                    destination_account:
+                      iban: ES9121000418450200051332
+      responses:
+        '200':
+          description: Batch processed. Check failed and errors for per item rejections. A nonzero failed count does not change the HTTP status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - failed
+                - errors
+                properties:
+                  success:
+                    type: integer
+                    minimum: 0
+                    description: Number of transactions successfully ingested and forwarded for processing.
+                    example: 1
+                  failed:
+                    type: integer
+                    minimum: 0
+                    description: Number of transactions that could not be ingested. Equal to errors.length.
+                    example: 1
+                  errors:
+                    type: array
+                    description: Per item error details for every transaction that failed. Empty when all transactions succeeded.
+                    items:
+                      type: object
+                      required:
+                      - index
+                      - type
+                      - transactionId
+                      - errorType
+                      - message
+                      description: Describes a single transaction that could not be ingested.
+                      properties:
+                        index:
+                          type: integer
+                          minimum: 0
+                          description: Position of the failed transaction in the input transactions array, starting at 0.
+                          example: 1
+                        type:
+                          type: string
+                          description: The type field of the failed transaction.
+                          example: payment
+                        transactionId:
+                          type: string
+                          description: The resolved transaction ID. Either the transaction_id from the request or the UUID assigned when transaction_id was omitted.
+                          example: txn_def456
+                        errorType:
+                          type: string
+                          description: 'definition_not_found: no Transaction Definition for this type. field_validation: payload does not match the definition field schema; message is a JSON map of dotted paths to errors. missing_link: link fields in the payload are missing or empty so no customer could be resolved. persist_failed: validation passed but the record could not be saved. forward_failed: saved but could not be queued for monitoring. other: unexpected failure for this item; see message and retry.'
+                          enum:
+                          - definition_not_found
+                          - field_validation
+                          - missing_link
+                          - persist_failed
+                          - forward_failed
+                          - other
+                          example: persist_failed
+                        message:
+                          type: string
+                          description: Description of the failure. For field_validation errors this includes a JSON object of dotted field paths mapped to their validation messages.
+                          example: Failed to persist transaction
+              examples:
+                allAccepted:
+                  summary: All transactions accepted
+                  value:
+                    success: 2
+                    failed: 0
+                    errors: []
+                mixedBatch:
+                  summary: Mixed batch with one persistence failure
+                  value:
+                    success: 1
+                    failed: 1
+                    errors:
+                    - index: 1
+                      type: payment
+                      transactionId: txn_def456
+                      errorType: persist_failed
+                      message: Failed to persist transaction
+                unknownTransactionType:
+                  summary: Unknown transaction type
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: definition_not_found
+                      message: No transaction definition found for type "wire"
+                invalidFields:
+                  summary: Invalid payload fields
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: field_validation
+                      message: 'Validation failed: {"amount":"Expected number, received string"}'
+                unlinkedCustomer:
+                  summary: Customer link not resolved
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: missing_link
+                      message: No link values could be resolved from the payload
+                queueFailure:
+                  summary: Monitoring queue failure
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: forward_failed
+                      message: 'Failed to forward transaction: queue unavailable'
+                unexpectedError:
+                  summary: Unexpected processing error
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: other
+                      message: 'Unexpected error processing transaction: timeout'
+        '400':
+          description: Request body failed structural validation (for example transactions array is missing, empty, exceeds 1,000 items, or an item is missing the required type field).
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - message
+                - statusCode
+                properties:
+                  message:
+                    type: string
+                    description: Description of the validation failure.
+                    example: Batch must contain at least one transaction
+                  statusCode:
+                    type: number
+                    example: 400
+        '500':
+          description: Unexpected server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Ingest transaction batch
+      tags:
+      - Transactions
+components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.
