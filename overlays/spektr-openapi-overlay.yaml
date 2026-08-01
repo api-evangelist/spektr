@@ -1,0 +1,18 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Spektr API
+  version: 1.0.0
+extends: openapi/spektr-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-enriched: '2026-07-21'
+    x-apievangelist-provider: spektr
+    x-apievangelist-auth: x-api-key (apiKey, header)
+    x-apievangelist-idempotency: idempotency-key header, 24h retention
+    x-apievangelist-webhooks: HMAC-signed batched process-execution webhooks
+    x-apievangelist-environments: [live, sandbox, test]
+    x-apievangelist-notes: >-
+      Spektr is an AI-powered compliance automation platform (KYB/KYC onboarding,
+      monitoring, transaction monitoring) for financial institutions. Spec
+      assembled from Spektr's ReadMe per-operation OpenAPI fragments.

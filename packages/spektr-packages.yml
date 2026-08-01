@@ -1,0 +1,18 @@
+generated: '2026-07-21'
+method: searched
+source: https://spektr.readme.io/docs/getting-started
+notes: >-
+  Spektr publishes a first-party JavaScript client SDK, @spektr/client-sdk. It is
+  distributed through Spektr's private AWS CodeArtifact repository (not the public
+  npm registry - registry.npmjs.org returns 404), so installation requires
+  authenticating to CodeArtifact. Marked official because it is documented in
+  Spektr's own SDK guide.
+packages:
+- language: javascript
+  registry: aws-codeartifact
+  name: "@spektr/client-sdk"
+  url: https://spektr.readme.io/docs/getting-started
+  install: npm install @spektr/client-sdk
+  public: false
+  official: true
+  notes: Requires AWS CodeArtifact auth (aws codeartifact login --domain spektr --repository spektr-npm); read-only access, token expires after 12h.

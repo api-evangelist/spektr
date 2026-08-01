@@ -1,0 +1,23 @@
+generated: '2026-07-21'
+method: probed
+notes: >-
+  Probed the standard /.well-known/ discovery surface on the website and API hosts.
+  No documents were served (website returns 404, API hosts are behind a WAF and
+  return 403). Absence is valid recorded data; no WellKnown/SecurityTxt pointer is
+  emitted because nothing returned 200.
+hosts:
+- host: https://www.spektr.com
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://api.spektr.com
+  documents:
+  - {path: /.well-known/security.txt, status: 403}
+  - {path: /.well-known/openid-configuration, status: 403}
+  - {path: /.well-known/oauth-authorization-server, status: 403}
+- host: https://ingest.spektr.com
+  documents:
+  - {path: /.well-known/security.txt, status: 403}

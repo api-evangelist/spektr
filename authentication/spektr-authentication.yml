@@ -1,0 +1,22 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/spektr-openapi.yml
+docs: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+notes: >-
+  Spektr uses a single API-key scheme. Keys are generated in the developer
+  dashboard (Settings) and sent on every request in the x-api-key header.
+  Keys are workspace-scoped. Webhook deliveries are separately authenticated
+  with an HMAC secret (see conventions/ and asyncapi/).
+schemes:
+- name: x-api-key
+  type: apiKey
+  in: header
+  parameter: x-api-key
+  description: You can generate API keys in settings from the developer dashboard.
+  sources:
+  - openapi/spektr-openapi.yml

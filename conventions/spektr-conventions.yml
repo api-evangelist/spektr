@@ -1,0 +1,57 @@
+generated: '2026-07-21'
+method: searched
+source: https://spektr.readme.io/
+docs:
+  idempotency: https://spektr.readme.io/docs/idempotent-requests
+  environments: https://spektr.readme.io/docs/environments
+  webhooks: https://spektr.readme.io/reference/about-webhooks
+  hmac: https://spektr.readme.io/docs/webhook-hmac-signature-verification
+authentication:
+  style: api-key
+  header: x-api-key
+  see: authentication/spektr-authentication.yml
+idempotency:
+  supported: true
+  header: idempotency-key
+  scope: "(idempotency-key, workspaceId)"
+  key_format: any string up to 255 chars; V4 UUID recommended
+  retention: 24h (keys pruned 24 hours after creation)
+  replay_signal: "response header `idempotent-replayed: true` on replayed responses"
+  mismatch: 422 Unprocessable Entity when same key is reused with different request parameters
+  in_flight_conflict: 409 while a request with the same key is still processing
+  fingerprint: HTTP method + path + query parameters + body
+  supported_operations:
+  - openapi/spektr-openapi.yml#DataImportController_create_v1
+  - openapi/spektr-openapi.yml#DataImportController_update_v1
+  - openapi/spektr-openapi.yml#ActionTicketController_createOnboarding_v1
+pagination:
+  style: page-number
+  params: [page, limit, sortBy, sortOrder]
+  time_filters: [createdAfter, createdBefore, updatedAfter, updatedBefore]
+  bulk:
+    api_endpoint_max: 5000 records returned inline
+    s3_endpoint_max: 300000 records, chunked into signed S3 files of max 10000 records each
+versioning:
+  scheme: uri-path
+  current: v3 (v1, v2, v3 coexist per resource)
+  notes: New capabilities are shipped as new version-prefixed paths; older versions remain until deprecated.
+  see: lifecycle/spektr-lifecycle.yml
+request_tracing:
+  block_until_ready_header: x-spektr-block-until-ready
+error_envelope:
+  format: custom
+  shape: '{ "message": string, "errorCode": string }'
+  content_type: application/json
+  notes: Not RFC 9457 problem+json; a flat message/errorCode object.
+  see: errors/spektr-problem-types.yml
+webhooks:
+  delivery: HTTPS POST (or Slack), Content-Type application/json
+  batching: events delivered in a `results[]` array; process each entry independently
+  security: HMAC signature headers (secret generated per workspace in Export Settings)
+  retries: 3 retries at 1s intervals on non-200 response
+  guarantee: at-least-once delivery
+  see: asyncapi/spektr-webhooks.yml
+rate_limits:
+  note: Webhook delivery rate is configurable per webhook in platform settings. Sandbox/Test environments are throttled. No published numeric API request rate limits.
+files:
+  workflow: Presigned S3 URLs (expire 1 hour); V3 endpoints support deferred file upload (submit -> S3 upload -> confirm).

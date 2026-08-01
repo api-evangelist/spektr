@@ -1,0 +1,30 @@
+{
+  "provider": "spektr",
+  "sources": [
+    "spektr-action-api-api-openapi.yml",
+    "spektr-events-api-api-openapi.yml",
+    "spektr-execution-api-api-openapi.yml",
+    "spektr-import-api-api-openapi.yml",
+    "spektr-orchestration-api-api-openapi.yml",
+    "spektr-records-api-api-openapi.yml",
+    "spektr-transaction-definitions-api-openapi.yml",
+    "spektr-transactions-api-openapi.yml",
+    "spektr-workspace-fields-api-api-openapi.yml"
+  ],
+  "outputs": [
+    "spektr-action-api-api-openapi.yml",
+    "spektr-events-api-api-openapi.yml",
+    "spektr-execution-api-api-openapi.yml",
+    "spektr-import-api-api-openapi.yml",
+    "spektr-orchestration-api-api-openapi.yml",
+    "spektr-records-api-api-openapi.yml",
+    "spektr-transaction-definitions-api-openapi.yml",
+    "spektr-transactions-api-openapi.yml",
+    "spektr-workspace-fields-api-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

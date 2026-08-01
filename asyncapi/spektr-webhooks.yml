@@ -1,0 +1,46 @@
+generated: '2026-07-21'
+method: searched
+source: https://spektr.readme.io/reference/process-execution-webhooks
+spec_type: Webhooks
+summary: >-
+  Spektr delivers process-execution and customer-lifecycle events as HMAC-signed
+  webhook batches. Subscribers register a webhook URL (HTTPS push or Slack) in
+  Settings and select which event types they receive per process type. There is
+  no published AsyncAPI document; this is the derived webhook event catalog.
+delivery:
+  transport: HTTPS POST (or Slack notification)
+  content_type: application/json
+  envelope: '{ "results": [ { id, workspaceId, eventType, timestamp, spektrId, data } ] }'
+  batching: multiple events per request in results[]; process each independently
+  security: HMAC signature headers; per-workspace secret generated in Export Settings; Key ID for rotation
+  retries: 3 retries at 1s intervals on non-200
+  guarantee: at-least-once delivery
+  rate_limit: configurable per webhook
+configuration:
+  where: Settings -> Developer -> Export settings
+  selectivity: subscribe per process type and choose timing (end-of-execution vs at-generation)
+events:
+- {type: PROCESS_RUN_START, description: A process starts running, status: available}
+- {type: LOOP_RUN_START, description: A loop starts running, status: available}
+- {type: PROCESS_RUN_END, description: A process finishes running, status: available}
+- {type: SERVICE_RUN, description: A service response is received, status: available}
+- {type: ALERT_ESCALATED, description: An alert is created, status: available}
+- {type: ALERT_RESOLVED, description: An alert is resolved, status: available}
+- {type: CUSTOMER_TAG_ADDED, description: A tag is added to a customer, status: available}
+- {type: CUSTOMER_TAG_REMOVED, description: A tag is removed from a customer, status: available}
+- {type: CUSTOMER_STATUS_CHANGE, description: Customer status changes, status: available, deprecated: true}
+- {type: CUSTOMER_STATUS_CHANGED, description: Customer status changes, status: available}
+- {type: CUSTOMER_DUPLICATE_DETECTION, description: A customer is found as duplicate, status: available}
+- {type: CUSTOMER_RECORD_UPDATE, description: A customer receives an external update, status: available, deprecated: true}
+- {type: CUSTOMER_RECORD_CHANGED, description: A customer receives an update, status: available}
+- {type: OWNERSHIP_AI_CREATED, description: A customer is created by AI discovery, status: available}
+- {type: OWNERSHIP_AI_ADDED_OWNER, description: An owner is added in the connection graph via AI discovery, status: available}
+- {type: CLIENT_RECORD_SYNC, description: An imported customer through a connector is synced, status: available}
+- {type: STEP_INIT, description: A form is rendered in the form editor, status: available}
+- {type: STEP_SUBMIT, description: A form is submitted in the form editor, status: available}
+inbound_events:
+  note: >-
+    Spektr also ingests customer transaction events (e.g. paymentMade) via
+    POST /v1/events for transaction monitoring - see openapi EventsController_import_v1
+    and the paymentMade schema.
+  paymentMade: https://spektr.readme.io/reference/paymentmade-schema-definition

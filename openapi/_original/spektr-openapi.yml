@@ -1,0 +1,5561 @@
+openapi: 3.0.0
+info:
+  title: Spektr API
+  description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets
+    and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace
+    field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
+  version: v2.23
+servers:
+- url: https://ingest.spektr.com
+paths:
+  /v1/data:
+    post:
+      description: Create a new dataset with a specified schema that allows to be used in processes. The schema defines the
+        structure of data entries. Once created, the dataset becomes available in the platform and can be connected to spektr
+        processes. Optionally, provide a "parentDatasetId" to create the dataset as a child of an existing dataset, used for
+        related entities.
+      operationId: DataImportController_create_v1
+      parameters:
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is
+          sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed:
+          true` header.'
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportCreateInput'
+            examples:
+              example:
+                value:
+                  name: dataset name
+                  dataType:
+                    first_name: string
+                    age: number
+                    passport: file
+      responses:
+        '201':
+          description: Dataset created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataImportResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+        '500':
+          description: Dataset creation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Create dataset
+      tags:
+      - Import API
+  /v1/data/{datasetId}:
+    put:
+      description: 'This endpoint allows clients to submit data entries for a dataset, including fields that require file
+        uploads. When a data entry includes a file field (e.g., "passport": "file.jpg"), the API responds with a unique id
+        for the entry and a presigned URL for uploading the file directly to AWS S3.
+
+
+        Upsert by "reference": records are matched to existing client records only by their "reference". If a data entry includes
+        a "reference" that already exists in the workspace, that record is updated in place and keeps its original "spektrId";
+        otherwise a new record is created with a newly generated "spektrId". A "reference" must be a non-empty string, cannot
+        be the literal value "root", and must be unique across the workspace — duplicate references (repeated within the same
+        batch or already assigned to another record) are rejected with 409 Conflict. Entries sent without a "reference" are
+        always created as new.'
+      operationId: DataImportController_update_v1
+      parameters:
+      - name: datasetId
+        required: true
+        in: path
+        description: The ID of the dataset
+        schema:
+          type: string
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is
+          sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed:
+          true` header.'
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The request body should be a JSON object containing a "data" array. Each item in the array represents
+          a data entry and should include fields as defined in your dataset schema ("first_name", "age", "passport") or workspace
+          fields. For file fields like "passport", include the key with a string value. Each item may also include an optional
+          top-level "reference" string. The "reference" field is reserved and may be sent even if it is not declared in the
+          dataset schema; it is always accepted and stored. Any other field that is not part of the dataset schema or workspace
+          fields is rejected.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataUpdateInput'
+            examples:
+              example:
+                value:
+                  data:
+                  - first_name: John
+                    last_name: Doe
+                    email: john.doe@email.com
+                    passport: passport.jpg
+                  - first_name: Jane
+                    last_name: Smith
+                    email: jane.smt@email.com
+      responses:
+        '201':
+          description: Entries created successfuly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUpdateResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Dataset with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+        '500':
+          description: Dataset update failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Import records
+      tags:
+      - Import API
+    delete:
+      description: Delete a dataset from the platform.
+      operationId: DataImportController_delete_v1
+      parameters:
+      - name: datasetId
+        required: true
+        in: path
+        description: The ID of the dataset
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Dataset deleted successfully
+        '404':
+          description: Dataset with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Dataset is currently used by a process and cannot be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataConflictError'
+        '500':
+          description: Dataset deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Delete dataset
+      tags:
+      - Import API
+  /v1/record/listOpenLoops:
+    post:
+      description: Get process pending runs for a given list of spektr IDs and/or reference IDs.
+      operationId: RecordController_listOpenLoops_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: An object containing an array of spektr IDs and reference IDs.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRecordIds'
+      responses:
+        '200':
+          description: Process runs fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessRunResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process runs not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Get pending process runs
+      tags:
+      - Records API
+  /v1/record/{spektrId}:
+    get:
+      description: Fetch a customer record by its spektr ID
+      operationId: RecordController_fetchRecord_v1
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The spektr ID of the customer record
+        schema:
+          type: string
+      - name: appendEntities
+        required: false
+        in: query
+        description: Appends the ownership graph entities to the response
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Customer record fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+      security:
+      - x-api-key: []
+      summary: Fetch customer record
+      tags:
+      - Records API
+    patch:
+      description: Update a customer record by its spektr ID
+      operationId: RecordController_updateRecord_v1
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The ID of the customer record
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The data to update the customer record with. Optional createdAt/updatedAt (Unix ms) are applied only
+          when they differ from stored values.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInput'
+      responses:
+        '200':
+          description: Customer record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+        '400':
+          description: Payload validation or parsing failed, or attempted to update restricted fields
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Customer record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Reference already exists; must be unique across client records
+      security:
+      - x-api-key: []
+      summary: Update customer record
+      tags:
+      - Records API
+  /v2/record/{spektrId}:
+    patch:
+      description: Update a customer record by its spektr ID. The ID can be a spektr ID or a reference ID. The type of the
+        ID is specified in the type query parameter. Provide at least one of a non-empty data object, status, or a timestamp
+        field (createdAt / updatedAt in Unix ms).
+      operationId: RecordController_updateRecordV2_v2
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The ID of the customer record
+        schema:
+          type: string
+      - name: type
+        required: true
+        in: query
+        description: The type of the customer record id. Either spektrId or reference
+        schema:
+          enum:
+          - spektrId
+          - reference
+          type: string
+      requestBody:
+        required: true
+        description: 'Fields to update: optional golden-record data, optional workflow status, optional createdAt/updatedAt
+          (Unix ms; applied only when changed).'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInputV2'
+      responses:
+        '200':
+          description: Customer record updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+        '400':
+          description: Payload validation or parsing failed, or attempted to update restricted fields
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Customer record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '409':
+          description: Reference already exists; must be unique across client records
+      security:
+      - x-api-key: []
+      summary: Update customer record v2
+      tags:
+      - Records API
+  /v1/record/reference/{reference}:
+    get:
+      description: "Fetch a customer record by a client reference. \n\nUsage: \n - on the first onboarding init request, pass\
+        \ the reference in the data\n - whenever the spektrId is needed, use this endpoint to fetch the \n   record using\
+        \ your reference"
+      operationId: RecordController_fetchRecordByReference_v1
+      parameters:
+      - name: reference
+        required: true
+        in: path
+        description: The customer reference
+        schema:
+          type: string
+      - name: appendFiles
+        required: false
+        in: query
+        description: Appends the presigned file URLs to the response
+        schema:
+          type: boolean
+      - name: appendEntities
+        required: false
+        in: query
+        description: Appends the ownership graph entities to the response
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Customer record fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordResponse'
+      security:
+      - x-api-key: []
+      summary: Fetch customer record by reference
+      tags:
+      - Records API
+  /v1/record/{spektrId}/timeline:
+    get:
+      description: Get form submits for a given record by its ID. If the ID is not found, an empty array is returned.
+      operationId: RecordController_getClientRecordFormSubmits_v1
+      parameters:
+      - name: spektrId
+        required: true
+        in: path
+        description: The ID of the customer record
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Customer form submits fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordFormSubmitsResponse'
+      security:
+      - x-api-key: []
+      summary: Get form submits for a given record
+      tags:
+      - Records API
+  /v1/record/bulk/fetch/api:
+    get:
+      description: Fetch multiple customer records and return them directly in the API response. Optimized for smaller datasets.
+        Max 5000 records at a time
+      operationId: RecordController_fetchRecordsApi_v1
+      parameters:
+      - name: createdAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created after this date
+        schema:
+          type: number
+      - name: createdBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created before this date
+        schema:
+          type: number
+      - name: updatedAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated after this date
+        schema:
+          type: number
+      - name: updatedBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated before this date
+        schema:
+          type: number
+      - name: maxCount
+        required: true
+        in: query
+        description: Maximum number of records to fetch (limited to 5000)
+        schema:
+          type: number
+      - name: token
+        required: false
+        in: query
+        description: Pagination token for cursor-based pagination. Use the token from the response to fetch the next page
+          of results.
+        schema:
+          example: 1769448798254_6977a55d0507d9fe9c85a90f
+          type: string
+      responses:
+        '200':
+          description: Returns records array with customer data directly in the response. Includes a token field for pagination
+            if more records are available.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordsResponse'
+      security:
+      - x-api-key: []
+      summary: Fetch records in bulk via API
+      tags:
+      - Records API
+  /v1/record/bulk/fetch/s3:
+    get:
+      description: Fetch multiple customer records and return signed URLs to download them from S3. Handles large datasets
+        by chunking data into multiple files. Max 300,000 records at a time. Data will be split into files of max 10,000 records.
+      operationId: RecordController_fetchRecordsS3_v1
+      parameters:
+      - name: createdAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created after this date
+        schema:
+          type: number
+      - name: createdBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records created before this date
+        schema:
+          type: number
+      - name: updatedAfter
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated after this date
+        schema:
+          type: number
+      - name: updatedBefore
+        required: false
+        in: query
+        description: Unix timestamp (milliseconds) to fetch records updated before this date
+        schema:
+          type: number
+      - name: maxCount
+        required: true
+        in: query
+        description: Maximum number of records to fetch (up to 300,000).
+        schema:
+          type: number
+      - name: token
+        required: false
+        in: query
+        description: Pagination token for cursor-based pagination. Use the token from the response to fetch the next page
+          of results.
+        schema:
+          example: 1769448798254_6977a55d0507d9fe9c85a90f
+          type: string
+      responses:
+        '200':
+          description: Returns an array of presigned S3 URLs for downloading record chunks as JSON files
+          content:
+            application/json:
+              schema:
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          description: Presigned URL to download the file
+                  token:
+                    type: string
+                    description: Pagination token for fetching the next page of results. Present only when more records are
+                      available.
+      security:
+      - x-api-key: []
+      summary: Fetch records in bulk via S3
+      tags:
+      - Records API
+  /v1/record/relations:
+    post:
+      description: 'Links two or more client records together (e.g. a company and its beneficial owners). Pass an array of
+        relation items where each side (`from`, `to`) is identified by `spektrId` or `reference`. Each item must specify `relationRole`
+        (one of the supported role keys such as `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`, `senior_management`,
+        `board_of_directors`, `controlling_entities`, `subsidiaries`, `authorized_signatories`, `signatories`, `contact_info`,
+        `person_with_significant_control`) and may include optional `data` metadata, `positions`, and a `direct` boolean.
+        The legacy `roles` array is no longer accepted - send `relationRole` directly instead. The request is atomic: all
+        relations are created together or none are, if any validation fails. Validation rules: both records must exist, `from`
+        and `to` cannot be the same record, duplicate relations are rejected, and the resulting graph must remain acyclic.'
+      operationId: RecordController_createClientRecordRelations_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: Array of relations to create
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateClientRecordRelationItemDto'
+      responses:
+        '201':
+          description: Relations created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateClientRecordRelationsResponseDto'
+        '400':
+          description: Payload validation failed or business rule violated (e.g. missing record, invalid role, cycle, from
+            === to)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+      security:
+      - x-api-key: []
+      summary: Create client record relations
+      tags:
+      - Records API
+    patch:
+      description: Updates mutable fields on existing v2 client record relations identified by `(from, to, relationRole)`.
+        Only `direct`, `positions`, and `data` may be modified; `from`, `to`, `relationRole`, `createdAt`, and `updatedAt`
+        are immutable. The `data` field is shallow-merged with the stored value (provided keys overwrite, existing unspecified
+        keys are preserved). Each item must include at least one of `direct`, `positions`, or `data`. All relations in the
+        batch are verified to exist before any updates are applied; if any relation is missing, the entire request is rejected
+        without persisting changes. Updates then run sequentially (best-effort after verification).
+      operationId: RecordController_updateClientRecordRelations_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: Array of relations to update
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateClientRecordRelationItemDto'
+      responses:
+        '200':
+          description: Relations updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateClientRecordRelationsResponseDto'
+        '400':
+          description: Payload validation failed or business rule violated (e.g. relation not found, duplicate key within
+            the payload, no update fields provided, from === to, invalid role)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+      security:
+      - x-api-key: []
+      summary: Update client record relations
+      tags:
+      - Records API
+  /v1/record/vendor-searches/{vendorSearchId}:
+    get:
+      description: Fetch the raw, unmodified response of a single vendor search (e.g. a Kyckr lookup) by its ID. The `vendorSearchId`
+        is the reference carried on the customer's timeline service-run events and outbound webhook payloads.
+      operationId: RecordController_getVendorSearch_v1
+      parameters:
+      - name: vendorSearchId
+        required: true
+        in: path
+        description: The ID of the vendor search to fetch
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Vendor search fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSearchResponse'
+        '404':
+          description: Vendor search not found for this customer record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Fetch a vendor search
+      tags:
+      - Records API
+  /v1/execution:
+    post:
+      description: Excute a process for a list of spektr IDs. The processId can be found in the spektr platform. The spektr
+        IDs are generated through the Import API.
+      operationId: ExecutionController_triggerProcess_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: Details needed to execute the process
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionInput'
+      responses:
+        '200':
+          description: Process excuted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Process trigger failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Execute process
+      tags:
+      - Execution API
+  /v2/execution:
+    post:
+      description: Execute a process for spektr IDs and/or reference IDs. Optionally provide email input and enable token
+        refresh on version mismatch to ensure execution uses the latest process version.
+      operationId: ExecutionController_executionV2_v2
+      parameters: []
+      requestBody:
+        required: true
+        description: Details needed to execute the process. The ids can be a spektr ID or a reference ID. The type of the
+          ID is specified in the type property.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionInputV2'
+      responses:
+        '200':
+          description: Process excuted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResponseV2'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Process trigger failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Execute process v2
+      tags:
+      - Execution API
+  /v3/execution:
+    post:
+      description: Execute a process for spektr IDs and/or reference IDs. Optionally provide email input and enable token
+        refresh on version mismatch to ensure execution uses the latest process version.
+      operationId: ExecutionController_executionV3_v3
+      parameters: []
+      requestBody:
+        required: true
+        description: Details needed to execute the process. The ids can be a spektr ID or a reference ID. The type of the
+          ID is specified in the type property.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionInputV3'
+      responses:
+        '200':
+          description: Process executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResponseV3'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '404':
+          description: Process with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Process trigger failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Execute process v3
+      tags:
+      - Execution API
+  /v1/public/actions/processId/{processId}/workspaceId/{workspaceId}:
+    post:
+      description: 'Creates a new onboarding session for your client. You can optionally prefill client data by submitting
+        a payload in the request body. The response includes a session token that you can append to the onboarding URL: https://actions.spektr.com/form?token={token}
+        to direct your client to the onboarding flow. If using a custom domain, replace actions.spektr.com with your domain.'
+      operationId: ActionTicketController_createOnboarding_v1
+      parameters:
+      - name: processId
+        required: true
+        in: path
+        description: The ID of the onboarding process template
+        schema:
+          type: string
+      - name: workspaceId
+        required: true
+        in: path
+        description: The ID of your workspace
+        schema:
+          type: string
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is
+          sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed:
+          true` header.'
+        required: false
+        schema:
+          type: string
+      - name: x-spektr-block-until-ready
+        in: header
+        description: Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before
+          responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.
+        required: false
+        schema:
+          type: string
+      - name: reference
+        required: false
+        in: query
+        description: Your custom reference ID to track this onboarding session or it can be included in the data payload
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  description: Client information to prefill in the onboarding forms (optional)
+                  properties:
+                    first_name:
+                      type: string
+                      example: John
+                    last_name:
+                      type: string
+                      example: Doe
+                    email:
+                      type: string
+                      example: john.doe@example.com
+                    phone_number:
+                      type: string
+                      example: '+1234567890'
+                    reference:
+                      type: string
+                      example: '1234567890'
+                      description: Your custom reference ID to track this onboarding session
+      responses:
+        '201':
+          description: Onboarding session created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Session token to be used in the onboarding URL. This token is required for all subsequent
+                      API calls related to this onboarding session.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  availableLanguages:
+                    type: array
+                    description: Available translations
+                    example:
+                    - en-GB
+                    - da-DK
+                    - sv-SE
+                  spektrId:
+                    type: string
+                    description: Unique ID of the customer going through the onboarding process
+                    example: 68876fa58281009be64b58f7
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid input parameters
+                  error:
+                    type: string
+                    description: Error type
+                    example: Bad Request
+                  statusCode:
+                    type: number
+                    description: HTTP status code
+                    example: 400
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+      security:
+      - x-api-key: []
+      summary: Start Onboarding
+      tags:
+      - Action API
+  /v1/events:
+    get:
+      description: List all events
+      externalDocs:
+        description: Process Execution Webhooks Documentation
+        url: https://spektr.readme.io/reference/process-execution-webhooks
+      operationId: EventsController_list_v1
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: Page number. Default is 1
+        schema:
+          type: number
+      - name: limit
+        required: false
+        in: query
+        description: Number of items per page. Default is 10. Min is 1. Max is 50
+        schema:
+          type: number
+      - name: delivered
+        required: false
+        in: query
+        description: Filter by delivery status
+        schema:
+          type: boolean
+      - name: createdBefore
+        required: false
+        in: query
+        description: Filter events created before timestamp (epoch, inclusive)
+        schema:
+          type: number
+      - name: createdAfter
+        required: false
+        in: query
+        description: Filter events created after timestamp (epoch, exclusive)
+        schema:
+          type: number
+      - name: sortBy
+        required: false
+        in: query
+        description: Field to sort by. Default is createdAt
+        schema:
+          enum:
+          - createdAt
+          type: string
+      - name: sortOrder
+        required: false
+        in: query
+        description: Sort order. Default is desc
+        schema:
+          enum:
+          - asc
+          - desc
+          type: string
+      responses:
+        '200':
+          description: 'Returns a paginated list of events. Refer to the documentation for detailed event schemas: https://spektr.readme.io/reference/process-execution-webhooks'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    description: Array of event results. See external documentation for detailed event schema.
+                  totalResults:
+                    type: number
+                    description: Total number of results
+                  limit:
+                    type: number
+                    description: Number of items per page
+                  page:
+                    type: number
+                    nullable: true
+                    description: Current page number
+                  totalPages:
+                    type: number
+                    description: Total number of pages
+                  pagingCounter:
+                    type: number
+                    description: Current paging counter
+                  hasPrevPage:
+                    type: boolean
+                    description: Whether there is a previous page
+                  hasNextPage:
+                    type: boolean
+                    description: Whether there is a next page
+                  prevPage:
+                    type: number
+                    nullable: true
+                    description: Previous page number
+                  nextPage:
+                    type: number
+                    nullable: true
+                    description: Next page number
+      security:
+      - x-api-key: []
+      summary: List events
+      tags:
+      - Events API
+    post:
+      description: Imports a list of events
+      operationId: EventsController_import_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventsDto'
+            examples:
+              example:
+                value:
+                  events:
+                  - workspaceId: string
+                    spektrId: string
+                    eventData:
+                      changes:
+                      - type: street_updated
+                        field: street
+                        oldValue: s1
+                        newValue: s2
+                        changedBy: user
+                        note: optional random note
+                    type: recordUpdated
+      responses:
+        '201':
+          description: Events imported successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsImportResponse'
+        '400':
+          description: Payload validation or parsing failed
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '500':
+          description: Events import failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Import events
+      tags:
+      - Events API
+  /v2/public/actions/processId/{processId}/workspaceId/{workspaceId}:
+    post:
+      description: 'Creates a new onboarding session for your client. You can optionally prefill client data by submitting
+        a payload in the request body. The response includes a session token that you can append to the onboarding URL: https://actions.spektr.com/form?token={token}
+        to direct your client to the onboarding flow. If using a custom domain, replace actions.spektr.com with your domain.'
+      operationId: OrchestrationController_createOnboarding_v2
+      parameters:
+      - name: processId
+        required: true
+        in: path
+        description: The ID of the onboarding process template
+        schema:
+          type: string
+      - name: workspaceId
+        required: true
+        in: path
+        description: The ID of your workspace
+        schema:
+          type: string
+      - name: x-spektr-block-until-ready
+        required: false
+        in: header
+        description: Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before
+          responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.
+        schema:
+          type: string
+      - name: idempotency-key
+        in: header
+        description: 'Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is
+          sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed:
+          true` header.'
+        required: false
+        schema:
+          type: string
+      - name: reference
+        required: false
+        in: query
+        description: Your custom reference ID to track this onboarding session or it can be included in the data payload
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  description: Client information to prefill in the onboarding forms (optional)
+                  properties:
+                    first_name:
+                      type: string
+                      example: John
+                    last_name:
+                      type: string
+                      example: Doe
+                    email:
+                      type: string
+                      example: john.doe@example.com
+                    phone_number:
+                      type: string
+                      example: '+1234567890'
+                    reference:
+                      type: string
+                      example: '1234567890'
+                      description: Your custom reference ID to track this onboarding session
+      responses:
+        '201':
+          description: Onboarding session created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Session token to be used in the onboarding URL. This token is required for all subsequent
+                      API calls related to this onboarding session.
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  availableLanguages:
+                    type: array
+                    description: Available translations
+                    example:
+                    - en-GB
+                    - da-DK
+                    - sv-SE
+                  spektrId:
+                    type: string
+                    description: Unique ID of the customer going through the onboarding process
+                    example: 68876fa58281009be64b58f7
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid input parameters
+                  error:
+                    type: string
+                    description: Error type
+                    example: Bad Request
+                  statusCode:
+                    type: number
+                    description: HTTP status code
+                    example: 400
+        '409':
+          description: A request with this idempotency-key is currently being processed
+        '422':
+          description: idempotency-key has already been used with different request parameters
+      security:
+      - x-api-key: []
+      summary: Start Onboarding
+      tags:
+      - Orchestration API
+  /v2/public/actions/{token}:
+    get:
+      description: "This endpoint is the second step in the onboarding process (and is continually used thereafter using polling\
+        \ mechanism)\n\n1. After a session is created using the InitOnboarding endpoint and a `token` is generated.\n2. Clients\
+        \ poll this endpoint with the `token` to retrieve the current step.\n3. Depending on the response, the client may\
+        \ need to collect specific data or perform certain actions\n   before calling `Submit` with that data.\n   When the\
+        \ node type is `externalData`, inspect `expectedFields` to know exactly which payload fields must be submitted to\
+        \ `submitUrl`.\n4. The client can then poll again to see if new steps are required or if the process has finished.\n\
+        Possible values are `running`, `pending`, `failed` or `completed`. Whenever `pending` is returned, the client should\
+        \ stop polling and submit the required payload according to the step type."
+      operationId: OrchestrationController_get_v2
+      parameters:
+      - name: token
+        required: true
+        in: path
+        description: Session token generated from InitOnboarding endpoint
+        schema:
+          type: string
+      - name: content-language
+        required: false
+        in: header
+        description: Language code for localized content (e.g., en-US, da-DK)
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Process initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentStepResponse'
+        '401':
+          description: Parameters are invalid or the Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Fetch current step
+      tags:
+      - Orchestration API
+    post:
+      deprecated: true
+      description: '**Deprecated.** Use `POST /v3/public/actions/{token}` instead, which supports file uploads via presigned
+        S3 URLs and role-entity submissions in a single request (see the [guide](https://spektr.readme.io/docs/submitting-files)).'
+      operationId: OrchestrationController_submit_v2
+      parameters:
+      - name: token
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Details needed to execute the process
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+                title: Form
+                description: 'A flat object where each key is a field name and each value can be one of the following types:
+
+
+                  - string: Text values
+
+                  - number: Numeric values
+
+                  - boolean: true/false values
+
+                  - date: Unix timestamp (milliseconds since epoch)
+
+                  - stringList: Multiple string values
+
+                  - entity: Array of objects representing ownership relations
+
+
+                  **NOTE:** The UI in this documentation may only show "string" as the value type, but all types listed above
+                  are accepted. Check the examples.
+
+
+                  The fields from the conditional type should be included in the root of the object.'
+                additionalProperties:
+                  oneOf:
+                  - type: string
+                    description: String value
+                  - type: number
+                    description: Number value
+                  - type: number
+                    format: unix-timestamp
+                    description: Date value as Unix timestamp (milliseconds since epoch)
+                    title: date
+                  - type: boolean
+                    description: Boolean value (true/false)
+                  - type: array
+                    items:
+                      type: string
+                    description: Array of strings (for stringList fields)
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                      required:
+                      - first_name
+                      - last_name
+                      description: Array of objects representing entities
+                    description: Array of objects (for ownership relations)
+                example:
+                  company_name: Example Company
+                  country_of_incorporation: SE
+                  annual_revenue: 5000000
+                  marketing_consent: true
+                  incorporation_date: 1622505600
+                  multi_select_field:
+                  - reading
+                  - sports
+                  entity:
+                  - first_name: John
+                    last_name: Doe
+                  - first_name: Jane
+                    last_name: Doe
+              - $ref: '#/components/schemas/SubmitHitHorizon'
+                title: HitHorizon
+              - $ref: '#/components/schemas/SubmitVeriff'
+                title: Veriff
+              - $ref: '#/components/schemas/SubmitMitId'
+                title: MitId
+              - $ref: '#/components/schemas/SubmitBankId'
+                title: BankId
+      responses:
+        '200':
+          description: Data submitted successfully
+        '400':
+          description: Payload validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Parameters are invalid or the Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Submit data
+      tags:
+      - Orchestration API
+  /v2/public/actions/{token}/go-back:
+    post:
+      description: "Enables the process to move one step backward, if applicable.\n     Use the query parameter 'reset=true'\
+        \ to reset the entire process to the beginning instead of going back one step.\n     After calling this, the client\
+        \ should poll `FetchCurrentStep` to get the newly-updated step."
+      operationId: OrchestrationController_goBack_v2
+      parameters:
+      - name: token
+        required: true
+        in: path
+        description: Session token for the process
+        schema:
+          example: '1234567890'
+          type: string
+      - name: reset
+        required: false
+        in: query
+        description: Set to "true" to reset the entire process to the beginning instead of going back one step
+        schema:
+          example: 'true'
+          type: string
+      responses:
+        '201':
+          description: Backward step operation successful
+        '401':
+          description: Parameters are invalid or the Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Go back
+      tags:
+      - Orchestration API
+  /v2/public/actions/{token}/submit-files:
+    post:
+      deprecated: true
+      description: '**Deprecated.** Use `POST /v3/public/actions/{token}` instead, which handles file uploads as part of the
+        standard submission via presigned S3 URLs returned in the response, followed by `POST /v3/public/actions/{token}/confirm`
+        to finalize (see the [guide](https://spektr.readme.io/docs/submitting-files)).'
+      operationId: OrchestrationController_submitFiles_v2
+      parameters:
+      - name: token
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: List of files to generate presigned URLs for
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GeneratePresignedUrlRequest'
+      responses:
+        '201':
+          description: Presigned URLs generated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeneratePresignedUrlResponse'
+        '401':
+          description: Parameters are invalid or the Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Generate Presigned URLs
+      tags:
+      - Orchestration API
+  /v3/public/actions/{token}:
+    post:
+      description: 'Submits form data with support for deferred file uploads.
+
+
+        **Integration Flow:**
+
+        1. Submit form data including file names for any file fields
+
+        2. If files need uploading, response includes presigned S3 URLs (status: `accepted`)
+
+        3. Upload files to S3 using the presigned URLs (multipart form POST)
+
+        4. Call `POST /:token/confirm` to verify uploads and complete submission
+
+
+        **Response Status:**
+
+        - `completed`: No files to upload, submission processed immediately
+
+        - `accepted`: Files need uploading, use provided presigned URLs then call /confirm
+
+
+        **File Upload:**
+
+        When uploading to S3, send a multipart form POST to the `url` with:
+
+        - All fields from the `fields` object as form fields
+
+        - The file content as `file` field'
+      operationId: OrchestrationController_submitV3_v3
+      parameters:
+      - name: token
+        required: true
+        in: path
+        description: Session token
+        schema:
+          type: string
+      - name: filledBy
+        required: true
+        in: query
+        description: The name of the entity that filled the form
+        schema:
+          example: John Doe
+          type: string
+      requestBody:
+        required: true
+        description: Form submission data
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+                title: Form
+                description: 'A flat object where each key is a field name and each value can be one of the following types:
+
+
+                  - string: Text values
+
+                  - number: Numeric values
+
+                  - boolean: true/false values
+
+                  - date: Unix timestamp (milliseconds since epoch)
+
+                  - stringList: Multiple string values
+
+                  - entity: Array of objects representing ownership relations
+
+                  - file: Filename as a string (file content uploaded separately via presigned URL)
+
+
+                  **NOTE:** The UI in this documentation may only show "string" as the value type, but all types listed above
+                  are accepted. Check the examples.
+
+
+                  The fields from the conditional type should be included in the root of the object.'
+                additionalProperties:
+                  oneOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: array
+                    items:
+                      type: string
+                example:
+                  company_name: Acme Corp
+                  incorporation_date: 1622505600
+                  document: company_registration.pdf
+              - $ref: '#/components/schemas/SubmitHitHorizon'
+                title: HitHorizon
+              - $ref: '#/components/schemas/SubmitVeriff'
+                title: Veriff
+              - $ref: '#/components/schemas/SubmitMitId'
+                title: MitId
+              - $ref: '#/components/schemas/SubmitBankId'
+                title: BankId
+      responses:
+        '200':
+          description: Submission completed or accepted
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/SubmitV3CompletedResponse'
+                  title: Completed
+                - $ref: '#/components/schemas/SubmitV3AcceptedResponse'
+                  title: Accepted
+        '400':
+          description: Validation error (invalid data or file type not allowed)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Submit form data (V3)
+      tags:
+      - Orchestration API
+  /v3/public/actions/{token}/confirm:
+    post:
+      description: 'Confirms that all file uploads are complete and triggers execution to resume.
+
+
+        **Integration Flow:**
+
+        1. Call after uploading all files from the `submitV3` response to S3
+
+        2. If all files are present in S3, returns `completed` and resumes process execution
+
+        3. If files are missing, throws 409 Conflict with new presigned URLs for retry
+
+
+        **Response Status:**
+
+        - `completed`: All files verified, execution resumed
+
+        - `pending` (409 Conflict): Files missing, presigned URLs provided for retry
+
+
+        **Retry Flow:**
+
+        If 409 is returned, upload the missing files using the new presigned URLs and call confirm again.'
+      operationId: OrchestrationController_confirmSubmission_v3
+      parameters:
+      - name: token
+        required: true
+        in: path
+        description: Session token from InitOnboarding endpoint
+        schema:
+          type: string
+      - name: filledBy
+        required: true
+        in: query
+        description: The name of the entity that filled the form
+        schema:
+          example: John Doe
+          type: string
+      responses:
+        '200':
+          description: All files verified, execution resumed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmCompletedResponse'
+        '400':
+          description: Context status is not pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Token is invalid or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '409':
+          description: Files missing - presigned URLs provided for retry upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfirmPendingResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Confirm submission
+      tags:
+      - Orchestration API
+  /v1/fields:
+    post:
+      description: 'Create a new workspace field definition. Field names must be unique within the workspace.
+
+
+        **Flat fields** (e.g. `input`, `select`, `checkbox`, `file`) store a single scalar value per customer record (string,
+        number, boolean, date, etc.). They do not use the `subFields` property.
+
+
+        **Object fields** (`type: "object"`) store structured, nested data as a JSON array of objects. They **must** include
+        a non-empty `subFields` array defining the schema for each entry. Sub-fields can themselves be of type `object`, enabling
+        recursive nesting.
+
+
+        '
+      operationId: WorkspaceFieldsController_create_v1
+      parameters: []
+      requestBody:
+        required: true
+        description: The workspace field definition to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkspaceFieldBody'
+            examples:
+              Flat field (input):
+                summary: Simple text input field
+                value:
+                  type: input
+                  category:
+                  - company
+                  attributes:
+                    name: company_name
+                    label: Company Name
+                    type: text
+                    placeholder: Acme Inc.
+                  config:
+                    spektrDataField: company_name
+                  validation:
+                  - type: required
+                    value: true
+                    message: Company name is required
+                  locked: false
+              Object field (nested):
+                summary: Structured field with nested sub-fields
+                value:
+                  type: object
+                  category:
+                  - individual
+                  attributes:
+                    name: employers
+                    label: Employers
+                  config:
+                    spektrDataField: employers
+                  validation: []
+                  locked: false
+                  subFields:
+                  - fieldName: full_name
+                    fieldLabel: Full name
+                    required: true
+                    type: input
+                    attributes:
+                      name: full_name
+                      label: Full name
+                      type: text
+                    validation:
+                    - type: required
+                      value: true
+                      message: Required
+                  - fieldName: address
+                    fieldLabel: Address
+                    required: false
+                    type: object
+                    subFields:
+                    - fieldName: line1
+                      fieldLabel: Address line 1
+                      required: false
+                      type: input
+                      attributes:
+                        name: line1
+                        label: Address line 1
+                        type: text
+                    - fieldName: country
+                      fieldLabel: Country
+                      required: false
+                      type: select
+                      attributes:
+                        name: country
+                        label: Country
+                        options:
+                        - value: RO
+                          label: Romania
+                        - value: GB
+                          label: United Kingdom
+      responses:
+        '201':
+          description: Workspace field created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Flat field:
+                  summary: Flat field response (input)
+                  value:
+                    id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+                Object field:
+                  summary: Object field response (nested)
+                  value:
+                    id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                      validation:
+                      - type: required
+                        value: true
+                        message: Required
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+        '400':
+          description: Payload validation failed (e.g. duplicate field name, invalid sub-field configuration)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Unauthorized — missing or invalid API key
+      security:
+      - x-api-key: []
+      summary: Create workspace field
+      tags:
+      - Workspace Fields API
+    get:
+      description: Retrieve all workspace field definitions. The response includes both flat fields (scalar values) and object
+        fields (nested structures with sub-fields).
+      operationId: WorkspaceFieldsController_getAll_v1
+      parameters:
+      - name: fieldType
+        required: false
+        in: query
+        description: Filter by entity category
+        schema:
+          enum:
+          - individual
+          - company
+          type: string
+      - name: source
+        required: false
+        in: query
+        description: Filter by field origin
+        schema:
+          enum:
+          - workspace
+          - spektr
+          type: string
+      - name: includeProtected
+        required: false
+        in: query
+        description: Include protected (system) fields. Defaults to true.
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: List of workspace fields
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Mixed list:
+                  summary: List containing flat and object fields
+                  value:
+                  - id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+                  - id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                      validation:
+                      - type: required
+                        value: true
+                        message: Required
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+        '401':
+          description: Unauthorized — missing or invalid API key
+      security:
+      - x-api-key: []
+      summary: List workspace fields
+      tags:
+      - Workspace Fields API
+  /v1/fields/{id}:
+    get:
+      description: Retrieve a single workspace field definition by its ID
+      operationId: WorkspaceFieldsController_getById_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the workspace field
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Workspace field fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Flat field:
+                  summary: Flat field response (input)
+                  value:
+                    id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+                Object field:
+                  summary: Object field response (nested)
+                  value:
+                    id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                      validation:
+                      - type: required
+                        value: true
+                        message: Required
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000000000
+        '401':
+          description: Unauthorized — missing or invalid API key
+        '404':
+          description: Workspace field not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Get workspace field by ID
+      tags:
+      - Workspace Fields API
+    patch:
+      description: 'Update an existing workspace field definition by its ID. '
+      operationId: WorkspaceFieldsController_update_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the workspace field to update
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The fields to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkspaceFieldBody'
+            examples:
+              Update label and validation:
+                summary: Change the label and add a max-length rule
+                value:
+                  attributes:
+                    name: company_name
+                    label: Company Legal Name
+                    type: text
+                    placeholder: Acme Inc.
+                  validation:
+                  - type: required
+                    value: true
+                    message: Company name is required
+                  - type: maxLength
+                    value: 200
+                    message: Maximum 200 characters
+              Added a new nested sub-field:
+                summary: Adding `city` requires sending the complete `subFields` tree
+                value:
+                  subFields:
+                  - fieldName: full_name
+                    fieldLabel: Full name
+                    required: true
+                    type: input
+                    attributes:
+                      name: full_name
+                      label: Full name
+                      type: text
+                  - fieldName: address
+                    fieldLabel: Address
+                    required: false
+                    type: object
+                    subFields:
+                    - fieldName: line1
+                      fieldLabel: Address line 1
+                      required: false
+                      type: input
+                      attributes:
+                        name: line1
+                        label: Address line 1
+                        type: text
+                    - fieldName: city
+                      fieldLabel: City
+                      required: false
+                      type: input
+                      attributes:
+                        name: city
+                        label: City
+                        type: text
+                    - fieldName: country
+                      fieldLabel: Country
+                      required: false
+                      type: select
+                      attributes:
+                        name: country
+                        label: Country
+                        options:
+                        - value: RO
+                          label: Romania
+                        - value: GB
+                          label: United Kingdom
+      responses:
+        '200':
+          description: Workspace field updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceFieldResponse'
+              examples:
+                Updated flat field:
+                  summary: Field after label and validation update
+                  value:
+                    id: 507f1f77bcf86cd799439011
+                    type: input
+                    attributes:
+                      name: company_name
+                      label: Company Legal Name
+                      type: text
+                      placeholder: Acme Inc.
+                    config:
+                      spektrDataField: company_name
+                    validation:
+                    - type: required
+                      value: true
+                      message: Company name is required
+                    - type: maxLength
+                      value: 200
+                      message: Maximum 200 characters
+                    category:
+                    - company
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000060000
+                Updated object field:
+                  summary: Object field after adding a new nested sub-field
+                  value:
+                    id: 507f1f77bcf86cd799439013
+                    type: object
+                    attributes:
+                      name: employers
+                      label: Employers
+                    config:
+                      spektrDataField: employers
+                    validation: []
+                    category:
+                    - individual
+                    groups: []
+                    locked: false
+                    protectedField: false
+                    source: workspace
+                    subFields:
+                    - fieldName: full_name
+                      fieldLabel: Full name
+                      required: true
+                      type: input
+                      attributes:
+                        name: full_name
+                        label: Full name
+                        type: text
+                    - fieldName: address
+                      fieldLabel: Address
+                      required: false
+                      type: object
+                      subFields:
+                      - fieldName: line1
+                        fieldLabel: Address line 1
+                        required: false
+                        type: input
+                        attributes:
+                          name: line1
+                          label: Address line 1
+                          type: text
+                      - fieldName: city
+                        fieldLabel: City
+                        required: false
+                        type: input
+                        attributes:
+                          name: city
+                          label: City
+                          type: text
+                      - fieldName: country
+                        fieldLabel: Country
+                        required: false
+                        type: select
+                        attributes:
+                          name: country
+                          label: Country
+                          options:
+                          - value: RO
+                            label: Romania
+                          - value: GB
+                            label: United Kingdom
+                    createdBy: 507f1f77bcf86cd799439012
+                    createdAt: 1700000000000
+                    updatedAt: 1700000060000
+        '400':
+          description: Payload validation failed (e.g. invalid sub-field configuration)
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/DataParseError'
+                - $ref: '#/components/schemas/DataValidationError'
+        '401':
+          description: Unauthorized — missing or invalid API key
+        '404':
+          description: Workspace field not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Update workspace field
+      tags:
+      - Workspace Fields API
+    delete:
+      description: Delete a workspace field definition by its ID. Protected fields cannot be deleted.
+      operationId: WorkspaceFieldsController_delete_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the workspace field to delete
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Workspace field deleted successfully
+        '401':
+          description: Unauthorized — missing or invalid API key
+        '403':
+          description: Cannot delete a protected field
+        '404':
+          description: Workspace field not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+      security:
+      - x-api-key: []
+      summary: Delete workspace field
+      tags:
+      - Workspace Fields API
+  /v1/transaction-definitions:
+    post:
+      description: 'Create a new transaction definition with a nested field schema, customer link declarations, and optional
+        non-client-scoped partitions. Leaf field values must be one of: "string", "number", "ipAddress", "date", "array".
+        Array fields accept only primitive elements (string, number, boolean, null). Each link txPath and partition txPath
+        must resolve to a declared leaf field (link and partition paths may not target array fields). Partition types must
+        not collide with link types.'
+      operationId: TransactionDefinitionController_create_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              - type
+              - fields
+              - link
+              properties:
+                name:
+                  type: string
+                  example: payment-transaction
+                type:
+                  type: string
+                  description: Unique transaction type identifier
+                  example: payment
+                fields:
+                  type: object
+                  description: 'Nested structure where leaf values are "string", "number", "ipAddress", "date", or "array"
+                    (array elements must be primitives: string, number, boolean, or null)'
+                  example:
+                    amount: number
+                    currency: string
+                    sourceIp: ipAddress
+                    sender_iban: string
+                    recipient_iban: string
+                    tags: array
+                    location:
+                      city: string
+                      country: string
+                link:
+                  type: array
+                  description: How transactions of this type link to customers. At least one entry is required.
+                  minItems: 1
+                  maxItems: 16
+                  items:
+                    type: object
+                    required:
+                    - type
+                    - txPath
+                    - clientRecordPath
+                    - direction
+                    properties:
+                      type:
+                        type: string
+                        description: Stable label that identifies this link type (e.g. "iban", "spektrId")
+                        example: iban
+                      txPath:
+                        type: string
+                        description: Dot-notation path into the transaction payload that resolves to a leaf field declared
+                          in "fields"
+                        example: sender_iban
+                      clientRecordPath:
+                        type: string
+                        description: Declarative path on the client record this link matches (e.g. "data.iban", "_id")
+                        example: data.iban
+                      direction:
+                        type: string
+                        enum:
+                        - source
+                        - destination
+                        description: Which side of the transaction this link represents
+                        example: source
+                  example:
+                  - type: iban
+                    txPath: sender_iban
+                    clientRecordPath: data.iban
+                    direction: source
+                partitions:
+                  type: array
+                  description: Optional non-client-scoped aggregation partitions (e.g. device, IP). Each partition type must
+                    be distinct from every link type.
+                  maxItems: 16
+                  items:
+                    type: object
+                    required:
+                    - type
+                    - txPath
+                    properties:
+                      type:
+                        type: string
+                        description: Stable label that identifies this partition type. Must not collide with any link type.
+                        example: deviceId
+                      txPath:
+                        type: string
+                        description: Dot-notation path into the transaction payload that resolves to a leaf field declared
+                          in "fields"
+                        example: device_id
+                realTimeFields:
+                  type: array
+                  description: Optional whitelist of dot-notation paths into "fields". When present, only these fields are
+                    available for transaction monitoring rules. When absent, all declared fields are available.
+                  items:
+                    type: string
+                  example:
+                  - amount
+                  - currency
+      responses:
+        '201':
+          description: Transaction definition created successfully
+        '400':
+          description: Payload validation failed
+        '500':
+          description: Transaction definition creation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Create transaction definition
+      tags:
+      - Transaction Definitions
+  /v1/transaction-definitions/{id}:
+    delete:
+      description: Delete a transaction definition by ID.
+      operationId: TransactionDefinitionController_delete_v1
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The ID of the transaction definition
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Transaction definition deleted successfully
+        '404':
+          description: Transaction definition with provided ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Transaction definition deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Delete transaction definition
+      tags:
+      - Transaction Definitions
+  /v1/transactions/batch:
+    post:
+      description: Ingests a batch of up to 1,000 transactions. Each transaction is validated against the workspace Transaction
+        Definition for its type, linked to the relevant customer, persisted, and forwarded for transaction monitoring. Returns
+        HTTP 200 regardless of per item outcome. Check the failed count and errors array in the response body.
+      operationId: TransactionsController_ingestBatch_v1
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - transactions
+              properties:
+                transactions:
+                  type: array
+                  description: The list of transactions to ingest. Must contain between 1 and 1,000 items.
+                  minItems: 1
+                  maxItems: 1000
+                  items:
+                    type: object
+                    required:
+                    - type
+                    additionalProperties: true
+                    description: A single transaction in the batch. The three top level fields (type, transaction_id, transactionDate)
+                      are reserved by the platform. All other fields are validated dynamically against the Transaction Definition
+                      configured for the given type.
+                    properties:
+                      type:
+                        type: string
+                        minLength: 1
+                        description: The transaction type. Must match the name of a Transaction Definition configured in your
+                          workspace.
+                        example: payment
+                      transaction_id:
+                        type: string
+                        minLength: 1
+                        description: Your stable identifier for this transaction. Used for upsert deduplication. If a transaction
+                          with this ID already exists it is updated rather than duplicated. If omitted, the platform generates
+                          a random UUID and the transaction cannot be idempotently resubmitted.
+                        example: txn_abc123
+                      transactionDate:
+                        type: number
+                        description: Unix timestamp in milliseconds representing when the transaction occurred. Used for ordered
+                          rolling history in aggregation rules.
+                        example: 1748512800000
+            examples:
+              payment:
+                summary: Payment transaction
+                value:
+                  transactions:
+                  - type: payment
+                    transaction_id: txn_abc123
+                    transactionDate: 1748512800000
+                    amount: 1500
+                    currency: EUR
+                    source_account:
+                      iban: DE89370400440532013000
+                    destination_account:
+                      iban: GB29NWBK60161331926819
+                  - type: payment
+                    transaction_id: txn_def456
+                    transactionDate: 1748516400000
+                    amount: 250
+                    currency: USD
+                    source_account:
+                      iban: FR7630006000011234567890189
+                    destination_account:
+                      iban: ES9121000418450200051332
+      responses:
+        '200':
+          description: Batch processed. Check failed and errors for per item rejections. A nonzero failed count does not change
+            the HTTP status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - failed
+                - errors
+                properties:
+                  success:
+                    type: integer
+                    minimum: 0
+                    description: Number of transactions successfully ingested and forwarded for processing.
+                    example: 1
+                  failed:
+                    type: integer
+                    minimum: 0
+                    description: Number of transactions that could not be ingested. Equal to errors.length.
+                    example: 1
+                  errors:
+                    type: array
+                    description: Per item error details for every transaction that failed. Empty when all transactions succeeded.
+                    items:
+                      type: object
+                      required:
+                      - index
+                      - type
+                      - transactionId
+                      - errorType
+                      - message
+                      description: Describes a single transaction that could not be ingested.
+                      properties:
+                        index:
+                          type: integer
+                          minimum: 0
+                          description: Position of the failed transaction in the input transactions array, starting at 0.
+                          example: 1
+                        type:
+                          type: string
+                          description: The type field of the failed transaction.
+                          example: payment
+                        transactionId:
+                          type: string
+                          description: The resolved transaction ID. Either the transaction_id from the request or the UUID
+                            assigned when transaction_id was omitted.
+                          example: txn_def456
+                        errorType:
+                          type: string
+                          description: 'definition_not_found: no Transaction Definition for this type. field_validation: payload
+                            does not match the definition field schema; message is a JSON map of dotted paths to errors. missing_link:
+                            link fields in the payload are missing or empty so no customer could be resolved. persist_failed:
+                            validation passed but the record could not be saved. forward_failed: saved but could not be queued
+                            for monitoring. other: unexpected failure for this item; see message and retry.'
+                          enum:
+                          - definition_not_found
+                          - field_validation
+                          - missing_link
+                          - persist_failed
+                          - forward_failed
+                          - other
+                          example: persist_failed
+                        message:
+                          type: string
+                          description: Description of the failure. For field_validation errors this includes a JSON object
+                            of dotted field paths mapped to their validation messages.
+                          example: Failed to persist transaction
+              examples:
+                allAccepted:
+                  summary: All transactions accepted
+                  value:
+                    success: 2
+                    failed: 0
+                    errors: []
+                mixedBatch:
+                  summary: Mixed batch with one persistence failure
+                  value:
+                    success: 1
+                    failed: 1
+                    errors:
+                    - index: 1
+                      type: payment
+                      transactionId: txn_def456
+                      errorType: persist_failed
+                      message: Failed to persist transaction
+                unknownTransactionType:
+                  summary: Unknown transaction type
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: definition_not_found
+                      message: No transaction definition found for type "wire"
+                invalidFields:
+                  summary: Invalid payload fields
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: field_validation
+                      message: 'Validation failed: {"amount":"Expected number, received string"}'
+                unlinkedCustomer:
+                  summary: Customer link not resolved
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: missing_link
+                      message: No link values could be resolved from the payload
+                queueFailure:
+                  summary: Monitoring queue failure
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: forward_failed
+                      message: 'Failed to forward transaction: queue unavailable'
+                unexpectedError:
+                  summary: Unexpected processing error
+                  value:
+                    success: 0
+                    failed: 1
+                    errors:
+                    - index: 0
+                      type: payment
+                      transactionId: txn_abc123
+                      errorType: other
+                      message: 'Unexpected error processing transaction: timeout'
+        '400':
+          description: Request body failed structural validation (for example transactions array is missing, empty, exceeds
+            1,000 items, or an item is missing the required type field).
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - message
+                - statusCode
+                properties:
+                  message:
+                    type: string
+                    description: Description of the validation failure.
+                    example: Batch must contain at least one transaction
+                  statusCode:
+                    type: number
+                    example: 400
+        '500':
+          description: Unexpected server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      security:
+      - x-api-key: []
+      summary: Ingest transaction batch
+      tags:
+      - Transactions
+components:
+  schemas:
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ImportCreateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the dataset
+        dataType:
+          type: object
+          additionalProperties:
+            type: string
+            enum:
+            - number
+            - string
+            - boolean
+            - date
+            - file
+            - country
+            - stringList
+          example:
+            name: dataset name
+            dataType:
+              first_name: string
+              age: number
+              passport: file
+          description: A dictionary that represents your schema, where each property is a key with a value type
+        parentDatasetId:
+          type: string
+          description: The ID of the parent dataset. When provided, the new dataset is created as a child dataset linked to
+            the parent, used for related entities.
+      required:
+      - name
+      - dataType
+    DataImportResponse:
+      type: object
+      properties:
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+      required:
+      - datasetId
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataUpdateInput:
+      type: object
+      properties:
+        data:
+          additionalProperties:
+            type: string
+            enum:
+            - number
+            - string
+            - boolean
+            - date
+            - file
+            - stringList
+          example:
+          - first_name: John
+            last_name: Doe
+            email: john.doe@email.com
+            passport: passport.jpg
+          - first_name: Jane
+            last_name: Smith
+            email: jane.smt@email.com
+          description: ' A list of records, where each record represents an individual entry. Each record is a dictionary
+            with specific key-value pairs.'
+          type: array
+          items:
+            type: object
+      required:
+      - data
+    DataUpdateResponseDataFileItem:
+      type: object
+      properties:
+        file:
+          type: string
+          description: The file name
+        url:
+          type: string
+          description: A presigned URL for uploading the file associated with the file field.
+        fields:
+          description: An array of headers needed for the file upload
+          type: array
+          items:
+            type: object
+      required:
+      - file
+      - url
+      - fields
+    DataUpdateResponseDataItem:
+      type: object
+      properties:
+        spektrId:
+          type: string
+          description: The spektr unique identifier for one entry
+        files:
+          description: An array of files if set on the request
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
+      required:
+      - spektrId
+      - files
+    DataUpdateResponse:
+      type: object
+      properties:
+        data:
+          example:
+          - spektrId: UUID
+            files:
+            - file: passport
+              url: https://spektr.com/presigned-url
+              fields:
+                header1: value1
+                header2: value2
+          - spektrId: UUID
+          description: The API responds with an array of objects corresponding to each data entry submitted. Each object includes
+            "spektrId" and "files" array if the entry includes file fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataItem'
+      required:
+      - data
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataConflictError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Cannot delete dataset that is linked to processes
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - dataset_linked_to_process
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ClientRecordId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the customer record
+        type:
+          type: string
+          description: The type of the customer record ID. Either spektrId or reference.
+          enum:
+          - spektrId
+          - reference
+      required:
+      - id
+      - type
+    ClientRecordIds:
+      type: object
+      properties:
+        ids:
+          description: An array of spektr IDs and reference IDs. The type of the ID is specified in the type property.
+          example:
+            ids:
+            - id: spektr_id
+              type: spektrId
+            - id: reference_id
+              type: reference
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+      required:
+      - ids
+    ProcessVersion:
+      type: object
+      properties:
+        currentVersion:
+          type: number
+          description: The current version of the process
+          example: 9
+        latestVersion:
+          type: number
+          description: The latest version of the process
+          example: 11
+      required:
+      - currentVersion
+      - latestVersion
+    ProcessTriggerSource:
+      type: object
+      properties:
+        sourceType:
+          type: string
+          description: The source type that triggered the process
+          example: spektr_process
+          enum:
+          - spektr_process
+          - external
+          - manual
+          - unknown
+        processId:
+          type: string
+          description: The ID of the process (required for spektr_process source type)
+        userId:
+          type: string
+          description: The ID of the user who triggered the process (required for manual source type)
+        userName:
+          type: string
+          description: The name of the user who triggered the process (required for manual source type)
+      required:
+      - sourceType
+    ProcessRunResponse:
+      type: object
+      properties:
+        executionContextId:
+          type: string
+          description: The ID of the execution context
+        spektrId:
+          type: string
+          description: The Spektr ID
+        processId:
+          type: string
+          description: The ID of the process
+        processName:
+          type: string
+          description: The name of the process
+        processType:
+          type: string
+          description: The type of the process
+        version:
+          description: The version information of the process
+          allOf:
+          - $ref: '#/components/schemas/ProcessVersion'
+        status:
+          type: string
+          description: The status of the execution context
+        reference:
+          type: string
+          description: The reference of the process run
+        token:
+          type: string
+          description: The token of the process run
+        header:
+          type: string
+          description: The header of the process run
+        description:
+          type: string
+          description: The description of the process run
+        triggerSource:
+          description: The source that triggered the process
+          allOf:
+          - $ref: '#/components/schemas/ProcessTriggerSource'
+        triggerTime:
+          type: number
+          description: The timestamp when the process was triggered
+        isExpired:
+          type: boolean
+          description: Whether the process run is expired
+      required:
+      - executionContextId
+      - spektrId
+      - processId
+      - processName
+      - processType
+      - version
+      - status
+      - isExpired
+    RecordProperties:
+      type: object
+      properties:
+        directOrIndirect:
+          type: string
+          description: The reference of the record
+        role:
+          type: string
+          description: The role of the record in the relation
+        percentage:
+          type: string
+          description: The percentage of ownership in the relation
+        ownership:
+          type: string
+          description: The ownership type of the record
+    RecordResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the record
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+        status:
+          type: string
+          description: The status of the record
+          enum:
+          - pending
+          - approved
+          - rejected
+        createdAt:
+          type: number
+          description: Creation timestamp
+        updatedAt:
+          type: number
+          description: Last update timestamp
+        tags:
+          description: Tags of the record
+          type: array
+          items:
+            type: string
+        reference:
+          type: string
+          description: Reference of the record
+        data:
+          type: object
+          description: Record data
+        files:
+          description: Files associated with the record
+          type: array
+          items:
+            type: string
+        entities:
+          description: Relations and UBOs associated with the record
+          type: array
+          items:
+            type: string
+        relationProps:
+          description: Relation properties of the record
+          allOf:
+          - $ref: '#/components/schemas/RecordProperties'
+      required:
+      - id
+      - datasetId
+      - status
+      - createdAt
+      - updatedAt
+      - tags
+    UpdateInput:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+          description: A list of records, where each record represents an individual entry. Each record is a dictionary with
+            specific key-value pairs. The value can be a string, number, boolean, or array of strings.
+        createdAt:
+          type: number
+          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
+        updatedAt:
+          type: number
+          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
+      required:
+      - data
+    UpdateInputV2:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+          description: Golden-record fields to merge into the customer. Optional when sending status. Must not be an empty
+            object when provided.
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+          - archived
+          description: 'Workflow status: pending, approved, rejected, or archived. Optional when sending non-empty data.'
+        createdAt:
+          type: number
+          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
+        updatedAt:
+          type: number
+          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
+    RecordFormSubmitResponse:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: Process ID
+        processType:
+          type: string
+          description: Process type, e.g. "onboarding"
+        processName:
+          type: string
+          description: Process name
+        spektrId:
+          type: string
+          description: ID of the record
+        eventType:
+          type: string
+          description: Type of the event, e.g. "form_submit"
+        stepName:
+          type: string
+          description: Name of the step in the process
+        stepId:
+          type: string
+          description: ID of the step in the process
+        formData:
+          type: object
+          description: Form data
+        createdAt:
+          type: number
+          description: Moment in time when the event happened, in milliseconds since epoch
+    RecordFormSubmitsResponse:
+      type: object
+      properties:
+        docs:
+          description: The form submits
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordFormSubmitResponse'
+    RecordsResponse:
+      type: object
+      properties:
+        records:
+          description: The records
+          type: array
+          items:
+            type: string
+        files:
+          type: object
+          description: The file details of the files containing the records
+        token:
+          type: string
+          description: Pagination token for fetching the next page
+    ClientRecordRelationEndpointDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - spektrId
+          - reference
+          description: Type of the record identifier
+        value:
+          type: string
+          description: Spektr ID or client reference value
+      required:
+      - type
+      - value
+    CreateClientRecordRelationItemDto:
+      type: object
+      properties:
+        from:
+          description: Subject of the relation (from)
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        to:
+          description: Interested party of the relation (to)
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        relationRole:
+          type: string
+          enum:
+          - beneficial_owners
+          - shareholders
+          - ultimate_beneficial_owners
+          - senior_management
+          - board_of_directors
+          - controlling_entities
+          - subsidiaries
+          - authorized_signatories
+          - signatories
+          - contact_info
+          - person_with_significant_control
+          description: Role of the interested party in the relation. Must be one of the supported role keys (e.g. `beneficial_owners`,
+            `shareholders`, `ultimate_beneficial_owners`).
+        direct:
+          type: boolean
+          default: false
+          description: Whether the relation is direct
+        positions:
+          default: []
+          description: Entity positions
+          type: array
+          items:
+            type: string
+        data:
+          type: object
+          default: {}
+          description: Arbitrary metadata for the relation
+        hasSignatoryPower:
+          type: boolean
+          default: false
+          deprecated: true
+          description: '@deprecated No longer used. Signatory power should be expressed via `relationRole` or the `data` field.'
+      required:
+      - from
+      - to
+      - relationRole
+    CreateClientRecordRelationsResponseItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Relation ID
+        subject:
+          type: string
+          description: Subject record ID
+        interestedParty:
+          type: string
+          description: Interested party record ID
+        directOrIndirect:
+          type: string
+          enum:
+          - direct
+          - indirect
+          description: Relation type
+        relationRole:
+          type: string
+          description: Role of the interested party in the relation
+        data:
+          type: object
+          description: Arbitrary relation metadata
+        positions:
+          description: Entity positions associated with the relation
+          type: array
+          items:
+            type: string
+        entityRoles:
+          deprecated: true
+          description: '@deprecated Not present on v2 relations. Use `relationRole` instead.'
+          type: array
+          items:
+            type: string
+        entityPositions:
+          deprecated: true
+          description: '@deprecated Not present on v2 relations. Use `positions` instead.'
+          type: array
+          items:
+            type: string
+        hasSignatoryPower:
+          type: boolean
+          deprecated: true
+          description: '@deprecated Not present on v2 relations.'
+        createdAt:
+          type: number
+          description: Creation timestamp
+        updatedAt:
+          type: number
+          description: Last update timestamp
+      required:
+      - id
+      - subject
+      - interestedParty
+      - directOrIndirect
+      - relationRole
+      - data
+      - positions
+      - createdAt
+      - updatedAt
+    CreateClientRecordRelationsResponseDto:
+      type: object
+      properties:
+        relations:
+          description: Created relations
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateClientRecordRelationsResponseItemDto'
+      required:
+      - relations
+    UpdateClientRecordRelationItemDto:
+      type: object
+      properties:
+        from:
+          description: Subject of the relation to update (from). Immutable.
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        to:
+          description: Interested party of the relation to update (to). Immutable.
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        relationRole:
+          type: string
+          enum:
+          - beneficial_owners
+          - shareholders
+          - ultimate_beneficial_owners
+          - senior_management
+          - board_of_directors
+          - controlling_entities
+          - subsidiaries
+          - authorized_signatories
+          - signatories
+          - contact_info
+          - person_with_significant_control
+          description: Role of the interested party in the relation. Used together with `from` and `to` to identify the relation.
+            Immutable.
+        direct:
+          type: boolean
+          description: Whether the relation is direct. Optional.
+        positions:
+          description: Entity positions. Replaces the stored array when provided.
+          type: array
+          items:
+            type: string
+        data:
+          type: object
+          description: Arbitrary relation metadata. Shallow-merged with the stored value when provided.
+      required:
+      - from
+      - to
+      - relationRole
+    VendorSearchResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The vendor search ID
+        vendor:
+          type: string
+          enum:
+          - websiteChecker
+          - licenseAi
+          - addressAi
+          - industryAi
+          - aiResearch
+          - entityResolution
+          - openCorporates
+          - complyAdvantage
+          - openCorporatesMonitoring
+          - openCorporatesRisk
+          - complyAdvantageKyc
+          - complyAdvantageKyb
+          - kyckr
+          - dnbCompanyInfo
+          - dnbOwnershipInsights
+          - dnbPrincipalsAndContacts
+          - dnbHierarchyAndConnections
+          - dnbFilingAndEvents
+          - companyWeb
+          - moodys
+          - bodacc
+          - veriff
+          - veriffIdv
+          - mitId
+          - frejaId
+          - mitIdBusiness
+          - bankId
+          - virk
+          - documentOCR
+          - hitHorizons
+          - bolagsverket
+          - onfido
+          - hubspot
+          - creditSafe
+          - scrive
+          - uc
+          - pdfGeneration
+          - ofsaa
+          - ceidg
+          - krs
+          - crbr
+          - ceidgOwnershipInsights
+          - rkizw
+          - rspo
+          - regon
+          - spektrKyb
+          - spektrUboEngine
+          - companiesHouse
+          - cpr
+          - dowJonesScreening
+          - dowJonesScreeningPerson
+          - dowJonesScreeningRps
+          - dowJonesScreeningRpsPerson
+          - ticCompany
+          - ticPerson
+          description: The vendor that produced this data
+        spektrId:
+          type: string
+          description: The spektr ID of the customer record this search belongs to
+        status:
+          type: string
+          enum:
+          - pending
+          - completed
+          - failed
+          - polling
+          description: The status of the vendor search
+        createdAt:
+          type: number
+          description: Unix timestamp (ms) when the search was created
+        updatedAt:
+          type: number
+          description: Unix timestamp (ms) when the search was last updated
+        response:
+          type: object
+          description: The raw, unmodified vendor API response, as stored at search time
+      required:
+      - id
+      - vendor
+      - status
+      - createdAt
+      - updatedAt
+      - response
+    ExecutionInput:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        spektrIds:
+          description: An array spektr IDs
+          type: array
+          items:
+            type: string
+      required:
+      - processId
+      - spektrIds
+    ExecutionResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The execution token
+          description: A record of spektr IDs and their corresponding execution tokens
+          example:
+            spektrId:
+              token: exec_token_1
+      required:
+      - data
+    EmailInput:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email address
+        subject:
+          type: string
+          description: The email subject
+        body:
+          type: string
+          description: The email body
+      required:
+      - email
+    ExecutionInputV2:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        ids:
+          description: An array of spektr IDs and reference IDs
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+        refreshTokenOnVersionMismatch:
+          type: boolean
+          description: Whether to refresh the token on version mismatch
+        emailInput:
+          description: The email input
+          allOf:
+          - $ref: '#/components/schemas/EmailInput'
+      required:
+      - processId
+      - ids
+    ExecutionResponseV2:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The execution token
+              idType:
+                type: string
+                enum:
+                - spektrId
+                - reference
+                description: The type of ID
+          description: A record of spektr IDs and their corresponding execution tokens
+          example:
+            spektrId:
+              token: exec_token_1
+              idType: spektrId
+            reference:
+              token: exec_token_2
+              idType: reference
+      required:
+      - data
+    ExecutionInputV3:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        ids:
+          description: An array of spektr IDs and reference IDs
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+        refreshTokenOnVersionMismatch:
+          type: boolean
+          description: Whether to refresh the token on version mismatch
+        emailInput:
+          description: The email input
+          allOf:
+          - $ref: '#/components/schemas/EmailInput'
+      required:
+      - processId
+      - ids
+    ExecutionResponseDataItemV3:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID
+        token:
+          type: string
+          description: The execution token
+        idType:
+          type: string
+          enum:
+          - spektrId
+          - reference
+          description: The type of ID
+      required:
+      - id
+      - idType
+    ExecutionResponseV3:
+      type: object
+      properties:
+        data:
+          description: A list of execution results
+          example:
+          - id: '10307116'
+            token: exec_token
+            idType: reference
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionResponseDataItemV3'
+      required:
+      - data
+    EventDto:
+      type: object
+      properties:
+        workspaceId:
+          type: string
+          description: The workspace ID.
+          nullable: true
+        spektrId:
+          type: string
+          description: The spektr ID, if available.
+          nullable: true
+        eventData:
+          type: object
+          description: The record of event data key/value properties
+          nullable: true
+        type:
+          type: string
+          description: The event type
+          nullable: true
+        createdAt:
+          type: number
+          description: Unix timestamp (milliseconds) that represents when the event was created
+        updatedAt:
+          type: number
+          description: Unix timestamp (milliseconds) that represents when the event was updated
+      required:
+      - workspaceId
+      - spektrId
+      - eventData
+      - type
+      - createdAt
+    EventsDto:
+      type: object
+      properties:
+        events:
+          example:
+          - workspaceId: string
+            spektrId: string
+            eventData:
+              changes:
+              - type: street_updated
+                field: street
+                oldValue: s1
+                newValue: s2
+                changedBy: user
+                note: optional random note
+            type: recordUpdated
+          description: The list of events to import
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDto'
+      required:
+      - events
+    EventsImportResponse:
+      type: object
+      properties:
+        eventIds:
+          description: IDs of the created events, in the same order as the input.
+          example:
+          - 507f1f77bcf86cd799439011
+          - 507f1f77bcf86cd799439012
+          type: array
+          items:
+            type: string
+      required:
+      - eventIds
+    Execution:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Represents an id for this execution
+        parentId:
+          type: string
+          description: Represents the parent execution id
+        status:
+          type: string
+          description: Status of the execution, used for the polling mechanism
+          example: pending
+        error:
+          type: string
+          description: The error message if the execution failed
+          example: Error message
+        currentStep:
+          type: number
+          description: The current step of the execution, starting from 1
+          example: 4
+        maxStep:
+          type: number
+          description: The maximum total steps in any reachable path from the current position (counting from step 1)
+          example: 6
+        minStep:
+          type: number
+          description: The minimum total steps in any reachable path from the current position (counting from step 1)
+          example: 6
+      required:
+      - id
+      - parentId
+      - status
+      - error
+      - currentStep
+      - maxStep
+      - minStep
+    InputAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        type:
+          type: string
+          description: Type of the input
+          example: text
+        placeholder:
+          type: string
+          description: Placeholder text for the field
+          example: Acme Inc.
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        maxLength:
+          type: number
+          description: Max length of the input value (characters)
+          example: 100
+      required:
+      - label
+      - name
+      - type
+      - placeholder
+      - internalId
+      - maxLength
+    StringFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: string
+          description: The default value of the field either prefilled or submitted previously
+          example: Test APS
+      required:
+      - spektrDataField
+    StringField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          - type: regex
+            value: ^[a-zA-Z0-9 ]+$
+            message: Only alphanumeric characters and spaces are allowed
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+            - $ref: '#/components/schemas/RegexValidation'
+              title: regex
+        attributes:
+          description: The field attributes
+          example:
+            type: text
+            placeholder: Acme Inc.
+            internalId: ''
+            label: Company name
+            name: Company name
+            maxLength: 100
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: string
+          enum:
+          - string
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: company_name
+            value: Test APS
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    NumberFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: number
+          description: The default value of the field either prefilled or submitted previously
+          example: 123
+      required:
+      - spektrDataField
+    NumberField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: Age is required
+          - type: regex
+            value: ^[0-9]+$
+            message: Only numbers are allowed
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+            - $ref: '#/components/schemas/RegexValidation'
+              title: regex
+        attributes:
+          description: The field attributes
+          example:
+            type: number
+            placeholder: Enter your age
+            label: Age
+            name: Age
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: number
+          enum:
+          - number
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: age
+            value: 30
+          allOf:
+          - $ref: '#/components/schemas/NumberFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    BooleanAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+      required:
+      - label
+      - name
+      - internalId
+    BooleanFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: boolean
+          description: The default value of the field either prefilled or submitted previously
+          example: true
+      required:
+      - spektrDataField
+    BooleanField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+        attributes:
+          description: The field attributes
+          example:
+            label: Is Active
+            name: Is Active
+          allOf:
+          - $ref: '#/components/schemas/BooleanAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: boolean
+          enum:
+          - boolean
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: is_active
+            value: true
+          allOf:
+          - $ref: '#/components/schemas/BooleanFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    DateAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        type:
+          type: string
+          description: Type of the input
+          example: text
+        placeholder:
+          type: string
+          description: Placeholder text for the field
+          example: Acme Inc.
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        maxLength:
+          type: number
+          description: Max length of the input value (characters)
+          example: 100
+        minDate:
+          type: string
+          description: Minimum allowed date for date fields
+          example: '1900-01-01'
+        maxDate:
+          type: string
+          description: Maximum allowed date for date fields
+          example: '2100-12-31'
+        maxDaysInPast:
+          type: number
+          description: Maximum number of days in the past allowed for date fields
+          example: 3650
+        maxDaysInFuture:
+          type: number
+          description: Maximum number of days in the future allowed for date fields
+          example: 30
+      required:
+      - label
+      - name
+      - type
+      - placeholder
+      - internalId
+      - maxLength
+      - minDate
+      - maxDate
+      - maxDaysInPast
+      - maxDaysInFuture
+    DateFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: number
+          description: The default value of the field either prefilled or submitted previously
+          example: 1622505600
+      required:
+      - spektrDataField
+    DateField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          - type: age
+            minimumAge: 18
+            message: You must be at least 18 years old
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+            - $ref: '#/components/schemas/AgeValidation'
+              title: age
+        attributes:
+          description: The field attributes
+          example:
+            type: date
+            placeholder: Select a date
+            label: Incorporation Date
+            name: Incorporation Date
+            minDate: '1900-01-01'
+            maxDate: '2100-12-31'
+            maxDaysInPast: 3650
+            maxDaysInFuture: 30
+          allOf:
+          - $ref: '#/components/schemas/DateAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: date
+          enum:
+          - date
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: incorporation_date
+            value: 1622505600
+          allOf:
+          - $ref: '#/components/schemas/DateFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    StringListField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+        attributes:
+          description: The field attributes
+          example:
+            type: select
+            placeholder: Select categories
+            label: Categories
+            name: Categories
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: stringList
+          enum:
+          - stringList
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: categories
+            value: category1,category2
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    FileAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        accept:
+          type: string
+          description: Allowed file types
+          example: .pdf,.jpg,.png
+        maxLength:
+          type: number
+          description: Max file name length (characters)
+          example: 120
+      required:
+      - label
+      - name
+      - internalId
+      - accept
+      - maxLength
+    FileField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This file is required
+          - type: maxFileSize
+            value: 5242880
+            message: File size too large
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+            - $ref: '#/components/schemas/MaxFileSizeValidation'
+              title: maxFileSize
+        attributes:
+          description: The field attributes
+          example:
+            label: Upload Document
+            name: Upload Document
+            accept: .pdf,.jpg,.png
+            maxLength: '15'
+          allOf:
+          - $ref: '#/components/schemas/FileAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: file
+          enum:
+          - file
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: document
+            value: file-123
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    ConditionalField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: conditional
+        dataType:
+          type: string
+          description: The data type of the field
+          example: conditional
+          enum:
+          - conditional
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: condition_field
+            value: condition_value
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+        segment:
+          type: object
+          description: The segment configuration for the conditional field
+        output:
+          type: string
+          description: The output mode, either "show" or "hide"
+          enum:
+          - show
+          - hide
+          default: hide
+        form:
+          type: object
+          description: The form definition containing fields and their order
+          example:
+            fields:
+              field-id-1: {}
+              field-id-2: {}
+            order:
+            - field-id-1
+            - field-id-2
+      required:
+      - type
+      - dataType
+      - config
+      - segment
+      - output
+      - form
+    EntityAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        helperText:
+          type: string
+          description: Helper text providing additional information about the field
+          example: Add all individuals who own 25% or more of the company
+        helperTextHtml:
+          type: string
+          description: Helper text providing additional information about the field (contains HTML tags)
+          example: <p>Add all individuals who own 25% or more of the company</p>
+        buttonText:
+          type: string
+          description: Text displayed on the button to add an entity
+          example: Add Owner
+        labelField:
+          type: string
+          description: The field to use as a label for identifying each entity
+          example: first_name
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        category:
+          type: string
+          description: Category of the entity relationship
+          example: UBO
+      required:
+      - label
+      - name
+      - helperText
+      - helperTextHtml
+      - buttonText
+      - labelField
+      - internalId
+      - category
+    EntityField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, entity)
+          example: entity
+        dataType:
+          type: string
+          description: The data type of the field
+          example: entity
+          enum:
+          - entity
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: entity
+            value: entity-data
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+        attributes:
+          description: The entity field attributes
+          allOf:
+          - $ref: '#/components/schemas/EntityAttributeObject'
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: At least one owner is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+        form:
+          type: object
+          description: The form definition containing fields and their order
+      required:
+      - type
+      - dataType
+      - config
+      - attributes
+      - validation
+      - form
+    UiAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        content:
+          type: string
+          description: Plain text content for the UI element (HTML tags stripped)
+          example: This is a paragraph
+        contentHtml:
+          type: string
+          description: HTML content for the UI element (contains HTML tags)
+          example: <p>This is a <strong>paragraph</strong></p>
+        labelHtml:
+          type: string
+          description: HTML label for the UI element (contains HTML tags)
+          example: <p>This is a <strong>paragraph</strong></p>
+        path:
+          type: string
+          description: Image path or URL for the External Media Field
+          example: /images/onboarding/welcome.png or https://example.com/image.png
+        componentType:
+          type: string
+          description: Component type for the Call to Action Field
+          example: popup
+          enum:
+          - popup
+          - accordion
+      required:
+      - label
+      - name
+      - content
+      - contentHtml
+      - labelHtml
+      - path
+      - componentType
+    UiField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., heading, paragraph, divider)
+          example: heading
+        dataType:
+          type: string
+          description: The data type of the field
+          example: ui
+          enum:
+          - ui
+        attributes:
+          description: The field attributes
+          example:
+            label: Section Title
+            name: section_title
+            content: This is a section heading
+          allOf:
+          - $ref: '#/components/schemas/UiAttributeObject'
+      required:
+      - type
+      - dataType
+      - attributes
+    RequiredValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: required
+          enum:
+          - required
+        value:
+          type: boolean
+          description: Whether the field is required
+          example: true
+      required:
+      - message
+      - type
+      - value
+    RegexValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: regex
+          enum:
+          - regex
+        value:
+          type: string
+          description: Regular expression pattern
+          example: ^[a-zA-Z0-9]+$
+      required:
+      - message
+      - type
+      - value
+    AgeValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: age
+          enum:
+          - age
+        minimumAge:
+          type: number
+          description: Minimum age required
+          example: 18
+        maximumAge:
+          type: number
+          description: Maximum age allowed
+          example: 65
+      required:
+      - message
+      - type
+    MaxFileSizeValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: maxFileSize
+          enum:
+          - maxFileSize
+        value:
+          type: number
+          description: Maximum file size in bytes
+          example: 5242880
+      required:
+      - message
+      - type
+      - value
+    FormResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The form type
+          enum:
+          - form
+        fields:
+          type: array
+          description: 'Each item represents a field in the form. NOTE: While represented as an array in the documentation,
+            the actual payload is a dictionary/object where field ID is the key and the field properties are the value.'
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/StringField'
+              title: string
+            - $ref: '#/components/schemas/NumberField'
+              title: number
+            - $ref: '#/components/schemas/BooleanField'
+              title: boolean
+            - $ref: '#/components/schemas/DateField'
+              title: date
+            - $ref: '#/components/schemas/StringListField'
+              title: stringList
+            - $ref: '#/components/schemas/CountryListField'
+              title: countryList
+            - $ref: '#/components/schemas/CurrencyListField'
+              title: currencyList
+            - $ref: '#/components/schemas/FileField'
+              title: file
+            - $ref: '#/components/schemas/ConditionalField'
+              title: conditional
+            - $ref: '#/components/schemas/EntityField'
+              title: entity
+            - $ref: '#/components/schemas/UiField'
+              title: ui
+          example:
+          - id: efdca216-e300-44cb-bb77-2810bf832212
+            type: input
+            dataType: string
+            config:
+              spektrDataField: company_name
+              value: Test APS
+            attributes:
+              type: text
+              placeholder: Acme Inc.
+              internalId: ''
+              label: Company name
+              name: Company name
+            validation:
+            - type: required
+              value: true
+              message: This field is required
+            - type: regex
+              value: ^[a-zA-Z0-9 ]+$
+              message: Only alphanumeric characters and spaces are allowed
+          - id: age-field
+            type: input
+            dataType: number
+            config:
+              spektrDataField: age
+              value: 30
+            attributes:
+              type: number
+              placeholder: Enter your age
+              label: Age
+              name: Age
+            validation:
+            - type: required
+              value: true
+              message: Age is required
+            - type: regex
+              value: ^[0-9]+$
+              message: Only numbers are allowed
+          - id: conditional-field
+            type: conditional
+            dataType: conditional
+            config:
+              spektrDataField: conditional_field
+              value: show_if_true
+            segment: {}
+            output: show
+            form:
+              fields:
+                nested-field-1:
+                  type: input
+                  dataType: string
+                  config:
+                    spektrDataField: nested_field
+                    value: ''
+                  attributes:
+                    type: text
+                    placeholder: Only shown conditionally
+                    label: Nested Field
+                    name: Nested Field
+                  validation:
+                  - type: required
+                    value: true
+                    message: This field is required
+              order:
+              - nested-field-1
+          - id: entity-field
+            type: entity
+            dataType: entity
+            config:
+              spektrDataField: beneficial_owners
+              value: ''
+            attributes:
+              label: Beneficial Owners
+              name: Beneficial Owners
+              helperText: Add all individuals who own 25% or more of the company
+              buttonText: Add Owner
+              labelField: first_name
+              category: UBO
+            validation:
+            - type: required
+              value: true
+              message: At least one owner is required
+            form:
+              fields:
+                first-name:
+                  type: input
+                  dataType: string
+                  config:
+                    spektrDataField: first_name
+                    value: ''
+                  attributes:
+                    type: text
+                    placeholder: First Name
+                    label: First Name
+                    name: First Name
+                  validation:
+                  - type: required
+                    value: true
+                    message: First name is required
+                  - type: regex
+                    value: ^[a-zA-Z ]+$
+                    message: Only letters and spaces are allowed
+                last-name:
+                  type: input
+                  dataType: string
+                  config:
+                    spektrDataField: last_name
+                    value: ''
+                  attributes:
+                    type: text
+                    placeholder: Last Name
+                    label: Last Name
+                    name: Last Name
+                  validation:
+                  - type: required
+                    value: true
+                    message: Last name is required
+                  - type: regex
+                    value: ^[a-zA-Z ]+$
+                    message: Only letters and spaces are allowed
+              order:
+              - first-name
+              - last-name
+          - id: date-field
+            type: input
+            dataType: date
+            config:
+              spektrDataField: birth_date
+              value: 946684800
+            attributes:
+              type: date
+              placeholder: Enter your birth date
+              label: Birth Date
+              name: Birth Date
+            validation:
+            - type: required
+              value: true
+              message: Birth date is required
+            - type: age
+              minimumAge: 18
+              message: You must be at least 18 years old
+      required:
+      - type
+      - fields
+    CountryListField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+        attributes:
+          description: The field attributes
+          example:
+            type: countryMultiselect
+            placeholder: Select countries
+            label: Countries
+            name: Countries
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: countryList
+          enum:
+          - countryList
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: countries
+            value: '["US", "GB"]'
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    CurrencyListField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+        attributes:
+          description: The field attributes
+          example:
+            type: currencyMultiselect
+            placeholder: Select currencies
+            label: Currencies
+            name: Currencies
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: currencyList
+          enum:
+          - currencyList
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: currencies
+            value: '["USD", "EUR"]'
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    EndStep:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: endStep
+        redirectUrl:
+          type: string
+          description: The redirect url
+          example: https://your-redirect-url.com/success
+        formText:
+          type: string
+          description: The form content or an optional message to display at the end
+          example: Thank you for completing your onboarding!
+      required:
+      - type
+      - redirectUrl
+      - formText
+    ExternalDataExpectedFieldSchema:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr data field that will be populated from the submitted payload
+          example: company_name
+        type:
+          type: string
+          description: The expected data type for the submitted value
+          enum:
+          - string
+          - number
+          - date
+          - country
+          - boolean
+          - stringList
+          - countryList
+          - currencyList
+          - object
+          example: string
+        required:
+          type: boolean
+          description: Whether this field must be included in the submit payload
+          example: true
+      required:
+      - spektrDataField
+      - type
+      - required
+    ExternalDataPayloadSchema:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: externalData
+        nodeId:
+          type: string
+          description: Unique identifier of the external data node awaiting payload submission
+          example: 680f2e7f8b3f4b01d2c9e0ab
+        submitUrl:
+          type: string
+          description: Relative endpoint the client should call to submit the payload for this step
+          example: public/actions/<token>
+        expectedFields:
+          description: Fields expected in the submit payload. Submit each value under its spektrDataField key.
+          example:
+          - spektrDataField: company_name
+            type: string
+            required: true
+          - spektrDataField: company_country
+            type: country
+            required: false
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalDataExpectedFieldSchema'
+        expiresAt:
+          type: number
+          description: Unix timestamp in milliseconds after which the external data request expires
+          example: 1735732800000
+      required:
+      - type
+      - nodeId
+      - submitUrl
+      - expectedFields
+    HitHorizonVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: hithorizon
+        searchTerm:
+          type: string
+          description: The search term submitted
+          example: spektr
+        results:
+          type: string
+          description: The results from the vendor company search
+      required:
+      - type
+      - searchTerm
+      - results
+    VeriffVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: veriff
+        params:
+          type: string
+          description: The parameters required to run a veriff session
+      required:
+      - type
+      - params
+    MitIDVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: mitId
+        params:
+          type: string
+          description: The parameters required to run a mitId session
+      required:
+      - type
+      - params
+    BankIDVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: bankId
+        params:
+          type: string
+          description: The parameters required to run a bankId session
+      required:
+      - type
+      - params
+    CurrentStepResponse:
+      type: object
+      properties:
+        node:
+          oneOf:
+          - $ref: '#/components/schemas/FormResponse'
+            title: form
+          - $ref: '#/components/schemas/EndStep'
+            title: endStep
+          - $ref: '#/components/schemas/HitHorizonVendor'
+            title: hitHorizon
+          - $ref: '#/components/schemas/VeriffVendor'
+            title: veriff
+          - $ref: '#/components/schemas/MitIDVendor'
+            title: mitId
+          - $ref: '#/components/schemas/BankIDVendor'
+            title: bankId
+          - $ref: '#/components/schemas/ExternalDataPayloadSchema'
+            title: externalData
+          description: The current step of the process, determined by the session state
+        execution:
+          description: Metadata for the execution
+          allOf:
+          - $ref: '#/components/schemas/Execution'
+      required:
+      - node
+      - execution
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Unauthorized Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - unauthorized
+          description: The error code
+      required:
+      - message
+      - errorCode
+    SubmitHitHorizon:
+      type: object
+      properties:
+        searchTerm:
+          type: string
+          description: The search term for company search
+          example: spektr
+        searchIdentifier:
+          type: string
+          description: The identifier of the company that is chosen
+          example: H-DK02xxxxxxx
+      required:
+      - searchTerm
+      - searchIdentifier
+    SubmitVeriff:
+      type: object
+      properties:
+        params:
+          type: string
+          description: The results parameters
+      required:
+      - params
+    SubmitMitId:
+      type: object
+      properties:
+        params:
+          type: string
+          description: The results parameters
+      required:
+      - params
+    SubmitBankId:
+      type: object
+      properties:
+        params:
+          type: string
+          description: The results parameters
+      required:
+      - params
+    GeneratePresignedUrlRequest:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The name of the file to be uploaded
+          example: utility_bill.pdf
+        spektrDataField:
+          type: string
+          description: The spektr data field key associated with the file
+          example: pdf_document
+      required:
+      - fileName
+      - spektrDataField
+    GeneratePresignedUrlResponse:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The name of the file to be uploaded
+          example: utility_bill.pdf
+        spektrDataField:
+          type: string
+          description: The spektr data field key associated with the file
+          example: pdf_document
+        url:
+          type: string
+          description: The presigned URL for uploading the file
+          example: https://s3.amazonaws.com/...
+        fields:
+          type: object
+          description: The fields required for the presigned URL upload
+          example:
+            key: '...'
+            AWSAccessKeyId: '...'
+            policy: '...'
+            signature: '...'
+      required:
+      - fileName
+      - spektrDataField
+      - url
+      - fields
+    SubmitV3CompletedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - completed
+          description: Submission completed immediately (no files to upload)
+      required:
+      - status
+    FileUploadPresignedUrlDto:
+      type: object
+      properties:
+        entityReference:
+          type: string
+          description: Entity reference. Only present for role-entity submissions.
+          example: 507f1f77bcf86cd799439011
+        fileName:
+          type: string
+          description: The name of the file to be uploaded
+          example: utility_bill.pdf
+        spektrDataField:
+          type: string
+          description: The spektr data field key associated with the file
+          example: pdf_document
+        url:
+          type: string
+          description: The presigned URL for uploading the file to S3
+          example: https://s3.amazonaws.com/bucket/...
+        fields:
+          type: object
+          description: Form fields required for the S3 presigned POST upload. Include these as form data when uploading.
+          example:
+            key: workspace/endClient/123/file.pdf
+            Content-Type: application/pdf
+            policy: '...'
+            x-amz-signature: '...'
+      required:
+      - fileName
+      - spektrDataField
+      - url
+      - fields
+    SubmitV3AcceptedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - accepted
+          description: Submission accepted, files need to be uploaded using presigned URLs
+        fileUploads:
+          description: Presigned URLs for uploading files to S3
+          type: array
+          items:
+            $ref: '#/components/schemas/FileUploadPresignedUrlDto'
+      required:
+      - status
+      - fileUploads
+    ConfirmCompletedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - completed
+          description: All files verified, execution resumed
+      required:
+      - status
+    ConfirmPendingResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          description: Some files are missing, presigned URLs provided for retry
+        fileUploads:
+          description: Presigned URLs for missing files
+          type: array
+          items:
+            $ref: '#/components/schemas/FileUploadPresignedUrlDto'
+      required:
+      - status
+      - fileUploads
+    FieldAttributesDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the field
+          example: Company Name
+        label:
+          type: string
+          description: Label shown to users
+          example: Company Name
+        helperText:
+          type: string
+          description: Helper text providing additional guidance
+          example: Enter the registered company name
+        placeholder:
+          type: string
+          description: Placeholder text for the input
+          example: Acme Inc.
+        type:
+          type: string
+          description: Input type (e.g. text, number, date, country)
+          example: text
+        fileType:
+          type: string
+          description: Accepted file types for file fields
+        options:
+          description: Options for select/radio fields
+          example:
+          - value: option1
+            label: Option 1
+          - value: option2
+            label: Option 2
+          type: array
+          items:
+            type: object
+        internalId:
+          type: string
+          description: Internal identifier for the field
+          example: company_name_field
+        currency:
+          type: object
+          description: Currency configuration
+          example:
+            symbol: $
+            code: USD
+        minDate:
+          type: string
+          description: Minimum allowed date for date fields (ISO format)
+          example: '1900-01-01'
+        maxDate:
+          type: string
+          description: Maximum allowed date for date fields (ISO format)
+          example: '2100-12-31'
+        maxDaysInPast:
+          type: number
+          description: Maximum number of days in the past allowed
+          example: 3650
+        maxDaysInFuture:
+          type: number
+          description: Maximum number of days in the future allowed
+          example: 30
+      required:
+      - name
+      - label
+    FieldConfigDto:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr data field key this field maps to
+          example: company_name
+        prefillDefaultValue:
+          type: boolean
+          description: Whether to prefill the default value
+          example: true
+        source:
+          type: string
+          description: Source field for prefilling
+          example: workspace
+        prefillSpektrDataField:
+          type: string
+          description: Spektr data field to use for prefilling
+          example: company_name
+        hideRoleDropdown:
+          type: boolean
+          description: Whether to hide the role dropdown
+          example: false
+        value:
+          type: object
+          description: Default or current value of the field
+          example: Acme Inc.
+        defaultValue:
+          type: object
+          description: Default value for the field
+          example: Default Company
+        prefillPreference:
+          type: object
+          description: Prefill preference configuration. `processSourceNodeIds` is optional; when omitted or empty, prefill
+            considers all eligible upstream vendor nodes (current behavior). When set, prefill is restricted to the listed
+            vendor node ids.
+          example:
+            process: true
+            record: true
+            processSourceNodeIds:
+            - 507f1f77bcf86cd799439011
+      required:
+      - spektrDataField
+    FieldValidationDto:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of validation rule
+          example: required
+          enum:
+          - required
+          - regex
+          - age
+          - maxNumberOfEntries
+          - maxNumberOfSignatories
+          - minNumberOfSignatories
+          - maxLength
+          - maxFileSize
+          - fileType
+          - maxFileNameLength
+        message:
+          type: string
+          description: Error message when validation fails
+          example: This field is required
+        value:
+          type: object
+          description: Validation value (type depends on validation type)
+          example: true
+        preset:
+          type: string
+          description: Regex preset identifier
+          example: email
+        minimumAge:
+          type: number
+          description: Minimum age (for age validation)
+          example: 18
+        maximumAge:
+          type: number
+          description: Maximum age (for age validation)
+          example: 65
+      required:
+      - type
+      - message
+    SubFieldDefinitionDto:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Unique name identifier of the sub-field
+          example: street_address
+        fieldLabel:
+          type: string
+          description: Display label for the sub-field
+          example: Street Address
+        fieldHelp:
+          type: string
+          description: Help text for the sub-field
+          example: Enter the full street address including number
+        required:
+          type: boolean
+          description: Whether the sub-field is required
+          example: true
+        type:
+          type: string
+          description: Input type of the sub-field
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        attributes:
+          description: Attributes for the sub-field
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules for the sub-field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        subFields:
+          description: Nested sub-fields for recursive object structures. Required when the sub-field type is "object", must
+            be omitted otherwise. On PATCH this array is **replaced wholesale** — partial merges are not supported.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+      required:
+      - fieldName
+      - fieldLabel
+      - required
+      - type
+    WorkspaceFieldResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the workspace field
+          example: 507f1f77bcf86cd799439011
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        validation:
+          description: Validation rules applied to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example: []
+          type: array
+          items:
+            type: string
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        protectedField:
+          type: boolean
+          description: Whether the field is protected from deletion
+          example: false
+        source:
+          type: string
+          description: Source of the field definition
+          example: workspace
+          enum:
+          - workspace
+          - spektr
+        spektrFieldKey:
+          type: string
+          description: Spektr field key for system-defined fields
+          example: company_name
+        subFields:
+          description: Sub-field definitions — present only when `type` is `"object"`. Defines the schema for each entry in
+            the object array. Sub-fields can themselves be of type `"object"` for recursive nesting.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+        createdBy:
+          type: string
+          description: Identifier of the user or API key that created this field
+          example: 507f1f77bcf86cd799439012
+        createdAt:
+          type: number
+          description: Creation timestamp (Unix milliseconds)
+          example: 1700000000000
+        updatedAt:
+          type: number
+          description: Last update timestamp (Unix milliseconds)
+          example: 1700000000000
+      required:
+      - id
+      - type
+      - attributes
+      - config
+      - category
+      - groups
+      - locked
+      - createdBy
+      - createdAt
+      - updatedAt
+    CreateWorkspaceFieldBody:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example:
+          - basic_info
+          type: array
+          items:
+            type: string
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules to apply to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        subFields:
+          description: Sub-field definitions — required when `type` is `"object"`, must be omitted for all other types. Defines
+            the schema for each entry in the object array. Sub-fields can themselves be of type `"object"` for recursive nesting.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+      required:
+      - type
+      - category
+      - attributes
+      - config
+      - locked
+    UpdateWorkspaceFieldBody:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example:
+          - basic_info
+          type: array
+          items:
+            type: string
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules to apply to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        subFields:
+          description: 'Sub-field definitions. The whole array is **replaced** when this key is present, so to add/remove/reorder
+            a single entry you must send the full desired array (recursively).
+
+
+            Required when the effective `type` is `"object"` (a non-empty array); must be omitted for all other types. If
+            `type` is being switched away from `"object"`, omit `subFields` entirely.'
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+  securitySchemes:
+    x-api-key:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: You can generate API keys in settings from the developer dashboard.

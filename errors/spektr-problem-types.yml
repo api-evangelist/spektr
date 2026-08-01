@@ -1,0 +1,46 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/spektr-openapi.yml
+format: custom
+envelope:
+  content_type: application/json
+  shape: '{ "message": string, "errorCode": string }'
+  notes: >-
+    Spektr returns a flat JSON error object with a human message and a machine
+    errorCode enum. This is not RFC 9457 application/problem+json. Validation
+    errors (400) may carry per-field detail (FieldValidationDto with error kinds
+    such as required, regex, age, maxFileSize).
+problems:
+- status: 400
+  errorCode: [validation_error, parse_error]
+  title: Payload validation or parsing failed
+  schema: [DataParseError, DataValidationError, FieldValidationDto]
+  remediation: Fix the request body to match the dataset/field schema; inspect the per-field errors array.
+- status: 401
+  errorCode: unauthorized
+  title: Unauthorized
+  schema: UnauthorizedError
+  remediation: Provide a valid x-api-key header generated in the developer dashboard.
+- status: 403
+  title: Forbidden
+  remediation: The API key lacks access to the requested workspace or resource.
+- status: 404
+  errorCode: not_found
+  title: Resource not found
+  schema: NotFoundError
+  remediation: Verify the spektrId / reference / datasetId / field id exists in the workspace.
+- status: 409
+  errorCode: conflict
+  title: Conflict
+  schema: DataConflictError
+  remediation: >-
+    Duplicate reference (upsert), an in-flight idempotency-key still processing,
+    or missing files on confirm. Retry per the documented flow.
+- status: 422
+  title: Unprocessable Entity
+  remediation: The idempotency-key was reused with different request parameters, or the payload failed semantic validation.
+- status: 500
+  errorCode: internal_server_error
+  title: Internal Server Error
+  schema: InternalServerError
+  remediation: Transient server error; retry with the same idempotency-key where supported.

@@ -1,0 +1,12 @@
+generated: '2026-07-21'
+method: generated
+source: openapi/spektr-openapi.yml
+skills:
+- file: spektr-import-and-onboard.md
+  name: Import a customer and start onboarding
+  api: openapi/spektr-openapi.yml
+  operations: [DataImportController_create_v1, DataImportController_update_v1, ActionTicketController_createOnboarding_v1, RecordController_fetchRecordByReference_v1]
+- file: spektr-execute-and-monitor.md
+  name: Execute a process and monitor via webhooks
+  api: openapi/spektr-openapi.yml
+  operations: [ExecutionController_executionV3_v3, RecordController_listOpenLoops_v1, RecordController_fetchRecord_v1, EventsController_import_v1]

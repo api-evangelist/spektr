@@ -1,0 +1,26 @@
+generated: '2026-07-21'
+method: searched
+source: https://spektr.readme.io/
+versioning:
+  scheme: uri-path
+  current: v3
+  observed: [v1, v2, v3]
+  docs: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  notes: Resources are versioned independently in the path (e.g. /v1/execution, /v2/execution, /v3/execution).
+deprecation:
+  policy_url: null
+  sunset_header: null
+  notes: >-
+    No formal published deprecation/Sunset (RFC 8594) policy found. Deprecated
+    operations are flagged in the OpenAPI (deprecated: true) with a documented
+    replacement.
+  deprecated_operations:
+  - op: openapi/spektr-openapi.yml#OrchestrationController_submit_v2
+    replacement: OrchestrationController_submitV3_v3 (POST /v3/public/actions/{token})
+  - op: openapi/spektr-openapi.yml#OrchestrationController_submitFiles_v2
+    replacement: OrchestrationController_submitV3_v3 (presigned S3 upload + confirm)
+status_page: https://spektr.statuspage.io
+release_notes: https://www.spektr.com/changelog
+sla:
+  url: null
+  notes: No public SLA/uptime target published; enterprise SLAs likely contractual.

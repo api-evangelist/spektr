@@ -1,0 +1,17 @@
+generated: '2026-07-21'
+method: searched
+source: https://www.spektr.com/changelog
+title: Release Notes
+scheme: named-dated releases (each release carries a code name)
+current_version: '16072026 - Quantum of Solace'
+notes: >-
+  Spektr publishes a public "Release Notes" changelog with dated, code-named
+  releases and narrative deep-dives. The API reference separately tracks doc
+  versions v1.0 through v2.23. Only the most recent release is captured here;
+  the live page is the source of truth.
+entries:
+- version: '16072026 - Quantum of Solace'
+  date: '2026-07-16'
+  highlights:
+  - Case investigation upgrade - link entities directly from the case view.
+  - Clearer case attribution (see exactly why a case was created).

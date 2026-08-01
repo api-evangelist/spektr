@@ -1,28 +1,284 @@
 aid: spektr
 name: Spektr
-description: 'Spektr is a company surfaced as a portfolio company of northzone, seedcamp and added to
-  the API Evangelist network as a stub for enrichment. Sector: enterprise; ai. This profile is a lead
-  awaiting the enrichment pipeline.'
+description: >-
+  Spektr is an AI-powered compliance automation platform for banks and fintechs, backed by
+  Northzone and Seedcamp. It automates KYB and KYC onboarding, continuous customer monitoring,
+  risk scoring, remediation, and transaction monitoring using configurable processes and a
+  library of AI agents (KYB, document review, network/ownership discovery, address and license
+  verification, source-of-funds, and false-positive reduction). The REST API (documented on
+  ReadMe at spektr.readme.io, served from ingest.spektr.com) covers dataset and customer-record
+  import, process execution and onboarding orchestration, event and transaction ingestion,
+  workspace field definitions, and HMAC-signed webhooks. Authentication is via an x-api-key
+  header, with idempotency-key support and Live/Sandbox/Test environments.
 url: https://raw.githubusercontent.com/api-evangelist/spektr/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - northzone
 - seedcamp
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: active
+x-tier-reason: enriched-has-api
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://cdn.prod.website-files.com/687e48ff717957204d88189a/69de85d328817d3ae0691be5_spektr-com.png
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-21'
 tags:
 - Company
-- Enterprise; Ai
-apis: []
+- Compliance
+- RegTech
+- KYB
+- KYC
+- Onboarding
+- Transaction Monitoring
+- Financial Services
+- Artificial Intelligence
+- Enterprise
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- aid: spektr:spektr-action-api-api
+  name: Spektr Action API API
+  description: The Action API API from Spektr — 1 operation(s) for action api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Action API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-action-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-events-api-api
+  name: Spektr Events API API
+  description: The Events API API from Spektr — 1 operation(s) for events api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Events API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-events-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-execution-api-api
+  name: Spektr Execution API API
+  description: The Execution API API from Spektr — 3 operation(s) for execution api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Execution API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-execution-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-import-api-api
+  name: Spektr Import API API
+  description: The Import API API from Spektr — 2 operation(s) for import api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Import API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-import-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-orchestration-api-api
+  name: Spektr Orchestration API API
+  description: The Orchestration API API from Spektr — 6 operation(s) for orchestration api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Orchestration API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-orchestration-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-records-api-api
+  name: Spektr Records API API
+  description: The Records API API from Spektr — 9 operation(s) for records api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Records API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-records-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-transaction-definitions-api
+  name: Spektr Transaction Definitions API
+  description: >-
+    The Transaction Definitions API from Spektr — 2 operation(s) for transaction definitions.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Transaction Definitions
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-transaction-definitions-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-transactions-api
+  name: Spektr Transactions API
+  description: The Transactions API from Spektr — 1 operation(s) for transactions.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-transactions-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
+- aid: spektr:spektr-workspace-fields-api-api
+  name: Spektr Workspace Fields API API
+  description: The Workspace Fields API API from Spektr — 2 operation(s) for workspace fields api.
+  humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  baseURL: https://ingest.spektr.com
+  tags:
+  - Workspace Fields API
+  properties:
+  - type: OpenAPI
+    url: openapi/spektr-workspace-fields-api-api-openapi.yml
+  - type: Documentation
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: APIReference
+    url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+  - type: GettingStarted
+    url: https://spektr.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/spektr-authentication.yml
 common:
+- type: DeveloperPortal
+  url: https://spektr.readme.io/
+- type: Documentation
+  url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+- type: APIReference
+  url: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
+- type: GettingStarted
+  url: https://spektr.readme.io/docs/getting-started
+- type: Blog
+  url: https://www.spektr.com/blog
+- type: Support
+  url: https://www.spektr.com/talk-to-us
+- type: TermsOfService
+  url: https://www.spektr.com/terms-of-service
+- type: PrivacyPolicy
+  url: https://www.spektr.com/privacy-policy
+- type: Compliance
+  url: https://www.spektr.com/trust
+- type: StatusPage
+  url: https://spektr.statuspage.io
+- type: Deprecation
+  url: lifecycle/spektr-lifecycle.yml
+- type: ChangeLog
+  url: changelog/spektr-changelog.yml
+- type: Authentication
+  url: authentication/spektr-authentication.yml
+- type: Idempotency
+  url: conventions/spektr-conventions.yml
+- type: Conventions
+  url: conventions/spektr-conventions.yml
+- type: ErrorCatalog
+  url: errors/spektr-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/spektr-lifecycle.yml
+- type: Sandbox
+  url: sandbox/spektr-sandbox.yml
+- type: Conformance
+  url: conformance/spektr-conformance.yml
+- type: DataModel
+  url: data-model/spektr-data-model.yml
+- type: Webhooks
+  url: asyncapi/spektr-webhooks.yml
+- type: MCPServer
+  url: mcp/spektr-mcp.yml
+- type: LLMsTxt
+  url: llms/spektr-llms.txt
+- type: Overlay
+  url: overlays/spektr-openapi-overlay.yaml
+- type: Packages
+  url: packages/spektr-packages.yml
+- type: SDKs
+  url: packages/spektr-packages.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: AgenticAccess
+  url: agentic-access/spektr-agentic-access.yml
+- type: DomainSecurity
+  url: security/spektr-domain-security.yml
+- type: TrustCenter
+  url: security/spektr-trust-center.yml
 - type: Website
   url: https://spektr.com
+x-enrichment:
+  date: '2026-07-21'
+  status: enriched
+  artifacts_added: 18
+  pass: local-v1

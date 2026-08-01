@@ -1,0 +1,62 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/spektr-openapi.yml
+notes: >-
+  Entity-relationship graph derived from the OpenAPI paths, id-reference fields,
+  and object reference. Records are identified by a Spektr-generated spektrId and
+  an optional client-supplied reference (unique per workspace). Everything is
+  scoped to a workspace.
+identifiers:
+  spektrId: Spektr-generated customer record id (e.g. UUID)
+  reference: client-supplied unique reference per workspace
+  datasetId: dataset id
+  workspaceId: tenant/workspace scope
+entities:
+- name: Workspace
+  description: Tenant scope for all resources.
+- name: Dataset
+  key: datasetId
+  description: Schema-bearing container for imported records; may have a parentDatasetId.
+- name: CustomerRecord
+  key: spektrId
+  alt_key: reference
+  description: A customer (person or business) record with schema-driven data fields and status.
+- name: RecordRelation
+  description: Directed link between two records (beneficial_owners, shareholders, ubo, etc.); graph must stay acyclic.
+- name: WorkspaceField
+  key: id
+  description: Field definition (flat scalar or nested object with subFields).
+- name: Process
+  key: processId
+  description: A configured compliance workflow (KYB/KYC onboarding, monitoring, risk, remediation).
+- name: ProcessRun
+  description: An execution instance of a Process over one or more records.
+- name: OnboardingSession
+  key: token
+  description: A public onboarding/orchestration session bound to a processId + workspaceId.
+- name: Event
+  description: Ingested customer event (e.g. paymentMade) for transaction monitoring.
+- name: TransactionDefinition
+  key: id
+  description: Schema for a transaction type with link and partition declarations.
+- name: Transaction
+  key: transaction_id
+  description: An ingested transaction validated against its TransactionDefinition and linked to a customer.
+- name: VendorSearch
+  key: vendorSearchId
+  description: Raw response of a vendor lookup (e.g. Kyckr) carried on timeline/webhook payloads.
+relationships:
+- {from: Dataset, type: belongs_to, to: Workspace, via: workspaceId}
+- {from: Dataset, type: has_one, to: Dataset, via: parentDatasetId}
+- {from: CustomerRecord, type: belongs_to, to: Dataset, via: datasetId}
+- {from: CustomerRecord, type: belongs_to, to: Workspace, via: workspaceId}
+- {from: RecordRelation, type: belongs_to, to: CustomerRecord, via: from}
+- {from: RecordRelation, type: belongs_to, to: CustomerRecord, via: to}
+- {from: ProcessRun, type: belongs_to, to: Process, via: processId}
+- {from: ProcessRun, type: has_many, to: CustomerRecord, via: spektrId}
+- {from: OnboardingSession, type: belongs_to, to: Process, via: processId}
+- {from: OnboardingSession, type: belongs_to, to: Workspace, via: workspaceId}
+- {from: Event, type: belongs_to, to: CustomerRecord, via: spektrId}
+- {from: Transaction, type: belongs_to, to: TransactionDefinition, via: type}
+- {from: Transaction, type: belongs_to, to: CustomerRecord, via: customer link}
+- {from: VendorSearch, type: belongs_to, to: CustomerRecord, via: spektrId}

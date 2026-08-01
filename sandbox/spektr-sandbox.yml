@@ -1,0 +1,29 @@
+generated: '2026-07-21'
+method: searched
+source: https://spektr.readme.io/docs/environments
+summary: >-
+  Spektr provides three isolated environments (Live, Sandbox, Test). Sandbox and
+  Test clone Live configuration, mock vendor data, and are throttled. The API host
+  is prefixed per environment. No test card numbers apply (Spektr is a compliance
+  platform, not a card processor) - the "test data" surface is mocked vendor
+  responses and cloned configuration.
+environments:
+- name: Live
+  purpose: Serves all live traffic and real user data.
+  api_host: https://api.spektr.com
+  ingest_host: https://ingest.spektr.com
+  characteristics: Real data, full performance, production-ready.
+- name: Sandbox
+  purpose: UAT and functional testing.
+  api_host: https://sandbox-api.spektr.com
+  ingest_host: https://sandbox-ingest.spektr.com
+  characteristics: Cloned configuration, mocked vendor data, throttled.
+- name: Test
+  purpose: Development environment for engineering teams.
+  api_host: https://test-api.spektr.com
+  ingest_host: https://test-ingest.spektr.com
+  characteristics: Cloned configuration, mocked vendor data, throttled.
+cloning:
+  direction: one-way (Live -> Sandbox or Live -> Test only)
+  cloneable: [Processes, Themes, Fields, Translations, Dataset schemas]
+mocked_vendor_data: true
