@@ -1,0 +1,373 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Records API API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Records API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get pending process runs",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/record/listOpenLoops",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get process pending runs for a given list of spektr IDs and/or reference IDs."
+        },
+        {
+          "info": {
+            "name": "Fetch customer record",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/record/:spektrId",
+            "params": [
+              {
+                "name": "spektrId",
+                "value": "",
+                "type": "path",
+                "description": "The spektr ID of the customer record"
+              },
+              {
+                "name": "appendEntities",
+                "value": "",
+                "type": "query",
+                "description": "Appends the ownership graph entities to the response"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch a customer record by its spektr ID"
+        },
+        {
+          "info": {
+            "name": "Update customer record",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://ingest.spektr.com/v1/record/:spektrId",
+            "params": [
+              {
+                "name": "spektrId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the customer record"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update a customer record by its spektr ID"
+        },
+        {
+          "info": {
+            "name": "Update customer record v2",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://ingest.spektr.com/v2/record/:spektrId",
+            "params": [
+              {
+                "name": "spektrId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the customer record"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The type of the customer record id. Either spektrId or reference"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update a customer record by its spektr ID. The ID can be a spektr ID or a reference ID. The type of the ID is specified in the type query parameter. Provide at least one of a non-empty data object, status, or a timestamp field (createdAt / updatedAt in Unix ms)."
+        },
+        {
+          "info": {
+            "name": "Fetch customer record by reference",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/record/reference/:reference",
+            "params": [
+              {
+                "name": "reference",
+                "value": "",
+                "type": "path",
+                "description": "The customer reference"
+              },
+              {
+                "name": "appendFiles",
+                "value": "",
+                "type": "query",
+                "description": "Appends the presigned file URLs to the response"
+              },
+              {
+                "name": "appendEntities",
+                "value": "",
+                "type": "query",
+                "description": "Appends the ownership graph entities to the response"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch a customer record by a client reference. \n\nUsage: \n - on the first onboarding init request, pass the reference in the data\n - whenever the spektrId is needed, use this endpoint to fetch the \n   record using your reference"
+        },
+        {
+          "info": {
+            "name": "Get form submits for a given record",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/record/:spektrId/timeline",
+            "params": [
+              {
+                "name": "spektrId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the customer record"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get form submits for a given record by its ID. If the ID is not found, an empty array is returned."
+        },
+        {
+          "info": {
+            "name": "Fetch records in bulk via API",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/record/bulk/fetch/api",
+            "params": [
+              {
+                "name": "createdAfter",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records created after this date"
+              },
+              {
+                "name": "createdBefore",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records created before this date"
+              },
+              {
+                "name": "updatedAfter",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records updated after this date"
+              },
+              {
+                "name": "updatedBefore",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records updated before this date"
+              },
+              {
+                "name": "maxCount",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of records to fetch (limited to 5000)"
+              },
+              {
+                "name": "token",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for cursor-based pagination. Use the token from the response to fetch the next page of results."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch multiple customer records and return them directly in the API response. Optimized for smaller datasets. Max 5000 records at a time"
+        },
+        {
+          "info": {
+            "name": "Fetch records in bulk via S3",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/record/bulk/fetch/s3",
+            "params": [
+              {
+                "name": "createdAfter",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records created after this date"
+              },
+              {
+                "name": "createdBefore",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records created before this date"
+              },
+              {
+                "name": "updatedAfter",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records updated after this date"
+              },
+              {
+                "name": "updatedBefore",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp (milliseconds) to fetch records updated before this date"
+              },
+              {
+                "name": "maxCount",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of records to fetch (up to 300,000)."
+              },
+              {
+                "name": "token",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for cursor-based pagination. Use the token from the response to fetch the next page of results."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch multiple customer records and return signed URLs to download them from S3. Handles large datasets by chunking data into multiple files. Max 300,000 records at a time. Data will be split into files of max 10,000 records."
+        },
+        {
+          "info": {
+            "name": "Create client record relations",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/record/relations",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Links two or more client records together (e.g. a company and its beneficial owners). Pass an array of relation items where each side (`from`, `to`) is identified by `spektrId` or `reference`. Each item must specify `relationRole` (one of the supported role keys such as `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`, `senior_management`, `board_of_directors`, `controlling_entities`, `subsidiaries`, `authorized_signatories`, `signatories`, `contact_info`, `person_with_significa"
+        },
+        {
+          "info": {
+            "name": "Update client record relations",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://ingest.spektr.com/v1/record/relations",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Updates mutable fields on existing v2 client record relations identified by `(from, to, relationRole)`. Only `direct`, `positions`, and `data` may be modified; `from`, `to`, `relationRole`, `createdAt`, and `updatedAt` are immutable. The `data` field is shallow-merged with the stored value (provided keys overwrite, existing unspecified keys are preserved). Each item must include at least one of `direct`, `positions`, or `data`. All relations in the batch are verified to exist before any updates "
+        },
+        {
+          "info": {
+            "name": "Fetch a vendor search",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/record/vendor-searches/:vendorSearchId",
+            "params": [
+              {
+                "name": "vendorSearchId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the vendor search to fetch"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Fetch the raw, unmodified response of a single vendor search (e.g. a Kyckr lookup) by its ID. The `vendorSearchId` is the reference carried on the customer's timeline service-run events and outbound webhook payloads."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

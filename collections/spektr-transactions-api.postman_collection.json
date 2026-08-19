@@ -1,0 +1,257 @@
+{
+  "item": [
+    {
+      "id": "803c6791-4018-4a1a-99bc-256b22679f49",
+      "name": "Transactions",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "53dee797-2db2-49b8-9671-52285332361a",
+          "name": "Ingest transaction batch",
+          "request": {
+            "name": "Ingest transaction batch",
+            "description": {
+              "content": "Ingests a batch of up to 1,000 transactions. Each transaction is validated against the workspace Transaction Definition for its type, linked to the relevant customer, persisted, and forwarded for transaction monitoring. Returns HTTP 200 regardless of per item outcome. Check the failed count and errors array in the response body.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "transactions",
+                "batch"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactions\": [\n    {\n      \"type\": \"<string>\",\n      \"transaction_id\": \"<string>\",\n      \"transactionDate\": \"<number>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "aa9a67a2-6ed1-48b4-84ac-d77927ab7d2e",
+              "name": "Batch processed. Check failed and errors for per item rejections. A nonzero failed count does not change the HTTP status.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transactions",
+                    "batch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": \"txn_abc123\",\n      \"transactionDate\": 1748512800000,\n      \"amount\": 1500,\n      \"currency\": \"EUR\",\n      \"source_account\": {\n        \"iban\": \"DE89370400440532013000\"\n      },\n      \"destination_account\": {\n        \"iban\": \"GB29NWBK60161331926819\"\n      }\n    },\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": \"txn_def456\",\n      \"transactionDate\": 1748516400000,\n      \"amount\": 250,\n      \"currency\": \"USD\",\n      \"source_account\": {\n        \"iban\": \"FR7630006000011234567890189\"\n      },\n      \"destination_account\": {\n        \"iban\": \"ES9121000418450200051332\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": 2,\n  \"failed\": 0,\n  \"errors\": []\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a6e5245b-1fed-48dd-a279-14c4de76e6ba",
+              "name": "Request body failed structural validation (for example transactions array is missing, empty, exceeds 1,000 items, or an item is missing the required type field).",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transactions",
+                    "batch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": \"txn_abc123\",\n      \"transactionDate\": 1748512800000,\n      \"amount\": 1500,\n      \"currency\": \"EUR\",\n      \"source_account\": {\n        \"iban\": \"DE89370400440532013000\"\n      },\n      \"destination_account\": {\n        \"iban\": \"GB29NWBK60161331926819\"\n      }\n    },\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": \"txn_def456\",\n      \"transactionDate\": 1748516400000,\n      \"amount\": 250,\n      \"currency\": \"USD\",\n      \"source_account\": {\n        \"iban\": \"FR7630006000011234567890189\"\n      },\n      \"destination_account\": {\n        \"iban\": \"ES9121000418450200051332\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Batch must contain at least one transaction\",\n  \"statusCode\": 400\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8656b4f2-a06e-40f6-a4ff-2fe6d514ec85",
+              "name": "Unexpected server error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transactions",
+                    "batch"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"transactions\": [\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": \"txn_abc123\",\n      \"transactionDate\": 1748512800000,\n      \"amount\": 1500,\n      \"currency\": \"EUR\",\n      \"source_account\": {\n        \"iban\": \"DE89370400440532013000\"\n      },\n      \"destination_account\": {\n        \"iban\": \"GB29NWBK60161331926819\"\n      }\n    },\n    {\n      \"type\": \"payment\",\n      \"transaction_id\": \"txn_def456\",\n      \"transactionDate\": 1748516400000,\n      \"amount\": 250,\n      \"currency\": \"USD\",\n      \"source_account\": {\n        \"iban\": \"FR7630006000011234567890189\"\n      },\n      \"destination_account\": {\n        \"iban\": \"ES9121000418450200051332\"\n      }\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://ingest.spektr.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "0bd534a4-0eca-493c-ae4e-b0916692843b",
+    "name": "Spektr Action API Transactions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.",
+      "type": "text/plain"
+    }
+  }
+}

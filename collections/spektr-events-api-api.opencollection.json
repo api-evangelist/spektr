@@ -1,0 +1,100 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Events API API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Events API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List events",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/events",
+            "params": [
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number. Default is 1"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page. Default is 10. Min is 1. Max is 50"
+              },
+              {
+                "name": "delivered",
+                "value": "",
+                "type": "query",
+                "description": "Filter by delivery status"
+              },
+              {
+                "name": "createdBefore",
+                "value": "",
+                "type": "query",
+                "description": "Filter events created before timestamp (epoch, inclusive)"
+              },
+              {
+                "name": "createdAfter",
+                "value": "",
+                "type": "query",
+                "description": "Filter events created after timestamp (epoch, exclusive)"
+              },
+              {
+                "name": "sortBy",
+                "value": "",
+                "type": "query",
+                "description": "Field to sort by. Default is createdAt"
+              },
+              {
+                "name": "sortOrder",
+                "value": "",
+                "type": "query",
+                "description": "Sort order. Default is desc"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List all events"
+        },
+        {
+          "info": {
+            "name": "Import events",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/events",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Imports a list of events"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

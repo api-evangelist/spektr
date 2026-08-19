@@ -1,0 +1,64 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Transaction Definitions API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Transaction Definitions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create transaction definition",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/transaction-definitions",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a new transaction definition with a nested field schema, customer link declarations, and optional non-client-scoped partitions. Leaf field values must be one of: \"string\", \"number\", \"ipAddress\", \"date\", \"array\". Array fields accept only primitive elements (string, number, boolean, null). Each link txPath and partition txPath must resolve to a declared leaf field (link and partition paths may not target array fields). Partition types must not collide with link types."
+        },
+        {
+          "info": {
+            "name": "Delete transaction definition",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://ingest.spektr.com/v1/transaction-definitions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the transaction definition"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a transaction definition by ID."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

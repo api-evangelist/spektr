@@ -1,0 +1,253 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Orchestration API API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Orchestration API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Start Onboarding",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v2/public/actions/processId/:processId/workspaceId/:workspaceId",
+            "headers": [
+              {
+                "name": "x-spektr-block-until-ready",
+                "value": ""
+              },
+              {
+                "name": "idempotency-key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "processId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the onboarding process template"
+              },
+              {
+                "name": "workspaceId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of your workspace"
+              },
+              {
+                "name": "reference",
+                "value": "",
+                "type": "query",
+                "description": "Your custom reference ID to track this onboarding session or it can be included in the data payload"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates a new onboarding session for your client. You can optionally prefill client data by submitting a payload in the request body. The response includes a session token that you can append to the onboarding URL: https://actions.spektr.com/form?token={token} to direct your client to the onboarding flow. If using a custom domain, replace actions.spektr.com with your domain."
+        },
+        {
+          "info": {
+            "name": "Fetch current step",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v2/public/actions/:token",
+            "headers": [
+              {
+                "name": "content-language",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "path",
+                "description": "Session token generated from InitOnboarding endpoint"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "This endpoint is the second step in the onboarding process (and is continually used thereafter using polling mechanism)\n\n1. After a session is created using the InitOnboarding endpoint and a `token` is generated.\n2. Clients poll this endpoint with the `token` to retrieve the current step.\n3. Depending on the response, the client may need to collect specific data or perform certain actions\n   before calling `Submit` with that data.\n   When the node type is `externalData`, inspect `expectedFields`"
+        },
+        {
+          "info": {
+            "name": "Submit data",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v2/public/actions/:token",
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "**Deprecated.** Use `POST /v3/public/actions/{token}` instead, which supports file uploads via presigned S3 URLs and role-entity submissions in a single request (see the [guide](https://spektr.readme.io/docs/submitting-files))."
+        },
+        {
+          "info": {
+            "name": "Go back",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v2/public/actions/:token/go-back",
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "path",
+                "description": "Session token for the process"
+              },
+              {
+                "name": "reset",
+                "value": "",
+                "type": "query",
+                "description": "Set to \"true\" to reset the entire process to the beginning instead of going back one step"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Enables the process to move one step backward, if applicable.\n     Use the query parameter 'reset=true' to reset the entire process to the beginning instead of going back one step.\n     After calling this, the client should poll `FetchCurrentStep` to get the newly-updated step."
+        },
+        {
+          "info": {
+            "name": "Generate Presigned URLs",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v2/public/actions/:token/submit-files",
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "**Deprecated.** Use `POST /v3/public/actions/{token}` instead, which handles file uploads as part of the standard submission via presigned S3 URLs returned in the response, followed by `POST /v3/public/actions/{token}/confirm` to finalize (see the [guide](https://spektr.readme.io/docs/submitting-files))."
+        },
+        {
+          "info": {
+            "name": "Submit form data (V3)",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v3/public/actions/:token",
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "path",
+                "description": "Session token"
+              },
+              {
+                "name": "filledBy",
+                "value": "",
+                "type": "query",
+                "description": "The name of the entity that filled the form"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Submits form data with support for deferred file uploads.\n\n**Integration Flow:**\n1. Submit form data including file names for any file fields\n2. If files need uploading, response includes presigned S3 URLs (status: `accepted`)\n3. Upload files to S3 using the presigned URLs (multipart form POST)\n4. Call `POST /:token/confirm` to verify uploads and complete submission\n\n**Response Status:**\n- `completed`: No files to upload, submission processed immediately\n- `accepted`: Files need uploading, use p"
+        },
+        {
+          "info": {
+            "name": "Confirm submission",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v3/public/actions/:token/confirm",
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "path",
+                "description": "Session token from InitOnboarding endpoint"
+              },
+              {
+                "name": "filledBy",
+                "value": "",
+                "type": "query",
+                "description": "The name of the entity that filled the form"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Confirms that all file uploads are complete and triggers execution to resume.\n\n**Integration Flow:**\n1. Call after uploading all files from the `submitV3` response to S3\n2. If all files are present in S3, returns `completed` and resumes process execution\n3. If files are missing, throws 409 Conflict with new presigned URLs for retry\n\n**Response Status:**\n- `completed`: All files verified, execution resumed\n- `pending` (409 Conflict): Files missing, presigned URLs provided for retry\n\n**Retry Flow:"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

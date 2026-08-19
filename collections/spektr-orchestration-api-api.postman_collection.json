@@ -1,0 +1,2282 @@
+{
+  "item": [
+    {
+      "id": "9ff76af2-076a-4dfb-81bf-481f126f19a3",
+      "name": "Orchestration API",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "e423f97d-1f62-4d3c-8e79-e29163ff309e",
+          "name": "Start Onboarding",
+          "request": {
+            "name": "Start Onboarding",
+            "description": {
+              "content": "Creates a new onboarding session for your client. You can optionally prefill client data by submitting a payload in the request body. The response includes a session token that you can append to the onboarding URL: https://actions.spektr.com/form?token={token} to direct your client to the onboarding flow. If using a custom domain, replace actions.spektr.com with your domain.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "public",
+                "actions",
+                "processId",
+                ":processId",
+                "workspaceId",
+                ":workspaceId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "reference",
+                  "value": "<string>",
+                  "description": "Your custom reference ID to track this onboarding session or it can be included in the data payload"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "processId",
+                  "description": "(Required) The ID of the onboarding process template"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "workspaceId",
+                  "description": "(Required) The ID of your workspace"
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.",
+                "key": "x-spektr-block-until-ready",
+                "value": "<string>"
+              },
+              {
+                "disabled": false,
+                "description": "Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.",
+                "key": "idempotency-key",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"first_name\": \"<string>\",\n    \"last_name\": \"<string>\",\n    \"email\": \"<string>\",\n    \"phone_number\": \"<string>\",\n    \"reference\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "063a3854-2de9-4209-a6dc-6f245dd252ab",
+              "name": "Onboarding session created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    "processId",
+                    ":processId",
+                    "workspaceId",
+                    ":workspaceId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reference",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "processId",
+                      "description": "(Required) The ID of the onboarding process template"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "workspaceId",
+                      "description": "(Required) The ID of your workspace"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.",
+                    "key": "x-spektr-block-until-ready",
+                    "value": "<string>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.",
+                    "key": "idempotency-key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone_number\": \"+1234567890\",\n    \"reference\": \"1234567890\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"availableLanguages\": [\n    \"en-GB\",\n    \"da-DK\",\n    \"sv-SE\"\n  ],\n  \"spektrId\": \"68876fa58281009be64b58f7\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ea4a4fc0-efd3-4db3-bd15-1094249ebbb8",
+              "name": "Invalid input parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    "processId",
+                    ":processId",
+                    "workspaceId",
+                    ":workspaceId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reference",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "processId",
+                      "description": "(Required) The ID of the onboarding process template"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "workspaceId",
+                      "description": "(Required) The ID of your workspace"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.",
+                    "key": "x-spektr-block-until-ready",
+                    "value": "<string>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.",
+                    "key": "idempotency-key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone_number\": \"+1234567890\",\n    \"reference\": \"1234567890\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Invalid input parameters\",\n  \"error\": \"Bad Request\",\n  \"statusCode\": 400\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "26dde368-5ef9-4f81-ade6-be872cc38b2e",
+              "name": "A request with this idempotency-key is currently being processed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    "processId",
+                    ":processId",
+                    "workspaceId",
+                    ":workspaceId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reference",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "processId",
+                      "description": "(Required) The ID of the onboarding process template"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "workspaceId",
+                      "description": "(Required) The ID of your workspace"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.",
+                    "key": "x-spektr-block-until-ready",
+                    "value": "<string>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.",
+                    "key": "idempotency-key",
+                    "value": "<string>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone_number\": \"+1234567890\",\n    \"reference\": \"1234567890\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "ef7f2f2c-5216-4392-854a-b7d25182f736",
+              "name": "idempotency-key has already been used with different request parameters",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    "processId",
+                    ":processId",
+                    "workspaceId",
+                    ":workspaceId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reference",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "processId",
+                      "description": "(Required) The ID of the onboarding process template"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "workspaceId",
+                      "description": "(Required) The ID of your workspace"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Set to 'true' to have the server wait until the onboarding session is ready to accept a submission before responding, so the returned token can be submitted immediately without client-side polling. Defaults to false.",
+                    "key": "x-spektr-block-until-ready",
+                    "value": "<string>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Optional unique key (1–255 chars) to ensure the request is processed only once. If a duplicate key is sent with the same request parameters, the original response is replayed. Replayed responses include the `idempotent-replayed: true` header.",
+                    "key": "idempotency-key",
+                    "value": "<string>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone_number\": \"+1234567890\",\n    \"reference\": \"1234567890\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+              "code": 422,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e9cbc2da-5b93-4e1d-87d5-bc858e802e91",
+          "name": "Fetch current step",
+          "request": {
+            "name": "Fetch current step",
+            "description": {
+              "content": "This endpoint is the second step in the onboarding process (and is continually used thereafter using polling mechanism)\n\n1. After a session is created using the InitOnboarding endpoint and a `token` is generated.\n2. Clients poll this endpoint with the `token` to retrieve the current step.\n3. Depending on the response, the client may need to collect specific data or perform certain actions\n   before calling `Submit` with that data.\n   When the node type is `externalData`, inspect `expectedFields` to know exactly which payload fields must be submitted to `submitUrl`.\n4. The client can then poll again to see if new steps are required or if the process has finished.\nPossible values are `running`, `pending`, `failed` or `completed`. Whenever `pending` is returned, the client should stop polling and submit the required payload according to the step type.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "public",
+                "actions",
+                ":token"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "token",
+                  "description": "(Required) Session token generated from InitOnboarding endpoint"
+                }
+              ]
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "Language code for localized content (e.g., en-US, da-DK)",
+                "key": "content-language",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "7115c12c-2818-4aa0-8cce-095177b45de4",
+              "name": "Process initiated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token generated from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Language code for localized content (e.g., en-US, da-DK)",
+                    "key": "content-language",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"node\": {\n    \"type\": \"form\",\n    \"fields\": [\n      {\n        \"type\": \"input\",\n        \"validation\": [\n          {\n            \"type\": \"required\",\n            \"value\": true,\n            \"message\": \"This field is required\"\n          },\n          {\n            \"type\": \"regex\",\n            \"value\": \"^[a-zA-Z0-9 ]+$\",\n            \"message\": \"Only alphanumeric characters and spaces are allowed\"\n          }\n        ],\n        \"attributes\": {\n          \"type\": \"text\",\n          \"placeholder\": \"Acme Inc.\",\n          \"internalId\": \"\",\n          \"label\": \"Company name\",\n          \"name\": \"Company name\",\n          \"maxLength\": 100\n        },\n        \"dataType\": \"string\",\n        \"config\": {\n          \"spektrDataField\": \"company_name\",\n          \"value\": \"Test APS\"\n        }\n      },\n      {\n        \"type\": \"input\",\n        \"validation\": [\n          {\n            \"type\": \"required\",\n            \"value\": true,\n            \"message\": \"This field is required\"\n          },\n          {\n            \"type\": \"regex\",\n            \"value\": \"^[a-zA-Z0-9 ]+$\",\n            \"message\": \"Only alphanumeric characters and spaces are allowed\"\n          }\n        ],\n        \"attributes\": {\n          \"type\": \"text\",\n          \"placeholder\": \"Acme Inc.\",\n          \"internalId\": \"\",\n          \"label\": \"Company name\",\n          \"name\": \"Company name\",\n          \"maxLength\": 100\n        },\n        \"dataType\": \"string\",\n        \"config\": {\n          \"spektrDataField\": \"company_name\",\n          \"value\": \"Test APS\"\n        }\n      }\n    ]\n  },\n  \"execution\": {\n    \"id\": \"string\",\n    \"parentId\": \"string\",\n    \"status\": \"pending\",\n    \"error\": \"Error message\",\n    \"currentStep\": 4,\n    \"maxStep\": 6,\n    \"minStep\": 6\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0bdec662-2765-4081-9240-d483f41977e3",
+              "name": "Parameters are invalid or the Token is invalid or expired",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token generated from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Language code for localized content (e.g., en-US, da-DK)",
+                    "key": "content-language",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized Exception\",\n  \"errorCode\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "15d94f52-abca-4449-8cf6-dca6a272f6a4",
+              "name": "Internal error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token generated from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Language code for localized content (e.g., en-US, da-DK)",
+                    "key": "content-language",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d4b7c512-6511-48f0-9422-8465c8f98984",
+          "name": "Submit data",
+          "request": {
+            "name": "Submit data",
+            "description": {
+              "content": "**Deprecated.** Use `POST /v3/public/actions/{token}` instead, which supports file uploads via presigned S3 URLs and role-entity submissions in a single request (see the [guide](https://spektr.readme.io/docs/submitting-files)).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "public",
+                "actions",
+                ":token"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "token",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key_0\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "377cce1e-5355-4418-862f-93e8077f192a",
+              "name": "Data submitted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "25cb0b06-ada3-436c-ba90-021830b61734",
+              "name": "Payload validation",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"errorCode\": \"invalid_request_body\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e2497646-ba11-44c3-a2c0-a95842f9443a",
+              "name": "Parameters are invalid or the Token is invalid or expired",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized Exception\",\n  \"errorCode\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7f123fd9-4c99-41ad-9b78-637d968d9442",
+              "name": "Internal error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f37afb6d-9d7e-41f3-b882-1801eb033355",
+          "name": "Go back",
+          "request": {
+            "name": "Go back",
+            "description": {
+              "content": "Enables the process to move one step backward, if applicable.\n     Use the query parameter 'reset=true' to reset the entire process to the beginning instead of going back one step.\n     After calling this, the client should poll `FetchCurrentStep` to get the newly-updated step.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "public",
+                "actions",
+                ":token",
+                "go-back"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "reset",
+                  "value": "<string>",
+                  "description": "Set to \"true\" to reset the entire process to the beginning instead of going back one step"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "token",
+                  "description": "(Required) Session token for the process"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "d8ba0f7a-2c29-48b7-b53a-b0f8f61beeb7",
+              "name": "Backward step operation successful",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token",
+                    "go-back"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reset",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token for the process"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "5f2f3536-662c-4d70-b0f5-ce8b33a24449",
+              "name": "Parameters are invalid or the Token is invalid or expired",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token",
+                    "go-back"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reset",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token for the process"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized Exception\",\n  \"errorCode\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b38bdf95-5edd-4a15-8aed-ca33a8e0d9ea",
+              "name": "Internal error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token",
+                    "go-back"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "reset",
+                      "value": "true"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token for the process"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "68f0b868-26e9-480a-92ff-a8381c893cf0",
+          "name": "Generate Presigned URLs",
+          "request": {
+            "name": "Generate Presigned URLs",
+            "description": {
+              "content": "**Deprecated.** Use `POST /v3/public/actions/{token}` instead, which handles file uploads as part of the standard submission via presigned S3 URLs returned in the response, followed by `POST /v3/public/actions/{token}/confirm` to finalize (see the [guide](https://spektr.readme.io/docs/submitting-files)).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "public",
+                "actions",
+                ":token",
+                "submit-files"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "token",
+                  "description": "(Required) "
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"fileName\": \"<string>\",\n    \"spektrDataField\": \"<string>\"\n  },\n  {\n    \"fileName\": \"<string>\",\n    \"spektrDataField\": \"<string>\"\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "97d2071b-ff4f-4e4e-9636-5976c398d793",
+              "name": "Presigned URLs generated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token",
+                    "submit-files"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\"\n  },\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\",\n    \"url\": \"https://s3.amazonaws.com/...\",\n    \"fields\": {\n      \"key\": \"...\",\n      \"AWSAccessKeyId\": \"...\",\n      \"policy\": \"...\",\n      \"signature\": \"...\"\n    }\n  },\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\",\n    \"url\": \"https://s3.amazonaws.com/...\",\n    \"fields\": {\n      \"key\": \"...\",\n      \"AWSAccessKeyId\": \"...\",\n      \"policy\": \"...\",\n      \"signature\": \"...\"\n    }\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "eb29eae4-e356-475c-9353-74319ef9d4fb",
+              "name": "Parameters are invalid or the Token is invalid or expired",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token",
+                    "submit-files"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\"\n  },\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized Exception\",\n  \"errorCode\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2f571659-166b-4b73-898a-411cdbb6b096",
+              "name": "Internal error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "public",
+                    "actions",
+                    ":token",
+                    "submit-files"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) "
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\"\n  },\n  {\n    \"fileName\": \"utility_bill.pdf\",\n    \"spektrDataField\": \"pdf_document\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "62d97655-2e10-4eae-b1a5-8a69bd84093c",
+          "name": "Submit form data (V3)",
+          "request": {
+            "name": "Submit form data (V3)",
+            "description": {
+              "content": "Submits form data with support for deferred file uploads.\n\n**Integration Flow:**\n1. Submit form data including file names for any file fields\n2. If files need uploading, response includes presigned S3 URLs (status: `accepted`)\n3. Upload files to S3 using the presigned URLs (multipart form POST)\n4. Call `POST /:token/confirm` to verify uploads and complete submission\n\n**Response Status:**\n- `completed`: No files to upload, submission processed immediately\n- `accepted`: Files need uploading, use provided presigned URLs then call /confirm\n\n**File Upload:**\nWhen uploading to S3, send a multipart form POST to the `url` with:\n- All fields from the `fields` object as form fields\n- The file content as `file` field",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v3",
+                "public",
+                "actions",
+                ":token"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filledBy",
+                  "value": "<string>",
+                  "description": "(Required) The name of the entity that filled the form"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "token",
+                  "description": "(Required) Session token"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key_0\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "96a9cead-cba8-4a70-96cc-81b191cd23e7",
+              "name": "Submission completed or accepted",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\",\n  \"key_1\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"completed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "eb444df9-604a-4da6-9e51-1c246671e5a1",
+              "name": "Validation error (invalid data or file type not allowed)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\",\n  \"key_1\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"errorCode\": \"invalid_request_body\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "cb736227-09b2-43b3-9272-f78587b95616",
+              "name": "Token is invalid or expired",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\",\n  \"key_1\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized Exception\",\n  \"errorCode\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e8461cde-4ebd-472d-b294-1545171e42a7",
+              "name": "Internal server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"key_0\": \"<string>\",\n  \"key_1\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c1f69040-68e9-4f29-b929-b7dadcb01685",
+          "name": "Confirm submission",
+          "request": {
+            "name": "Confirm submission",
+            "description": {
+              "content": "Confirms that all file uploads are complete and triggers execution to resume.\n\n**Integration Flow:**\n1. Call after uploading all files from the `submitV3` response to S3\n2. If all files are present in S3, returns `completed` and resumes process execution\n3. If files are missing, throws 409 Conflict with new presigned URLs for retry\n\n**Response Status:**\n- `completed`: All files verified, execution resumed\n- `pending` (409 Conflict): Files missing, presigned URLs provided for retry\n\n**Retry Flow:**\nIf 409 is returned, upload the missing files using the new presigned URLs and call confirm again.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v3",
+                "public",
+                "actions",
+                ":token",
+                "confirm"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "filledBy",
+                  "value": "<string>",
+                  "description": "(Required) The name of the entity that filled the form"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "token",
+                  "description": "(Required) Session token from InitOnboarding endpoint"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "b33204b5-6aa1-45ea-8b4c-3ff53a2c212d",
+              "name": "All files verified, execution resumed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token",
+                    "confirm"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"completed\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "36502bf6-a887-491a-b0cc-3cbf029ff45a",
+              "name": "Context status is not pending",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token",
+                    "confirm"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"string\",\n  \"errorCode\": \"invalid_request_body\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2ffc7766-893e-49fc-bd85-f3ad85ae5b95",
+              "name": "Token is invalid or expired",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token",
+                    "confirm"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Unauthorized Exception\",\n  \"errorCode\": \"unauthorized\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5305f400-a243-422d-b6e2-a9dda987072d",
+              "name": "Files missing - presigned URLs provided for retry upload",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token",
+                    "confirm"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"pending\",\n  \"fileUploads\": [\n    {\n      \"fileName\": \"utility_bill.pdf\",\n      \"spektrDataField\": \"pdf_document\",\n      \"url\": \"https://s3.amazonaws.com/bucket/...\",\n      \"fields\": {\n        \"key\": \"workspace/endClient/123/file.pdf\",\n        \"Content-Type\": \"application/pdf\",\n        \"policy\": \"...\",\n        \"x-amz-signature\": \"...\"\n      },\n      \"entityReference\": \"507f1f77bcf86cd799439011\"\n    },\n    {\n      \"fileName\": \"utility_bill.pdf\",\n      \"spektrDataField\": \"pdf_document\",\n      \"url\": \"https://s3.amazonaws.com/bucket/...\",\n      \"fields\": {\n        \"key\": \"workspace/endClient/123/file.pdf\",\n        \"Content-Type\": \"application/pdf\",\n        \"policy\": \"...\",\n        \"x-amz-signature\": \"...\"\n      },\n      \"entityReference\": \"507f1f77bcf86cd799439011\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6cf826e9-4843-4dec-a00b-1ae5084614dc",
+              "name": "Internal server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v3",
+                    "public",
+                    "actions",
+                    ":token",
+                    "confirm"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "filledBy",
+                      "value": "John Doe"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "token",
+                      "description": "(Required) Session token from InitOnboarding endpoint"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://ingest.spektr.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "d75b2397-4b32-4c8c-a5de-5d395a89f229",
+    "name": "Spektr Action API Orchestration API API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.",
+      "type": "text/plain"
+    }
+  }
+}

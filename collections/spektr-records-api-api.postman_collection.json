@@ -1,0 +1,2134 @@
+{
+  "item": [
+    {
+      "id": "d24f2c7d-0c04-43c3-94de-96c24fbe588b",
+      "name": "Records API",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "65c1d1e7-9788-432c-92df-35f24a52246f",
+          "name": "Get pending process runs",
+          "request": {
+            "name": "Get pending process runs",
+            "description": {
+              "content": "Get process pending runs for a given list of spektr IDs and/or reference IDs.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "listOpenLoops"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "aa539c14-97a0-447e-9958-5dd420492195",
+              "name": "Process runs fetched successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "listOpenLoops"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"executionContextId\": \"string\",\n  \"spektrId\": \"string\",\n  \"processId\": \"string\",\n  \"processName\": \"string\",\n  \"processType\": \"string\",\n  \"version\": {\n    \"currentVersion\": 9,\n    \"latestVersion\": 11\n  },\n  \"status\": \"string\",\n  \"isExpired\": true,\n  \"reference\": \"string\",\n  \"token\": \"string\",\n  \"header\": \"string\",\n  \"description\": \"string\",\n  \"triggerSource\": {\n    \"sourceType\": \"spektr_process\",\n    \"processId\": \"string\",\n    \"userId\": \"string\",\n    \"userName\": \"string\"\n  },\n  \"triggerTime\": 1567.7793288794296\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ac659fb2-9c57-4a29-8d53-7c41cdb669b4",
+              "name": "Payload validation or parsing failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "listOpenLoops"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "94ef3af8-33c7-49ab-9446-8fe676ac81ac",
+              "name": "Process runs not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "listOpenLoops"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ids\": [\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"type\": \"<string>\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "0e5c1b72-3077-491e-86f9-4121a2830a89",
+          "name": "Fetch customer record",
+          "request": {
+            "name": "Fetch customer record",
+            "description": {
+              "content": "Fetch a customer record by its spektr ID",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                ":spektrId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "appendEntities",
+                  "value": "<boolean>",
+                  "description": "Appends the ownership graph entities to the response"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "spektrId",
+                  "description": "(Required) The spektr ID of the customer record"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "a2596a39-0f98-4ad3-8c84-77217b254ab6",
+              "name": "Customer record fetched successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "appendEntities",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The spektr ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"datasetId\": \"5455e496-9f03-4d27-8cbc-5ccfbeb688a2\",\n  \"status\": \"pending\",\n  \"createdAt\": 9763.457542966635,\n  \"updatedAt\": 5878.857539290862,\n  \"tags\": [\n    \"string\",\n    \"string\"\n  ],\n  \"reference\": \"string\",\n  \"data\": {},\n  \"files\": [\n    \"string\",\n    \"string\"\n  ],\n  \"entities\": [\n    \"string\",\n    \"string\"\n  ],\n  \"relationProps\": {\n    \"directOrIndirect\": \"string\",\n    \"role\": \"string\",\n    \"percentage\": \"string\",\n    \"ownership\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "5422c48b-d7fa-4fb5-928d-44ba91a8ec0d",
+          "name": "Update customer record",
+          "request": {
+            "name": "Update customer record",
+            "description": {
+              "content": "Update a customer record by its spektr ID",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                ":spektrId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "spektrId",
+                  "description": "(Required) The ID of the customer record"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "3ccb5c1e-68e2-4fbb-8a88-5696dc90f3d1",
+              "name": "Customer record updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"datasetId\": \"5455e496-9f03-4d27-8cbc-5ccfbeb688a2\",\n  \"status\": \"approved\",\n  \"createdAt\": 4742.185042281737,\n  \"updatedAt\": 1242.026992155646,\n  \"tags\": [\n    \"string\",\n    \"string\"\n  ],\n  \"reference\": \"string\",\n  \"data\": {},\n  \"files\": [\n    \"string\",\n    \"string\"\n  ],\n  \"entities\": [\n    \"string\",\n    \"string\"\n  ],\n  \"relationProps\": {\n    \"directOrIndirect\": \"string\",\n    \"role\": \"string\",\n    \"percentage\": \"string\",\n    \"ownership\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0d734e09-ba87-4b29-a05b-aa50b3dfc9d6",
+              "name": "Payload validation or parsing failed, or attempted to update restricted fields",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a2dfe971-cf7c-4d21-9602-770f8bfc4415",
+              "name": "Customer record not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4f683b7b-840c-447e-91d3-48e90dad7626",
+              "name": "Reference already exists; must be unique across client records",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d27e3ebd-66df-4de4-9ae0-2a45b84663c2",
+          "name": "Update customer record v2",
+          "request": {
+            "name": "Update customer record v2",
+            "description": {
+              "content": "Update a customer record by its spektr ID. The ID can be a spektr ID or a reference ID. The type of the ID is specified in the type query parameter. Provide at least one of a non-empty data object, status, or a timestamp field (createdAt / updatedAt in Unix ms).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v2",
+                "record",
+                ":spektrId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "type",
+                  "value": "<string>",
+                  "description": "(Required) The type of the customer record id. Either spektrId or reference"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "spektrId",
+                  "description": "(Required) The ID of the customer record"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\",\n    \"key_1\": \"<string>\",\n    \"key_2\": \"<string>\",\n    \"key_3\": \"<string>\",\n    \"key_4\": \"<string>\"\n  },\n  \"status\": \"<string>\",\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "06e8ba35-23fb-4ba3-a299-b8fcc44a58bc",
+              "name": "Customer record updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"status\": \"<string>\",\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"datasetId\": \"5455e496-9f03-4d27-8cbc-5ccfbeb688a2\",\n  \"status\": \"approved\",\n  \"createdAt\": 4742.185042281737,\n  \"updatedAt\": 1242.026992155646,\n  \"tags\": [\n    \"string\",\n    \"string\"\n  ],\n  \"reference\": \"string\",\n  \"data\": {},\n  \"files\": [\n    \"string\",\n    \"string\"\n  ],\n  \"entities\": [\n    \"string\",\n    \"string\"\n  ],\n  \"relationProps\": {\n    \"directOrIndirect\": \"string\",\n    \"role\": \"string\",\n    \"percentage\": \"string\",\n    \"ownership\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "9c30f8a1-5328-4572-bb08-453739588f52",
+              "name": "Payload validation or parsing failed, or attempted to update restricted fields",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"status\": \"<string>\",\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d9fde1ac-76d3-4316-bced-f3618b229947",
+              "name": "Customer record not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"status\": \"<string>\",\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fb1a96d0-360e-4cc7-955b-89ace79cd2ec",
+              "name": "Reference already exists; must be unique across client records",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v2",
+                    "record",
+                    ":spektrId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"data\": {\n    \"key_0\": \"<string>\"\n  },\n  \"status\": \"<string>\",\n  \"createdAt\": \"<number>\",\n  \"updatedAt\": \"<number>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "438832a0-9835-4882-8db1-024d6a09d733",
+          "name": "Fetch customer record by reference",
+          "request": {
+            "name": "Fetch customer record by reference",
+            "description": {
+              "content": "Fetch a customer record by a client reference. \n\nUsage: \n - on the first onboarding init request, pass the reference in the data\n - whenever the spektrId is needed, use this endpoint to fetch the \n   record using your reference",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "reference",
+                ":reference"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "appendFiles",
+                  "value": "<boolean>",
+                  "description": "Appends the presigned file URLs to the response"
+                },
+                {
+                  "disabled": false,
+                  "key": "appendEntities",
+                  "value": "<boolean>",
+                  "description": "Appends the ownership graph entities to the response"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "reference",
+                  "description": "(Required) The customer reference"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "0299aad4-15b9-4cf1-a18f-8977b5fb26e9",
+              "name": "Customer record fetched successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "reference",
+                    ":reference"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "appendFiles",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "appendEntities",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "reference",
+                      "description": "(Required) The customer reference"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"datasetId\": \"5455e496-9f03-4d27-8cbc-5ccfbeb688a2\",\n  \"status\": \"approved\",\n  \"createdAt\": 4742.185042281737,\n  \"updatedAt\": 1242.026992155646,\n  \"tags\": [\n    \"string\",\n    \"string\"\n  ],\n  \"reference\": \"string\",\n  \"data\": {},\n  \"files\": [\n    \"string\",\n    \"string\"\n  ],\n  \"entities\": [\n    \"string\",\n    \"string\"\n  ],\n  \"relationProps\": {\n    \"directOrIndirect\": \"string\",\n    \"role\": \"string\",\n    \"percentage\": \"string\",\n    \"ownership\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "97359e0a-ef07-49cc-947f-b3b6f08fa207",
+          "name": "Get form submits for a given record",
+          "request": {
+            "name": "Get form submits for a given record",
+            "description": {
+              "content": "Get form submits for a given record by its ID. If the ID is not found, an empty array is returned.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                ":spektrId",
+                "timeline"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "spektrId",
+                  "description": "(Required) The ID of the customer record"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "40c62d48-2f62-4369-b2d8-5c05e03a20c2",
+              "name": "Customer form submits fetched successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    ":spektrId",
+                    "timeline"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "spektrId",
+                      "description": "(Required) The ID of the customer record"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"docs\": [\n    {\n      \"processId\": \"string\",\n      \"processType\": \"string\",\n      \"processName\": \"string\",\n      \"spektrId\": \"string\",\n      \"eventType\": \"string\",\n      \"stepName\": \"string\",\n      \"stepId\": \"string\",\n      \"formData\": {},\n      \"createdAt\": 7407.28096655107\n    },\n    {\n      \"processId\": \"string\",\n      \"processType\": \"string\",\n      \"processName\": \"string\",\n      \"spektrId\": \"string\",\n      \"eventType\": \"string\",\n      \"stepName\": \"string\",\n      \"stepId\": \"string\",\n      \"formData\": {},\n      \"createdAt\": 5400.874454399281\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "8734777f-18e4-42e4-adc7-832d7b4ee192",
+          "name": "Fetch records in bulk via API",
+          "request": {
+            "name": "Fetch records in bulk via API",
+            "description": {
+              "content": "Fetch multiple customer records and return them directly in the API response. Optimized for smaller datasets. Max 5000 records at a time",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "bulk",
+                "fetch",
+                "api"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "createdAfter",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records created after this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "createdBefore",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records created before this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "updatedAfter",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records updated after this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "updatedBefore",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records updated before this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "maxCount",
+                  "value": "<number>",
+                  "description": "(Required) Maximum number of records to fetch (limited to 5000)"
+                },
+                {
+                  "disabled": false,
+                  "key": "token",
+                  "value": "<string>",
+                  "description": "Pagination token for cursor-based pagination. Use the token from the response to fetch the next page of results."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "0fe4cc32-9fa2-46c8-b12c-ee7d8df9324a",
+              "name": "Returns records array with customer data directly in the response. Includes a token field for pagination if more records are available.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "bulk",
+                    "fetch",
+                    "api"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "createdAfter",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "createdBefore",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "updatedAfter",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "updatedBefore",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "maxCount",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "token",
+                      "value": "1769448798254_6977a55d0507d9fe9c85a90f"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"records\": [\n    \"string\",\n    \"string\"\n  ],\n  \"files\": {},\n  \"token\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "750d2c7b-9747-44cf-91a5-3119f45ab1ee",
+          "name": "Fetch records in bulk via S3",
+          "request": {
+            "name": "Fetch records in bulk via S3",
+            "description": {
+              "content": "Fetch multiple customer records and return signed URLs to download them from S3. Handles large datasets by chunking data into multiple files. Max 300,000 records at a time. Data will be split into files of max 10,000 records.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "bulk",
+                "fetch",
+                "s3"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "createdAfter",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records created after this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "createdBefore",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records created before this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "updatedAfter",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records updated after this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "updatedBefore",
+                  "value": "<number>",
+                  "description": "Unix timestamp (milliseconds) to fetch records updated before this date"
+                },
+                {
+                  "disabled": false,
+                  "key": "maxCount",
+                  "value": "<number>",
+                  "description": "(Required) Maximum number of records to fetch (up to 300,000)."
+                },
+                {
+                  "disabled": false,
+                  "key": "token",
+                  "value": "<string>",
+                  "description": "Pagination token for cursor-based pagination. Use the token from the response to fetch the next page of results."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "3b0f413c-f01c-420c-bf67-209c98b51baf",
+              "name": "Returns an array of presigned S3 URLs for downloading record chunks as JSON files",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "bulk",
+                    "fetch",
+                    "s3"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "createdAfter",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "createdBefore",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "updatedAfter",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "updatedBefore",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "maxCount",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "token",
+                      "value": "1769448798254_6977a55d0507d9fe9c85a90f"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"files\": [\n    {\n      \"url\": \"string\"\n    },\n    {\n      \"url\": \"string\"\n    }\n  ],\n  \"token\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "add1d20e-e0d6-4be0-a5c6-b32ea4f2a7c7",
+          "name": "Create client record relations",
+          "request": {
+            "name": "Create client record relations",
+            "description": {
+              "content": "Links two or more client records together (e.g. a company and its beneficial owners). Pass an array of relation items where each side (`from`, `to`) is identified by `spektrId` or `reference`. Each item must specify `relationRole` (one of the supported role keys such as `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`, `senior_management`, `board_of_directors`, `controlling_entities`, `subsidiaries`, `authorized_signatories`, `signatories`, `contact_info`, `person_with_significant_control`) and may include optional `data` metadata, `positions`, and a `direct` boolean. The legacy `roles` array is no longer accepted - send `relationRole` directly instead. The request is atomic: all relations are created together or none are, if any validation fails. Validation rules: both records must exist, `from` and `to` cannot be the same record, duplicate relations are rejected, and the resulting graph must remain acyclic.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "relations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": false,\n    \"data\": \"<object>\",\n    \"hasSignatoryPower\": false\n  },\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": false,\n    \"data\": \"<object>\",\n    \"hasSignatoryPower\": false\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c437a841-1a08-4da7-b19f-281821d37f80",
+              "name": "Relations created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": false,\n    \"data\": \"<object>\",\n    \"hasSignatoryPower\": false\n  },\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": false,\n    \"data\": \"<object>\",\n    \"hasSignatoryPower\": false\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"relations\": [\n    {\n      \"id\": \"string\",\n      \"subject\": \"string\",\n      \"interestedParty\": \"string\",\n      \"directOrIndirect\": \"indirect\",\n      \"relationRole\": \"string\",\n      \"data\": {},\n      \"positions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"createdAt\": 2197.220610239151,\n      \"updatedAt\": 668.7584586331419,\n      \"entityRoles\": [\n        \"string\",\n        \"string\"\n      ],\n      \"entityPositions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"hasSignatoryPower\": true\n    },\n    {\n      \"id\": \"string\",\n      \"subject\": \"string\",\n      \"interestedParty\": \"string\",\n      \"directOrIndirect\": \"indirect\",\n      \"relationRole\": \"string\",\n      \"data\": {},\n      \"positions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"createdAt\": 893.3277565092224,\n      \"updatedAt\": 6245.773534533391,\n      \"entityRoles\": [\n        \"string\",\n        \"string\"\n      ],\n      \"entityPositions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"hasSignatoryPower\": false\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2e086783-209a-41d7-88c2-b074fd2ab922",
+              "name": "Payload validation failed or business rule violated (e.g. missing record, invalid role, cycle, from === to)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": false,\n    \"data\": \"<object>\",\n    \"hasSignatoryPower\": false\n  },\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": false,\n    \"data\": \"<object>\",\n    \"hasSignatoryPower\": false\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "44a9b7b7-9ba9-49d2-a052-f89d5ed56ac4",
+          "name": "Update client record relations",
+          "request": {
+            "name": "Update client record relations",
+            "description": {
+              "content": "Updates mutable fields on existing v2 client record relations identified by `(from, to, relationRole)`. Only `direct`, `positions`, and `data` may be modified; `from`, `to`, `relationRole`, `createdAt`, and `updatedAt` are immutable. The `data` field is shallow-merged with the stored value (provided keys overwrite, existing unspecified keys are preserved). Each item must include at least one of `direct`, `positions`, or `data`. All relations in the batch are verified to exist before any updates are applied; if any relation is missing, the entire request is rejected without persisting changes. Updates then run sequentially (best-effort after verification).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "relations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": \"<boolean>\",\n    \"positions\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"data\": \"<object>\"\n  },\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": \"<boolean>\",\n    \"positions\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"data\": \"<object>\"\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "706a7175-1b1d-4c87-a9e8-b8e290c31b4c",
+              "name": "Relations updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": \"<boolean>\",\n    \"positions\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"data\": \"<object>\"\n  },\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": \"<boolean>\",\n    \"positions\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"data\": \"<object>\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"relations\": [\n    {\n      \"id\": \"string\",\n      \"subject\": \"string\",\n      \"interestedParty\": \"string\",\n      \"directOrIndirect\": \"indirect\",\n      \"relationRole\": \"string\",\n      \"data\": {},\n      \"positions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"createdAt\": 5005.334652040091,\n      \"updatedAt\": 8395.247835691202,\n      \"entityRoles\": [\n        \"string\",\n        \"string\"\n      ],\n      \"entityPositions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"hasSignatoryPower\": false\n    },\n    {\n      \"id\": \"string\",\n      \"subject\": \"string\",\n      \"interestedParty\": \"string\",\n      \"directOrIndirect\": \"indirect\",\n      \"relationRole\": \"string\",\n      \"data\": {},\n      \"positions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"createdAt\": 8529.311757627052,\n      \"updatedAt\": 624.203884132567,\n      \"entityRoles\": [\n        \"string\",\n        \"string\"\n      ],\n      \"entityPositions\": [\n        \"string\",\n        \"string\"\n      ],\n      \"hasSignatoryPower\": false\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1fa85438-58cc-4ea2-8bd4-df646256f1ba",
+              "name": "Payload validation failed or business rule violated (e.g. relation not found, duplicate key within the payload, no update fields provided, from === to, invalid role)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "relations"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": \"<boolean>\",\n    \"positions\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"data\": \"<object>\"\n  },\n  {\n    \"from\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"to\": {\n      \"type\": \"<string>\",\n      \"value\": \"<string>\"\n    },\n    \"relationRole\": \"<string>\",\n    \"direct\": \"<boolean>\",\n    \"positions\": [\n      \"<string>\",\n      \"<string>\"\n    ],\n    \"data\": \"<object>\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ff79f802-3bd4-4678-a8c2-ffdc2b656b24",
+          "name": "Fetch a vendor search",
+          "request": {
+            "name": "Fetch a vendor search",
+            "description": {
+              "content": "Fetch the raw, unmodified response of a single vendor search (e.g. a Kyckr lookup) by its ID. The `vendorSearchId` is the reference carried on the customer's timeline service-run events and outbound webhook payloads.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "record",
+                "vendor-searches",
+                ":vendorSearchId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "vendorSearchId",
+                  "description": "(Required) The ID of the vendor search to fetch"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "716ffa7b-3780-493f-a861-7985a90f5857",
+              "name": "Vendor search fetched successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "vendor-searches",
+                    ":vendorSearchId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "vendorSearchId",
+                      "description": "(Required) The ID of the vendor search to fetch"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"vendor\": \"krs\",\n  \"status\": \"polling\",\n  \"createdAt\": 7170.927422644057,\n  \"updatedAt\": 3021.531140973316,\n  \"response\": {},\n  \"spektrId\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "81557dac-4b26-4c18-a736-5605f5429c59",
+              "name": "Vendor search not found for this customer record",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "record",
+                    "vendor-searches",
+                    ":vendorSearchId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "vendorSearchId",
+                      "description": "(Required) The ID of the vendor search to fetch"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://ingest.spektr.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "08a1ba2a-dec4-4a44-b520-0cc8d26cb322",
+    "name": "Spektr Action API Records API API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.",
+      "type": "text/plain"
+    }
+  }
+}

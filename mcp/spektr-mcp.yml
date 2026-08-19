@@ -2,36 +2,88 @@ generated: '2026-07-21'
 method: derived
 status: candidate
 source: openapi/spektr-openapi.yml
-notes: >-
-  No official hosted/remote Spektr MCP server was found. This is a candidate tool
-  list derived one-to-one from the OpenAPI operations, for a potential MCP server
-  fronting the Spektr API (x-api-key auth).
+notes: No official hosted/remote Spektr MCP server was found. This is a candidate tool list derived one-to-one
+  from the OpenAPI operations, for a potential MCP server fronting the Spektr API (x-api-key auth).
 server:
   name: spektr
   transport: http
   url: null
 tools:
-- {name: create_dataset, description: Create a dataset schema, source_operation: openapi/spektr-openapi.yml#DataImportController_create_v1}
-- {name: import_records, description: Import records into a dataset, source_operation: openapi/spektr-openapi.yml#DataImportController_update_v1}
-- {name: delete_dataset, description: Delete a dataset, source_operation: openapi/spektr-openapi.yml#DataImportController_delete_v1}
-- {name: list_open_loops, description: Get pending process runs, source_operation: openapi/spektr-openapi.yml#RecordController_listOpenLoops_v1}
-- {name: fetch_record, description: Fetch a customer record by spektr ID, source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecord_v1}
-- {name: update_record, description: Update a customer record, source_operation: openapi/spektr-openapi.yml#RecordController_updateRecord_v1}
-- {name: update_record_v2, description: Update a customer record (v2), source_operation: openapi/spektr-openapi.yml#RecordController_updateRecordV2_v2}
-- {name: fetch_record_by_reference, description: Fetch a customer record by client reference, source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecordByReference_v1}
-- {name: get_record_timeline, description: Get form submits/timeline for a record, source_operation: openapi/spektr-openapi.yml#RecordController_getClientRecordFormSubmits_v1}
-- {name: fetch_records_bulk_api, description: Fetch records in bulk inline, source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecordsApi_v1}
-- {name: fetch_records_bulk_s3, description: Fetch records in bulk via S3, source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecordsS3_v1}
-- {name: create_record_relations, description: Link client records, source_operation: openapi/spektr-openapi.yml#RecordController_createClientRecordRelations_v1}
-- {name: update_record_relations, description: Update client record relations, source_operation: openapi/spektr-openapi.yml#RecordController_updateClientRecordRelations_v1}
-- {name: get_vendor_search, description: Fetch a raw vendor search result, source_operation: openapi/spektr-openapi.yml#RecordController_getVendorSearch_v1}
-- {name: execute_process, description: Execute a process for spektr IDs, source_operation: openapi/spektr-openapi.yml#ExecutionController_triggerProcess_v1}
-- {name: execute_process_v2, description: Execute a process (v2), source_operation: openapi/spektr-openapi.yml#ExecutionController_executionV2_v2}
-- {name: execute_process_v3, description: Execute a process (v3), source_operation: openapi/spektr-openapi.yml#ExecutionController_executionV3_v3}
-- {name: start_onboarding, description: Create an onboarding session, source_operation: openapi/spektr-openapi.yml#ActionTicketController_createOnboarding_v1}
-- {name: list_events, description: List events, source_operation: openapi/spektr-openapi.yml#EventsController_list_v1}
-- {name: import_events, description: Import events (e.g. paymentMade), source_operation: openapi/spektr-openapi.yml#EventsController_import_v1}
-- {name: create_workspace_field, description: Create a workspace field definition, source_operation: openapi/spektr-openapi.yml#WorkspaceFieldsController_create_v1}
-- {name: list_workspace_fields, description: List workspace field definitions, source_operation: openapi/spektr-openapi.yml#WorkspaceFieldsController_getAll_v1}
-- {name: create_transaction_definition, description: Create a transaction definition, source_operation: openapi/spektr-openapi.yml#TransactionDefinitionController_create_v1}
-- {name: ingest_transactions, description: Ingest a batch of transactions, source_operation: openapi/spektr-openapi.yml#TransactionsController_ingestBatch_v1}
+- name: create_dataset
+  description: Create a dataset schema
+  source_operation: openapi/spektr-openapi.yml#DataImportController_create_v1
+- name: import_records
+  description: Import records into a dataset
+  source_operation: openapi/spektr-openapi.yml#DataImportController_update_v1
+- name: delete_dataset
+  description: Delete a dataset
+  source_operation: openapi/spektr-openapi.yml#DataImportController_delete_v1
+- name: list_open_loops
+  description: Get pending process runs
+  source_operation: openapi/spektr-openapi.yml#RecordController_listOpenLoops_v1
+- name: fetch_record
+  description: Fetch a customer record by spektr ID
+  source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecord_v1
+- name: update_record
+  description: Update a customer record
+  source_operation: openapi/spektr-openapi.yml#RecordController_updateRecord_v1
+- name: update_record_v2
+  description: Update a customer record (v2)
+  source_operation: openapi/spektr-openapi.yml#RecordController_updateRecordV2_v2
+- name: fetch_record_by_reference
+  description: Fetch a customer record by client reference
+  source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecordByReference_v1
+- name: get_record_timeline
+  description: Get form submits/timeline for a record
+  source_operation: openapi/spektr-openapi.yml#RecordController_getClientRecordFormSubmits_v1
+- name: fetch_records_bulk_api
+  description: Fetch records in bulk inline
+  source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecordsApi_v1
+- name: fetch_records_bulk_s3
+  description: Fetch records in bulk via S3
+  source_operation: openapi/spektr-openapi.yml#RecordController_fetchRecordsS3_v1
+- name: create_record_relations
+  description: Link client records
+  source_operation: openapi/spektr-openapi.yml#RecordController_createClientRecordRelations_v1
+- name: update_record_relations
+  description: Update client record relations
+  source_operation: openapi/spektr-openapi.yml#RecordController_updateClientRecordRelations_v1
+- name: get_vendor_search
+  description: Fetch a raw vendor search result
+  source_operation: openapi/spektr-openapi.yml#RecordController_getVendorSearch_v1
+- name: execute_process
+  description: Execute a process for spektr IDs
+  source_operation: openapi/spektr-openapi.yml#ExecutionController_triggerProcess_v1
+- name: execute_process_v2
+  description: Execute a process (v2)
+  source_operation: openapi/spektr-openapi.yml#ExecutionController_executionV2_v2
+- name: execute_process_v3
+  description: Execute a process (v3)
+  source_operation: openapi/spektr-openapi.yml#ExecutionController_executionV3_v3
+- name: start_onboarding
+  description: Create an onboarding session
+  source_operation: openapi/spektr-openapi.yml#ActionTicketController_createOnboarding_v1
+- name: list_events
+  description: List events
+  source_operation: openapi/spektr-openapi.yml#EventsController_list_v1
+- name: import_events
+  description: Import events (e.g. paymentMade)
+  source_operation: openapi/spektr-openapi.yml#EventsController_import_v1
+- name: create_workspace_field
+  description: Create a workspace field definition
+  source_operation: openapi/spektr-openapi.yml#WorkspaceFieldsController_create_v1
+- name: list_workspace_fields
+  description: List workspace field definitions
+  source_operation: openapi/spektr-openapi.yml#WorkspaceFieldsController_getAll_v1
+- name: create_transaction_definition
+  description: Create a transaction definition
+  source_operation: openapi/spektr-openapi.yml#TransactionDefinitionController_create_v1
+- name: ingest_transactions
+  description: Ingest a batch of transactions
+  source_operation: openapi/spektr-openapi.yml#TransactionsController_ingestBatch_v1
+deployment:
+  mode: none
+  verified: derived
+  tools: 24
+  checked: '2026-08-12'
+  source: catalog MCP census

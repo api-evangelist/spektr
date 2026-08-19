@@ -1,0 +1,105 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Import API API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Import API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create dataset",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/data",
+            "headers": [
+              {
+                "name": "idempotency-key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a new dataset with a specified schema that allows to be used in processes. The schema defines the structure of data entries. Once created, the dataset becomes available in the platform and can be connected to spektr processes. Optionally, provide a \"parentDatasetId\" to create the dataset as a child of an existing dataset, used for related entities."
+        },
+        {
+          "info": {
+            "name": "Import records",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://ingest.spektr.com/v1/data/:datasetId",
+            "headers": [
+              {
+                "name": "idempotency-key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "datasetId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the dataset"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "This endpoint allows clients to submit data entries for a dataset, including fields that require file uploads. When a data entry includes a file field (e.g., \"passport\": \"file.jpg\"), the API responds with a unique id for the entry and a presigned URL for uploading the file directly to AWS S3.\n\nUpsert by \"reference\": records are matched to existing client records only by their \"reference\". If a data entry includes a \"reference\" that already exists in the workspace, that record is updated in place"
+        },
+        {
+          "info": {
+            "name": "Delete dataset",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://ingest.spektr.com/v1/data/:datasetId",
+            "params": [
+              {
+                "name": "datasetId",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the dataset"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a dataset from the platform."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

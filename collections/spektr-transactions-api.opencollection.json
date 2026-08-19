@@ -1,0 +1,39 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Transactions API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Transactions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Ingest transaction batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/transactions/batch",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Ingests a batch of up to 1,000 transactions. Each transaction is validated against the workspace Transaction Definition for its type, linked to the relevant customer, persisted, and forwarded for transaction monitoring. Returns HTTP 200 regardless of per item outcome. Check the failed count and errors array in the response body."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

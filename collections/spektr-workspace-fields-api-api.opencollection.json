@@ -1,0 +1,155 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Spektr Action API Workspace Fields API API",
+    "version": "v2.23"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Workspace Fields API",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List workspace fields",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/fields",
+            "params": [
+              {
+                "name": "fieldType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by entity category"
+              },
+              {
+                "name": "source",
+                "value": "",
+                "type": "query",
+                "description": "Filter by field origin"
+              },
+              {
+                "name": "includeProtected",
+                "value": "",
+                "type": "query",
+                "description": "Include protected (system) fields. Defaults to true."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve all workspace field definitions. The response includes both flat fields (scalar values) and object fields (nested structures with sub-fields)."
+        },
+        {
+          "info": {
+            "name": "Create workspace field",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://ingest.spektr.com/v1/fields",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a new workspace field definition. Field names must be unique within the workspace.\n\n**Flat fields** (e.g. `input`, `select`, `checkbox`, `file`) store a single scalar value per customer record (string, number, boolean, date, etc.). They do not use the `subFields` property.\n\n**Object fields** (`type: \"object\"`) store structured, nested data as a JSON array of objects. They **must** include a non-empty `subFields` array defining the schema for each entry. Sub-fields can themselves be of typ"
+        },
+        {
+          "info": {
+            "name": "Get workspace field by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://ingest.spektr.com/v1/fields/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the workspace field"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve a single workspace field definition by its ID"
+        },
+        {
+          "info": {
+            "name": "Update workspace field",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://ingest.spektr.com/v1/fields/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the workspace field to update"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update an existing workspace field definition by its ID. "
+        },
+        {
+          "info": {
+            "name": "Delete workspace field",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://ingest.spektr.com/v1/fields/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The ID of the workspace field to delete"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a workspace field definition by its ID. Protected fields cannot be deleted."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

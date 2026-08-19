@@ -1,0 +1,461 @@
+{
+  "item": [
+    {
+      "id": "ece18e1e-8f23-4a54-8129-5a6e54f1a921",
+      "name": "Transaction Definitions",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "30740126-740e-42c2-801f-2dd69e5f8712",
+          "name": "Create transaction definition",
+          "request": {
+            "name": "Create transaction definition",
+            "description": {
+              "content": "Create a new transaction definition with a nested field schema, customer link declarations, and optional non-client-scoped partitions. Leaf field values must be one of: \"string\", \"number\", \"ipAddress\", \"date\", \"array\". Array fields accept only primitive elements (string, number, boolean, null). Each link txPath and partition txPath must resolve to a declared leaf field (link and partition paths may not target array fields). Partition types must not collide with link types.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "transaction-definitions"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"<string>\",\n  \"type\": \"<string>\",\n  \"fields\": \"<object>\",\n  \"link\": [\n    {\n      \"type\": \"<string>\",\n      \"txPath\": \"<string>\",\n      \"clientRecordPath\": \"<string>\",\n      \"direction\": \"<string>\"\n    }\n  ],\n  \"partitions\": [\n    {\n      \"type\": \"<string>\",\n      \"txPath\": \"<string>\"\n    },\n    {\n      \"type\": \"<string>\",\n      \"txPath\": \"<string>\"\n    }\n  ],\n  \"realTimeFields\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "2fd9192b-e0df-4e6f-b90e-57b8fd715478",
+              "name": "Transaction definition created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transaction-definitions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"payment-transaction\",\n  \"type\": \"payment\",\n  \"fields\": {\n    \"amount\": \"number\",\n    \"currency\": \"string\",\n    \"sourceIp\": \"ipAddress\",\n    \"sender_iban\": \"string\",\n    \"recipient_iban\": \"string\",\n    \"tags\": \"array\",\n    \"location\": {\n      \"city\": \"string\",\n      \"country\": \"string\"\n    }\n  },\n  \"link\": [\n    {\n      \"type\": \"iban\",\n      \"txPath\": \"sender_iban\",\n      \"clientRecordPath\": \"data.iban\",\n      \"direction\": \"source\"\n    }\n  ],\n  \"partitions\": [\n    {\n      \"type\": \"deviceId\",\n      \"txPath\": \"device_id\"\n    },\n    {\n      \"type\": \"deviceId\",\n      \"txPath\": \"device_id\"\n    }\n  ],\n  \"realTimeFields\": [\n    \"amount\",\n    \"currency\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "a20c0dba-5b6b-4133-8404-6cd0955b27b7",
+              "name": "Payload validation failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transaction-definitions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"payment-transaction\",\n  \"type\": \"payment\",\n  \"fields\": {\n    \"amount\": \"number\",\n    \"currency\": \"string\",\n    \"sourceIp\": \"ipAddress\",\n    \"sender_iban\": \"string\",\n    \"recipient_iban\": \"string\",\n    \"tags\": \"array\",\n    \"location\": {\n      \"city\": \"string\",\n      \"country\": \"string\"\n    }\n  },\n  \"link\": [\n    {\n      \"type\": \"iban\",\n      \"txPath\": \"sender_iban\",\n      \"clientRecordPath\": \"data.iban\",\n      \"direction\": \"source\"\n    }\n  ],\n  \"partitions\": [\n    {\n      \"type\": \"deviceId\",\n      \"txPath\": \"device_id\"\n    },\n    {\n      \"type\": \"deviceId\",\n      \"txPath\": \"device_id\"\n    }\n  ],\n  \"realTimeFields\": [\n    \"amount\",\n    \"currency\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "84149359-88b8-444b-965d-b6bdb0bd579b",
+              "name": "Transaction definition creation failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transaction-definitions"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"payment-transaction\",\n  \"type\": \"payment\",\n  \"fields\": {\n    \"amount\": \"number\",\n    \"currency\": \"string\",\n    \"sourceIp\": \"ipAddress\",\n    \"sender_iban\": \"string\",\n    \"recipient_iban\": \"string\",\n    \"tags\": \"array\",\n    \"location\": {\n      \"city\": \"string\",\n      \"country\": \"string\"\n    }\n  },\n  \"link\": [\n    {\n      \"type\": \"iban\",\n      \"txPath\": \"sender_iban\",\n      \"clientRecordPath\": \"data.iban\",\n      \"direction\": \"source\"\n    }\n  ],\n  \"partitions\": [\n    {\n      \"type\": \"deviceId\",\n      \"txPath\": \"device_id\"\n    },\n    {\n      \"type\": \"deviceId\",\n      \"txPath\": \"device_id\"\n    }\n  ],\n  \"realTimeFields\": [\n    \"amount\",\n    \"currency\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e1951d89-cb6a-4410-88b7-8b0cebc4e4ef",
+          "name": "Delete transaction definition",
+          "request": {
+            "name": "Delete transaction definition",
+            "description": {
+              "content": "Delete a transaction definition by ID.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "transaction-definitions",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The ID of the transaction definition"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "23254c40-fc8d-4b74-85c3-5d062c9629b7",
+              "name": "Transaction definition deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transaction-definitions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the transaction definition"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "30bfd6cd-6f49-4a56-bd0b-0abf146a955f",
+              "name": "Transaction definition with provided ID not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transaction-definitions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the transaction definition"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "28593260-fb21-45a3-84fb-e4b7f754d279",
+              "name": "Transaction definition deletion failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "transaction-definitions",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the transaction definition"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://ingest.spektr.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "c0c46b73-08ba-4ceb-adc1-9cb3eb20403b",
+    "name": "Spektr Action API Transaction Definitions API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.",
+      "type": "text/plain"
+    }
+  }
+}

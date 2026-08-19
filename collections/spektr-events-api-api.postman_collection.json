@@ -1,0 +1,421 @@
+{
+  "item": [
+    {
+      "id": "e22b1ca5-ba32-48e1-a222-aef8db606f26",
+      "name": "Events API",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "69d1cead-9869-40dc-bddd-c29adebbe8cf",
+          "name": "List events",
+          "request": {
+            "name": "List events",
+            "description": {
+              "content": "List all events",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "events"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "<number>",
+                  "description": "Page number. Default is 1"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "<number>",
+                  "description": "Number of items per page. Default is 10. Min is 1. Max is 50"
+                },
+                {
+                  "disabled": false,
+                  "key": "delivered",
+                  "value": "<boolean>",
+                  "description": "Filter by delivery status"
+                },
+                {
+                  "disabled": false,
+                  "key": "createdBefore",
+                  "value": "<number>",
+                  "description": "Filter events created before timestamp (epoch, inclusive)"
+                },
+                {
+                  "disabled": false,
+                  "key": "createdAfter",
+                  "value": "<number>",
+                  "description": "Filter events created after timestamp (epoch, exclusive)"
+                },
+                {
+                  "disabled": false,
+                  "key": "sortBy",
+                  "value": "<string>",
+                  "description": "Field to sort by. Default is createdAt"
+                },
+                {
+                  "disabled": false,
+                  "key": "sortOrder",
+                  "value": "<string>",
+                  "description": "Sort order. Default is desc"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "87529296-22ad-4881-a8a1-521b80610fd4",
+              "name": "Returns a paginated list of events. Refer to the documentation for detailed event schemas: https://spektr.readme.io/reference/process-execution-webhooks",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "delivered",
+                      "value": "<boolean>"
+                    },
+                    {
+                      "key": "createdBefore",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "createdAfter",
+                      "value": "<number>"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"totalResults\": 4978.6365214583875,\n  \"limit\": 9933.863444697945,\n  \"page\": 1941.739939733783,\n  \"totalPages\": 2641.1490086860367,\n  \"pagingCounter\": 8848.753164545118,\n  \"hasPrevPage\": true,\n  \"hasNextPage\": false,\n  \"prevPage\": 7698.452982309972,\n  \"nextPage\": 7247.144642572201\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "17cd86b8-5125-4142-a1f4-9e1380175d43",
+          "name": "Import events",
+          "request": {
+            "name": "Import events",
+            "description": {
+              "content": "Imports a list of events",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "events"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"workspaceId\": \"<string>\",\n      \"spektrId\": \"<string>\",\n      \"eventData\": \"<object>\",\n      \"type\": \"<string>\",\n      \"createdAt\": \"<number>\",\n      \"updatedAt\": \"<number>\"\n    },\n    {\n      \"workspaceId\": \"<string>\",\n      \"spektrId\": \"<string>\",\n      \"eventData\": \"<object>\",\n      \"type\": \"<string>\",\n      \"createdAt\": \"<number>\",\n      \"updatedAt\": \"<number>\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "8f125737-0c89-4d4b-8c72-4304ed34bec7",
+              "name": "Events imported successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"events\": [\n    {\n      \"workspaceId\": \"string\",\n      \"spektrId\": \"string\",\n      \"eventData\": {\n        \"changes\": [\n          {\n            \"type\": \"street_updated\",\n            \"field\": \"street\",\n            \"oldValue\": \"s1\",\n            \"newValue\": \"s2\",\n            \"changedBy\": \"user\",\n            \"note\": \"optional random note\"\n          }\n        ]\n      },\n      \"type\": \"recordUpdated\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"eventIds\": [\n    \"507f1f77bcf86cd799439011\",\n    \"507f1f77bcf86cd799439012\"\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "348ed514-c6d3-4f3b-b07f-a668fd412bdd",
+              "name": "Payload validation or parsing failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"events\": [\n    {\n      \"workspaceId\": \"string\",\n      \"spektrId\": \"string\",\n      \"eventData\": {\n        \"changes\": [\n          {\n            \"type\": \"street_updated\",\n            \"field\": \"street\",\n            \"oldValue\": \"s1\",\n            \"newValue\": \"s2\",\n            \"changedBy\": \"user\",\n            \"note\": \"optional random note\"\n          }\n        ]\n      },\n      \"type\": \"recordUpdated\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b01c67f1-1a7e-4f49-8604-abe3eb553095",
+              "name": "Events import failed",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "events"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"events\": [\n    {\n      \"workspaceId\": \"string\",\n      \"spektrId\": \"string\",\n      \"eventData\": {\n        \"changes\": [\n          {\n            \"type\": \"street_updated\",\n            \"field\": \"street\",\n            \"oldValue\": \"s1\",\n            \"newValue\": \"s2\",\n            \"changedBy\": \"user\",\n            \"note\": \"optional random note\"\n          }\n        ]\n      },\n      \"type\": \"recordUpdated\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Internal Server Error\",\n  \"errorCode\": \"internal_server_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://ingest.spektr.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "b91acf2e-9b43-4482-8c32-67a79231fb53",
+    "name": "Spektr Action API Events API API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.",
+      "type": "text/plain"
+    }
+  }
+}

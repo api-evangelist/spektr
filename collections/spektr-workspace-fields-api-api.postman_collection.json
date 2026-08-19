@@ -1,0 +1,1221 @@
+{
+  "item": [
+    {
+      "id": "cda48cd8-6a25-42e4-8d0c-e4d327c866c9",
+      "name": "Workspace Fields API",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "7d59d844-70f7-49ed-b324-a0eb5d110ac0",
+          "name": "Create workspace field",
+          "request": {
+            "name": "Create workspace field",
+            "description": {
+              "content": "Create a new workspace field definition. Field names must be unique within the workspace.\n\n**Flat fields** (e.g. `input`, `select`, `checkbox`, `file`) store a single scalar value per customer record (string, number, boolean, date, etc.). They do not use the `subFields` property.\n\n**Object fields** (`type: \"object\"`) store structured, nested data as a JSON array of objects. They **must** include a non-empty `subFields` array defining the schema for each entry. Sub-fields can themselves be of type `object`, enabling recursive nesting.\n\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "fields"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"<string>\",\n  \"category\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"attributes\": {\n    \"name\": \"<string>\",\n    \"label\": \"<string>\",\n    \"helperText\": \"<string>\",\n    \"placeholder\": \"<string>\",\n    \"type\": \"<string>\",\n    \"fileType\": \"<string>\",\n    \"options\": [\n      \"<object>\",\n      \"<object>\"\n    ],\n    \"internalId\": \"<string>\",\n    \"currency\": \"<object>\",\n    \"minDate\": \"<string>\",\n    \"maxDate\": \"<string>\",\n    \"maxDaysInPast\": \"<number>\",\n    \"maxDaysInFuture\": \"<number>\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"<string>\",\n    \"prefillDefaultValue\": \"<boolean>\",\n    \"source\": \"<string>\",\n    \"prefillSpektrDataField\": \"<string>\",\n    \"hideRoleDropdown\": \"<boolean>\",\n    \"value\": \"<object>\",\n    \"defaultValue\": \"<object>\",\n    \"prefillPreference\": \"<object>\"\n  },\n  \"locked\": \"<boolean>\",\n  \"groups\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"validation\": [\n    {\n      \"type\": \"<string>\",\n      \"message\": \"<string>\",\n      \"value\": \"<object>\",\n      \"preset\": \"<string>\",\n      \"minimumAge\": \"<number>\",\n      \"maximumAge\": \"<number>\"\n    },\n    {\n      \"type\": \"<string>\",\n      \"message\": \"<string>\",\n      \"value\": \"<object>\",\n      \"preset\": \"<string>\",\n      \"minimumAge\": \"<number>\",\n      \"maximumAge\": \"<number>\"\n    }\n  ],\n  \"subFields\": [\n    {\n      \"fieldName\": \"<string>\",\n      \"fieldLabel\": \"<string>\",\n      \"required\": \"<boolean>\",\n      \"type\": \"<string>\",\n      \"fieldHelp\": \"<string>\",\n      \"attributes\": {\n        \"name\": \"<string>\",\n        \"label\": \"<string>\",\n        \"helperText\": \"<string>\",\n        \"placeholder\": \"<string>\",\n        \"type\": \"<string>\",\n        \"fileType\": \"<string>\",\n        \"options\": [\n          \"<object>\",\n          \"<object>\"\n        ],\n        \"internalId\": \"<string>\",\n        \"currency\": \"<object>\",\n        \"minDate\": \"<string>\",\n        \"maxDate\": \"<string>\",\n        \"maxDaysInPast\": \"<number>\",\n        \"maxDaysInFuture\": \"<number>\"\n      },\n      \"validation\": [\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        }\n      ],\n      \"subFields\": [\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        },\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        }\n      ]\n    },\n    {\n      \"fieldName\": \"<string>\",\n      \"fieldLabel\": \"<string>\",\n      \"required\": \"<boolean>\",\n      \"type\": \"<string>\",\n      \"fieldHelp\": \"<string>\",\n      \"attributes\": {\n        \"name\": \"<string>\",\n        \"label\": \"<string>\",\n        \"helperText\": \"<string>\",\n        \"placeholder\": \"<string>\",\n        \"type\": \"<string>\",\n        \"fileType\": \"<string>\",\n        \"options\": [\n          \"<object>\",\n          \"<object>\"\n        ],\n        \"internalId\": \"<string>\",\n        \"currency\": \"<object>\",\n        \"minDate\": \"<string>\",\n        \"maxDate\": \"<string>\",\n        \"maxDaysInPast\": \"<number>\",\n        \"maxDaysInFuture\": \"<number>\"\n      },\n      \"validation\": [\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        }\n      ],\n      \"subFields\": [\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        },\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "83b2e4ab-ccc4-44c7-8bab-8534d53eedce",
+              "name": "Workspace field created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"input\",\n  \"category\": [\n    \"company\"\n  ],\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"company_name\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    }\n  ],\n  \"locked\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"507f1f77bcf86cd799439011\",\n  \"type\": \"input\",\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"company_name\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    }\n  ],\n  \"category\": [\n    \"company\"\n  ],\n  \"groups\": [],\n  \"locked\": false,\n  \"protectedField\": false,\n  \"source\": \"workspace\",\n  \"createdBy\": \"507f1f77bcf86cd799439012\",\n  \"createdAt\": 1700000000000,\n  \"updatedAt\": 1700000000000\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "2944a432-2cc2-4683-9820-1496d6123360",
+              "name": "Payload validation failed (e.g. duplicate field name, invalid sub-field configuration)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"input\",\n  \"category\": [\n    \"company\"\n  ],\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"company_name\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    }\n  ],\n  \"locked\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a3c3d2e1-5910-474b-8854-119bf4996bbf",
+              "name": "Unauthorized — missing or invalid API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"input\",\n  \"category\": [\n    \"company\"\n  ],\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"company_name\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    }\n  ],\n  \"locked\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "f1d0493b-cb5a-44a8-8a44-cd40f20d45ee",
+          "name": "List workspace fields",
+          "request": {
+            "name": "List workspace fields",
+            "description": {
+              "content": "Retrieve all workspace field definitions. The response includes both flat fields (scalar values) and object fields (nested structures with sub-fields).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "fields"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "fieldType",
+                  "value": "<string>",
+                  "description": "Filter by entity category"
+                },
+                {
+                  "disabled": false,
+                  "key": "source",
+                  "value": "<string>",
+                  "description": "Filter by field origin"
+                },
+                {
+                  "disabled": false,
+                  "key": "includeProtected",
+                  "value": "<boolean>",
+                  "description": "Include protected (system) fields. Defaults to true."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "360a9961-7f81-4a4a-b258-34502f2f8a3d",
+              "name": "List of workspace fields",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "fieldType",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "source",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "includeProtected",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"type\": \"input\",\n    \"attributes\": {\n      \"name\": \"company_name\",\n      \"label\": \"Company Name\",\n      \"type\": \"text\",\n      \"placeholder\": \"Acme Inc.\"\n    },\n    \"config\": {\n      \"spektrDataField\": \"company_name\"\n    },\n    \"validation\": [\n      {\n        \"type\": \"required\",\n        \"value\": true,\n        \"message\": \"Company name is required\"\n      }\n    ],\n    \"category\": [\n      \"company\"\n    ],\n    \"groups\": [],\n    \"locked\": false,\n    \"protectedField\": false,\n    \"source\": \"workspace\",\n    \"createdBy\": \"507f1f77bcf86cd799439012\",\n    \"createdAt\": 1700000000000,\n    \"updatedAt\": 1700000000000\n  },\n  {\n    \"id\": \"507f1f77bcf86cd799439013\",\n    \"type\": \"object\",\n    \"attributes\": {\n      \"name\": \"employers\",\n      \"label\": \"Employers\"\n    },\n    \"config\": {\n      \"spektrDataField\": \"employers\"\n    },\n    \"validation\": [],\n    \"category\": [\n      \"individual\"\n    ],\n    \"groups\": [],\n    \"locked\": false,\n    \"protectedField\": false,\n    \"source\": \"workspace\",\n    \"subFields\": [\n      {\n        \"fieldName\": \"full_name\",\n        \"fieldLabel\": \"Full name\",\n        \"required\": true,\n        \"type\": \"input\",\n        \"attributes\": {\n          \"name\": \"full_name\",\n          \"label\": \"Full name\",\n          \"type\": \"text\"\n        },\n        \"validation\": [\n          {\n            \"type\": \"required\",\n            \"value\": true,\n            \"message\": \"Required\"\n          }\n        ]\n      },\n      {\n        \"fieldName\": \"address\",\n        \"fieldLabel\": \"Address\",\n        \"required\": false,\n        \"type\": \"object\",\n        \"subFields\": [\n          {\n            \"fieldName\": \"line1\",\n            \"fieldLabel\": \"Address line 1\",\n            \"required\": false,\n            \"type\": \"input\",\n            \"attributes\": {\n              \"name\": \"line1\",\n              \"label\": \"Address line 1\",\n              \"type\": \"text\"\n            }\n          },\n          {\n            \"fieldName\": \"country\",\n            \"fieldLabel\": \"Country\",\n            \"required\": false,\n            \"type\": \"select\",\n            \"attributes\": {\n              \"name\": \"country\",\n              \"label\": \"Country\",\n              \"options\": [\n                {\n                  \"value\": \"RO\",\n                  \"label\": \"Romania\"\n                },\n                {\n                  \"value\": \"GB\",\n                  \"label\": \"United Kingdom\"\n                }\n              ]\n            }\n          }\n        ]\n      }\n    ],\n    \"createdBy\": \"507f1f77bcf86cd799439012\",\n    \"createdAt\": 1700000000000,\n    \"updatedAt\": 1700000000000\n  }\n]",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f77db579-1526-47e3-95e1-6f20c014bbfa",
+              "name": "Unauthorized — missing or invalid API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "fieldType",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "source",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "includeProtected",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "98306c52-f4fa-48a7-8cbc-7fc94c95cbf5",
+          "name": "Get workspace field by ID",
+          "request": {
+            "name": "Get workspace field by ID",
+            "description": {
+              "content": "Retrieve a single workspace field definition by its ID",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "fields",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The ID of the workspace field"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "c6dcf87d-6da6-453d-96d9-98a2e39a88c3",
+              "name": "Workspace field fetched successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"507f1f77bcf86cd799439011\",\n  \"type\": \"input\",\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"company_name\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    }\n  ],\n  \"category\": [\n    \"company\"\n  ],\n  \"groups\": [],\n  \"locked\": false,\n  \"protectedField\": false,\n  \"source\": \"workspace\",\n  \"createdBy\": \"507f1f77bcf86cd799439012\",\n  \"createdAt\": 1700000000000,\n  \"updatedAt\": 1700000000000\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "53362544-a9b5-4688-bb83-3958a1561b95",
+              "name": "Unauthorized — missing or invalid API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "2819d64d-4557-47cf-ae1b-588e84e062e8",
+              "name": "Workspace field not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "d662dffa-7e42-4535-902b-d2a541f6da3a",
+          "name": "Update workspace field",
+          "request": {
+            "name": "Update workspace field",
+            "description": {
+              "content": "Update an existing workspace field definition by its ID. ",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "fields",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The ID of the workspace field to update"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"<string>\",\n  \"category\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"groups\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"attributes\": {\n    \"name\": \"<string>\",\n    \"label\": \"<string>\",\n    \"helperText\": \"<string>\",\n    \"placeholder\": \"<string>\",\n    \"type\": \"<string>\",\n    \"fileType\": \"<string>\",\n    \"options\": [\n      \"<object>\",\n      \"<object>\"\n    ],\n    \"internalId\": \"<string>\",\n    \"currency\": \"<object>\",\n    \"minDate\": \"<string>\",\n    \"maxDate\": \"<string>\",\n    \"maxDaysInPast\": \"<number>\",\n    \"maxDaysInFuture\": \"<number>\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"<string>\",\n      \"message\": \"<string>\",\n      \"value\": \"<object>\",\n      \"preset\": \"<string>\",\n      \"minimumAge\": \"<number>\",\n      \"maximumAge\": \"<number>\"\n    },\n    {\n      \"type\": \"<string>\",\n      \"message\": \"<string>\",\n      \"value\": \"<object>\",\n      \"preset\": \"<string>\",\n      \"minimumAge\": \"<number>\",\n      \"maximumAge\": \"<number>\"\n    }\n  ],\n  \"config\": {\n    \"spektrDataField\": \"<string>\",\n    \"prefillDefaultValue\": \"<boolean>\",\n    \"source\": \"<string>\",\n    \"prefillSpektrDataField\": \"<string>\",\n    \"hideRoleDropdown\": \"<boolean>\",\n    \"value\": \"<object>\",\n    \"defaultValue\": \"<object>\",\n    \"prefillPreference\": \"<object>\"\n  },\n  \"locked\": \"<boolean>\",\n  \"subFields\": [\n    {\n      \"fieldName\": \"<string>\",\n      \"fieldLabel\": \"<string>\",\n      \"required\": \"<boolean>\",\n      \"type\": \"<string>\",\n      \"fieldHelp\": \"<string>\",\n      \"attributes\": {\n        \"name\": \"<string>\",\n        \"label\": \"<string>\",\n        \"helperText\": \"<string>\",\n        \"placeholder\": \"<string>\",\n        \"type\": \"<string>\",\n        \"fileType\": \"<string>\",\n        \"options\": [\n          \"<object>\",\n          \"<object>\"\n        ],\n        \"internalId\": \"<string>\",\n        \"currency\": \"<object>\",\n        \"minDate\": \"<string>\",\n        \"maxDate\": \"<string>\",\n        \"maxDaysInPast\": \"<number>\",\n        \"maxDaysInFuture\": \"<number>\"\n      },\n      \"validation\": [\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        }\n      ],\n      \"subFields\": [\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        },\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        }\n      ]\n    },\n    {\n      \"fieldName\": \"<string>\",\n      \"fieldLabel\": \"<string>\",\n      \"required\": \"<boolean>\",\n      \"type\": \"<string>\",\n      \"fieldHelp\": \"<string>\",\n      \"attributes\": {\n        \"name\": \"<string>\",\n        \"label\": \"<string>\",\n        \"helperText\": \"<string>\",\n        \"placeholder\": \"<string>\",\n        \"type\": \"<string>\",\n        \"fileType\": \"<string>\",\n        \"options\": [\n          \"<object>\",\n          \"<object>\"\n        ],\n        \"internalId\": \"<string>\",\n        \"currency\": \"<object>\",\n        \"minDate\": \"<string>\",\n        \"maxDate\": \"<string>\",\n        \"maxDaysInPast\": \"<number>\",\n        \"maxDaysInFuture\": \"<number>\"\n      },\n      \"validation\": [\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        },\n        {\n          \"type\": \"<string>\",\n          \"message\": \"<string>\",\n          \"value\": \"<object>\",\n          \"preset\": \"<string>\",\n          \"minimumAge\": \"<number>\",\n          \"maximumAge\": \"<number>\"\n        }\n      ],\n      \"subFields\": [\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        },\n        {\n          \"value\": \"<Circular reference to #/components/schemas/SubFieldDefinitionDto detected>\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d94aad2b-0dba-4e23-8c2d-afb7d63c3abb",
+              "name": "Workspace field updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to update"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Legal Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    },\n    {\n      \"type\": \"maxLength\",\n      \"value\": 200,\n      \"message\": \"Maximum 200 characters\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"507f1f77bcf86cd799439011\",\n  \"type\": \"input\",\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Legal Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"config\": {\n    \"spektrDataField\": \"company_name\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    },\n    {\n      \"type\": \"maxLength\",\n      \"value\": 200,\n      \"message\": \"Maximum 200 characters\"\n    }\n  ],\n  \"category\": [\n    \"company\"\n  ],\n  \"groups\": [],\n  \"locked\": false,\n  \"protectedField\": false,\n  \"source\": \"workspace\",\n  \"createdBy\": \"507f1f77bcf86cd799439012\",\n  \"createdAt\": 1700000000000,\n  \"updatedAt\": 1700000060000\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5e8671c9-e6a8-4a6c-a0cc-fc37eb532f9f",
+              "name": "Payload validation failed (e.g. invalid sub-field configuration)",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to update"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Legal Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    },\n    {\n      \"type\": \"maxLength\",\n      \"value\": 200,\n      \"message\": \"Maximum 200 characters\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Error parsing data as JSON\",\n  \"errorCode\": \"data_parse_error\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c8e647ff-327c-4427-ae8b-c51a52381266",
+              "name": "Unauthorized — missing or invalid API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to update"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Legal Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    },\n    {\n      \"type\": \"maxLength\",\n      \"value\": 200,\n      \"message\": \"Maximum 200 characters\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "3ba85c9e-b959-4fc5-9fb0-06dd2fa50a55",
+              "name": "Workspace field not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to update"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"attributes\": {\n    \"name\": \"company_name\",\n    \"label\": \"Company Legal Name\",\n    \"type\": \"text\",\n    \"placeholder\": \"Acme Inc.\"\n  },\n  \"validation\": [\n    {\n      \"type\": \"required\",\n      \"value\": true,\n      \"message\": \"Company name is required\"\n    },\n    {\n      \"type\": \"maxLength\",\n      \"value\": 200,\n      \"message\": \"Maximum 200 characters\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "39014a54-a083-4b87-832b-04b8dfcea216",
+          "name": "Delete workspace field",
+          "request": {
+            "name": "Delete workspace field",
+            "description": {
+              "content": "Delete a workspace field definition by its ID. Protected fields cannot be deleted.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "fields",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) The ID of the workspace field to delete"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "DELETE",
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "x-api-key"
+                },
+                {
+                  "key": "value",
+                  "value": "{{apiKey}}"
+                },
+                {
+                  "key": "in",
+                  "value": "header"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "95de14e1-6f0c-40d4-9f25-bc4847ab9620",
+              "name": "Workspace field deleted successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to delete"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "36fe8cad-13f9-41b8-94f3-e37a23d3decb",
+              "name": "Unauthorized — missing or invalid API key",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to delete"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "805af3be-591a-48cb-8344-cde206cb1605",
+              "name": "Cannot delete a protected field",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to delete"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "8df939ee-c60c-43c9-b243-bc732fd39654",
+              "name": "Workspace field not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "fields",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) The ID of the workspace field to delete"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: apikey",
+                      "type": "text/plain"
+                    },
+                    "key": "x-api-key",
+                    "value": "<API Key>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Not Found Exception\",\n  \"errorCode\": \"not_found\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://ingest.spektr.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "ef615937-ef24-4549-b359-db70a05e04f2",
+    "name": "Spektr Action API Workspace Fields API API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.",
+      "type": "text/plain"
+    }
+  }
+}
