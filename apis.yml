@@ -42,6 +42,17 @@ tags:
 - KYC
 - Onboarding
 - Transaction Monitoring
+- Financial-Services
+- Artificial Intelligence
+- Enterprise
+tags_raw:
+- Company
+- Compliance
+- RegTech
+- KYB
+- KYC
+- Onboarding
+- Transaction Monitoring
 - Financial Services
 - Artificial Intelligence
 - Enterprise
@@ -184,6 +195,8 @@ apis:
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
