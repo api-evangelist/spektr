@@ -1,0 +1,25 @@
+slug: spektr
+provider: Spektr
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Banking & Capital Markets
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: Transactions
+  spec_file: spektr-transactions-api-openapi.yml
+  capability_id: BC-1400.10
+  capability_id_l1: BC-1400
+  capability_name: AML Transaction Monitoring Management
+  confidence: 0.7
+  evidence: 'POST /v1/transactions/batch ''Ingest transaction batch''; description: ''transaction ingestion
+    ... for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows'''
+  reason: Transaction ingestion into a compliance platform whose stated purpose is transaction monitoring
+    — AML transaction monitoring rather than payment processing, since Spektr does not move money.

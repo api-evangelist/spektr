@@ -240,6 +240,9 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 common:
+- type: CapabilityMap
+  url: capabilities/spektr-capability-edges.yml
+  name: Spektr Business Capability Map
 - type: DeveloperPortal
   url: https://spektr.readme.io/
 - type: Documentation
