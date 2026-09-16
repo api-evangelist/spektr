@@ -1,15 +1,13 @@
 aid: spektr
 name: Spektr
-description: >-
-  Spektr is an AI-powered compliance automation platform for banks and fintechs, backed by
-  Northzone and Seedcamp. It automates KYB and KYC onboarding, continuous customer monitoring,
-  risk scoring, remediation, and transaction monitoring using configurable processes and a
-  library of AI agents (KYB, document review, network/ownership discovery, address and license
-  verification, source-of-funds, and false-positive reduction). The REST API (documented on
-  ReadMe at spektr.readme.io, served from ingest.spektr.com) covers dataset and customer-record
-  import, process execution and onboarding orchestration, event and transaction ingestion,
-  workspace field definitions, and HMAC-signed webhooks. Authentication is via an x-api-key
-  header, with idempotency-key support and Live/Sandbox/Test environments.
+description: Spektr is an AI-powered compliance automation platform for banks and fintechs, backed by
+  Northzone and Seedcamp. It automates KYB and KYC onboarding, continuous customer monitoring, risk scoring,
+  remediation, and transaction monitoring using configurable processes and a library of AI agents (KYB,
+  document review, network/ownership discovery, address and license verification, source-of-funds, and
+  false-positive reduction). The REST API (documented on ReadMe at spektr.readme.io, served from ingest.spektr.com)
+  covers dataset and customer-record import, process execution and onboarding orchestration, event and
+  transaction ingestion, workspace field definitions, and HMAC-signed webhooks. Authentication is via
+  an x-api-key header, with idempotency-key support and Live/Sandbox/Test environments.
 url: https://raw.githubusercontent.com/api-evangelist/spektr/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -47,7 +45,7 @@ accessModel:
 image: https://cdn.prod.website-files.com/687e48ff717957204d88189a/69de85d328817d3ae0691be5_spektr-com.png
 specificationVersion: '0.23'
 created: '2026-07-17'
-modified: '2026-07-21'
+modified: '2026-09-16'
 tags:
 - Company
 - Compliance
@@ -77,7 +75,7 @@ maintainers:
   email: info@apis.io
 apis:
 - aid: spektr:spektr-action-api-api
-  name: Spektr Action API API
+  name: Spektr Action API
   description: The Action API API from Spektr — 1 operation(s) for action api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -95,7 +93,7 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-events-api-api
-  name: Spektr Events API API
+  name: Spektr Events API
   description: The Events API API from Spektr — 1 operation(s) for events api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -113,7 +111,7 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-execution-api-api
-  name: Spektr Execution API API
+  name: Spektr Execution API
   description: The Execution API API from Spektr — 3 operation(s) for execution api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -131,7 +129,7 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-import-api-api
-  name: Spektr Import API API
+  name: Spektr Import API
   description: The Import API API from Spektr — 2 operation(s) for import api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -149,7 +147,7 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-orchestration-api-api
-  name: Spektr Orchestration API API
+  name: Spektr Orchestration API
   description: The Orchestration API API from Spektr — 6 operation(s) for orchestration api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -167,7 +165,7 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-records-api-api
-  name: Spektr Records API API
+  name: Spektr Records API
   description: The Records API API from Spektr — 9 operation(s) for records api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -186,8 +184,7 @@ apis:
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-transaction-definitions-api
   name: Spektr Transaction Definitions API
-  description: >-
-    The Transaction Definitions API from Spektr — 2 operation(s) for transaction definitions.
+  description: The Transaction Definitions API from Spektr — 2 operation(s) for transaction definitions.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
   tags:
@@ -224,7 +221,7 @@ apis:
   - type: Authentication
     url: authentication/spektr-authentication.yml
 - aid: spektr:spektr-workspace-fields-api-api
-  name: Spektr Workspace Fields API API
+  name: Spektr Workspace Fields API
   description: The Workspace Fields API API from Spektr — 2 operation(s) for workspace fields api.
   humanURL: https://spektr.readme.io/reference/welcome-to-spektr-api-documentation
   baseURL: https://ingest.spektr.com
@@ -289,7 +286,10 @@ common:
   url: asyncapi/spektr-webhooks.yml
 - type: X-MCPServerCandidate
   url: mcp/spektr-mcp.yml
-  note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate — a tool list derived from the published API contracts, not an existing server. The scorer already read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type surfaces with a server that does not exist.'
+  note: 'Renamed from MCPServer 2026-09-03 (roadmap#247): the manifest self-describes as status: candidate
+    — a tool list derived from the published API contracts, not an existing server. The scorer already
+    read the manifest and reported mcp_server correctly; the MCPServer type was crediting the artifact-type
+    surfaces with a server that does not exist.'
 - type: LLMsTxt
   url: llms/spektr-llms.txt
 - type: Overlay
