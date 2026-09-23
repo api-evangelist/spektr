@@ -1,6 +1,6 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  title: Spektr Action API Import API API
+  title: Spektr Import API
   description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
   version: v2.23
 servers:
@@ -175,18 +175,57 @@ paths:
       - Import API
 components:
   schemas:
-    InternalServerError:
+    DataConflictError:
       type: object
       properties:
         message:
           type: string
           enum:
-          - Internal Server Error
+          - Cannot delete dataset that is linked to processes
           description: The error message
         errorCode:
           type: string
           enum:
-          - internal_server_error
+          - dataset_linked_to_process
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataImportResponse:
+      type: object
+      properties:
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+      required:
+      - datasetId
+    DataUpdateResponseDataItem:
+      type: object
+      properties:
+        spektrId:
+          type: string
+          description: The spektr unique identifier for one entry
+        files:
+          description: An array of files if set on the request
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
+      required:
+      - spektrId
+      - files
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
           description: The error code
       required:
       - message
@@ -207,15 +246,55 @@ components:
       required:
       - message
       - errorCode
-    DataImportResponse:
+    DataValidationError:
       type: object
       properties:
-        datasetId:
+        message:
           type: string
-          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
-          description: The ID of the dataset
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
       required:
-      - datasetId
+      - message
+      - errorCode
+    DataUpdateResponse:
+      type: object
+      properties:
+        data:
+          example:
+          - spektrId: UUID
+            files:
+            - file: passport
+              url: https://spektr.com/presigned-url
+              fields:
+                header1: value1
+                header2: value2
+          - spektrId: UUID
+          description: The API responds with an array of objects corresponding to each data entry submitted. Each object includes "spektrId" and "files" array if the entry includes file fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataItem'
+      required:
+      - data
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
     ImportCreateInput:
       type: object
       properties:
@@ -247,34 +326,6 @@ components:
       required:
       - name
       - dataType
-    DataUpdateResponseDataItem:
-      type: object
-      properties:
-        spektrId:
-          type: string
-          description: The spektr unique identifier for one entry
-        files:
-          description: An array of files if set on the request
-          type: array
-          items:
-            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
-      required:
-      - spektrId
-      - files
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
     DataUpdateInput:
       type: object
       properties:
@@ -320,57 +371,6 @@ components:
       - file
       - url
       - fields
-    DataUpdateResponse:
-      type: object
-      properties:
-        data:
-          example:
-          - spektrId: UUID
-            files:
-            - file: passport
-              url: https://spektr.com/presigned-url
-              fields:
-                header1: value1
-                header2: value2
-          - spektrId: UUID
-          description: The API responds with an array of objects corresponding to each data entry submitted. Each object includes "spektrId" and "files" array if the entry includes file fields.
-          type: array
-          items:
-            $ref: '#/components/schemas/DataUpdateResponseDataItem'
-      required:
-      - data
-    DataConflictError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Cannot delete dataset that is linked to processes
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - dataset_linked_to_process
-          description: The error code
-      required:
-      - message
-      - errorCode
-    DataParseError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Error parsing data as JSON
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - data_parse_error
-          description: The error code
-      required:
-      - message
-      - errorCode
   securitySchemes:
     x-api-key:
       type: apiKey

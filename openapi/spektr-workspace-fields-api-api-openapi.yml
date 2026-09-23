@@ -1,6 +1,6 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  title: Spektr Action API Workspace Fields API API
+  title: Spektr Workspace Fields API
   description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
   version: v2.23
 servers:
@@ -16,10 +16,7 @@ paths:
         **Flat fields** (e.g. `input`, `select`, `checkbox`, `file`) store a single scalar value per customer record (string, number, boolean, date, etc.). They do not use the `subFields` property.
 
 
-        **Object fields** (`type: "object"`) store structured, nested data as a JSON array of objects. They **must** include a non-empty `subFields` array defining the schema for each entry. Sub-fields can themselves be of type `object`, enabling recursive nesting.
-
-
-        '
+        **Object fields** (`type: "object"`) store structured, nested data as a JSON array of objects. They **must** include a non-empty `subFields` array defining the schema for each entry. Sub-fields can themselves be of type `object`, enabling recursive nesting.'
       operationId: WorkspaceFieldsController_create_v1
       parameters: []
       requestBody:
@@ -446,7 +443,7 @@ paths:
       tags:
       - Workspace Fields API
     patch:
-      description: 'Update an existing workspace field definition by its ID. '
+      description: Update an existing workspace field definition by its ID.
       operationId: WorkspaceFieldsController_update_v1
       parameters:
       - name: id
@@ -672,123 +669,6 @@ paths:
       - Workspace Fields API
 components:
   schemas:
-    UpdateWorkspaceFieldBody:
-      type: object
-      properties:
-        type:
-          type: string
-          description: Field input type
-          example: input
-          enum:
-          - input
-          - radio
-          - select
-          - checkbox
-          - file
-          - optionSwitch
-          - consent
-          - multiSelectDropdown
-          - multipleValuesInput
-          - object
-        category:
-          type: array
-          description: Categories the field belongs to
-          example:
-          - company
-          items:
-            type: string
-            enum:
-            - individual
-            - company
-        groups:
-          description: Groups the field belongs to
-          example:
-          - basic_info
-          type: array
-          items:
-            type: string
-        attributes:
-          description: Field display attributes (name, label, placeholder, etc.)
-          allOf:
-          - $ref: '#/components/schemas/FieldAttributesDto'
-        validation:
-          description: Validation rules to apply to the field
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldValidationDto'
-        config:
-          description: Field configuration including the Spektr data field mapping
-          allOf:
-          - $ref: '#/components/schemas/FieldConfigDto'
-        locked:
-          type: boolean
-          description: Whether the field is locked from editing
-          example: false
-        subFields:
-          description: 'Sub-field definitions. The whole array is **replaced** when this key is present, so to add/remove/reorder a single entry you must send the full desired array (recursively).
-
-
-            Required when the effective `type` is `"object"` (a non-empty array); must be omitted for all other types. If `type` is being switched away from `"object"`, omit `subFields` entirely.'
-          type: array
-          items:
-            $ref: '#/components/schemas/SubFieldDefinitionDto'
-    FieldValidationDto:
-      type: object
-      properties:
-        type:
-          type: string
-          description: Type of validation rule
-          example: required
-          enum:
-          - required
-          - regex
-          - age
-          - maxNumberOfEntries
-          - maxNumberOfSignatories
-          - minNumberOfSignatories
-          - maxLength
-          - maxFileSize
-          - fileType
-          - maxFileNameLength
-        message:
-          type: string
-          description: Error message when validation fails
-          example: This field is required
-        value:
-          type: object
-          description: Validation value (type depends on validation type)
-          example: true
-        preset:
-          type: string
-          description: Regex preset identifier
-          example: email
-        minimumAge:
-          type: number
-          description: Minimum age (for age validation)
-          example: 18
-        maximumAge:
-          type: number
-          description: Maximum age (for age validation)
-          example: 65
-      required:
-      - type
-      - message
-    NotFoundError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Not Found Exception
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - not_found
-          description: The error code
-      required:
-      - message
-      - errorCode
     FieldAttributesDto:
       type: object
       properties:
@@ -854,59 +734,6 @@ components:
       required:
       - name
       - label
-    SubFieldDefinitionDto:
-      type: object
-      properties:
-        fieldName:
-          type: string
-          description: Unique name identifier of the sub-field
-          example: street_address
-        fieldLabel:
-          type: string
-          description: Display label for the sub-field
-          example: Street Address
-        fieldHelp:
-          type: string
-          description: Help text for the sub-field
-          example: Enter the full street address including number
-        required:
-          type: boolean
-          description: Whether the sub-field is required
-          example: true
-        type:
-          type: string
-          description: Input type of the sub-field
-          example: input
-          enum:
-          - input
-          - radio
-          - select
-          - checkbox
-          - file
-          - optionSwitch
-          - consent
-          - multiSelectDropdown
-          - multipleValuesInput
-          - object
-        attributes:
-          description: Attributes for the sub-field
-          allOf:
-          - $ref: '#/components/schemas/FieldAttributesDto'
-        validation:
-          description: Validation rules for the sub-field
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldValidationDto'
-        subFields:
-          description: Nested sub-fields for recursive object structures. Required when the sub-field type is "object", must be omitted otherwise. On PATCH this array is **replaced wholesale** — partial merges are not supported.
-          type: array
-          items:
-            $ref: '#/components/schemas/SubFieldDefinitionDto'
-      required:
-      - fieldName
-      - fieldLabel
-      - required
-      - type
     FieldConfigDto:
       type: object
       properties:
@@ -948,20 +775,6 @@ components:
             - 507f1f77bcf86cd799439011
       required:
       - spektrDataField
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
     WorkspaceFieldResponse:
       type: object
       properties:
@@ -1060,6 +873,112 @@ components:
       - createdBy
       - createdAt
       - updatedAt
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    UpdateWorkspaceFieldBody:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Field input type
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        category:
+          type: array
+          description: Categories the field belongs to
+          example:
+          - company
+          items:
+            type: string
+            enum:
+            - individual
+            - company
+        groups:
+          description: Groups the field belongs to
+          example:
+          - basic_info
+          type: array
+          items:
+            type: string
+        attributes:
+          description: Field display attributes (name, label, placeholder, etc.)
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules to apply to the field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        config:
+          description: Field configuration including the Spektr data field mapping
+          allOf:
+          - $ref: '#/components/schemas/FieldConfigDto'
+        locked:
+          type: boolean
+          description: Whether the field is locked from editing
+          example: false
+        subFields:
+          description: 'Sub-field definitions. The whole array is **replaced** when this key is present, so to add/remove/reorder a single entry you must send the full desired array (recursively).
+
+
+            Required when the effective `type` is `"object"` (a non-empty array); must be omitted for all other types. If `type` is being switched away from `"object"`, omit `subFields` entirely.'
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
     CreateWorkspaceFieldBody:
       type: object
       properties:
@@ -1123,22 +1042,100 @@ components:
       - attributes
       - config
       - locked
-    DataParseError:
+    FieldValidationDto:
       type: object
       properties:
+        type:
+          type: string
+          description: Type of validation rule
+          example: required
+          enum:
+          - required
+          - regex
+          - age
+          - maxNumberOfEntries
+          - maxNumberOfSignatories
+          - minNumberOfSignatories
+          - maxLength
+          - maxFileSize
+          - fileType
+          - maxFileNameLength
         message:
           type: string
-          enum:
-          - Error parsing data as JSON
-          description: The error message
-        errorCode:
+          description: Error message when validation fails
+          example: This field is required
+        value:
+          type: object
+          description: Validation value (type depends on validation type)
+          example: true
+        preset:
           type: string
-          enum:
-          - data_parse_error
-          description: The error code
+          description: Regex preset identifier
+          example: email
+        minimumAge:
+          type: number
+          description: Minimum age (for age validation)
+          example: 18
+        maximumAge:
+          type: number
+          description: Maximum age (for age validation)
+          example: 65
       required:
+      - type
       - message
-      - errorCode
+    SubFieldDefinitionDto:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Unique name identifier of the sub-field
+          example: street_address
+        fieldLabel:
+          type: string
+          description: Display label for the sub-field
+          example: Street Address
+        fieldHelp:
+          type: string
+          description: Help text for the sub-field
+          example: Enter the full street address including number
+        required:
+          type: boolean
+          description: Whether the sub-field is required
+          example: true
+        type:
+          type: string
+          description: Input type of the sub-field
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        attributes:
+          description: Attributes for the sub-field
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules for the sub-field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        subFields:
+          description: Nested sub-fields for recursive object structures. Required when the sub-field type is "object", must be omitted otherwise. On PATCH this array is **replaced wholesale** — partial merges are not supported.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+      required:
+      - fieldName
+      - fieldLabel
+      - required
+      - type
   securitySchemes:
     x-api-key:
       type: apiKey

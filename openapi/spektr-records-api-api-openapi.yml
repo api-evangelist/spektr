@@ -1,6 +1,6 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  title: Spektr Action API Records API API
+  title: Spektr Records API
   description: Spektr is an AI-powered compliance automation platform for financial institutions. The API manages datasets and customer record imports, process execution and onboarding orchestration, event and transaction ingestion, workspace field definitions, and webhooks for KYB/KYC onboarding, monitoring, and transaction-monitoring workflows.
   version: v2.23
 servers:
@@ -177,7 +177,16 @@ paths:
       - Records API
   /v1/record/reference/{reference}:
     get:
-      description: "Fetch a customer record by a client reference. \n\nUsage: \n - on the first onboarding init request, pass the reference in the data\n - whenever the spektrId is needed, use this endpoint to fetch the \n   record using your reference"
+      description: 'Fetch a customer record by a client reference.
+
+
+        Usage:
+
+        - on the first onboarding init request, pass the reference in the data
+
+        - whenever the spektrId is needed, use this endpoint to fetch the
+
+        record using your reference'
       operationId: RecordController_fetchRecordByReference_v1
       parameters:
       - name: reference
@@ -450,6 +459,463 @@ paths:
       - Records API
 components:
   schemas:
+    RecordFormSubmitsResponse:
+      type: object
+      properties:
+        docs:
+          description: The form submits
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordFormSubmitResponse'
+    CreateClientRecordRelationsResponseDto:
+      type: object
+      properties:
+        relations:
+          description: Created relations
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateClientRecordRelationsResponseItemDto'
+      required:
+      - relations
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    CreateClientRecordRelationItemDto:
+      type: object
+      properties:
+        from:
+          description: Subject of the relation (from)
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        to:
+          description: Interested party of the relation (to)
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        relationRole:
+          type: string
+          enum:
+          - beneficial_owners
+          - shareholders
+          - ultimate_beneficial_owners
+          - senior_management
+          - board_of_directors
+          - controlling_entities
+          - subsidiaries
+          - authorized_signatories
+          - signatories
+          - contact_info
+          - person_with_significant_control
+          description: Role of the interested party in the relation. Must be one of the supported role keys (e.g. `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`).
+        direct:
+          type: boolean
+          default: false
+          description: Whether the relation is direct
+        positions:
+          default: []
+          description: Entity positions
+          type: array
+          items:
+            type: string
+        data:
+          type: object
+          default: {}
+          description: Arbitrary metadata for the relation
+        hasSignatoryPower:
+          type: boolean
+          default: false
+          deprecated: true
+          description: '@deprecated No longer used. Signatory power should be expressed via `relationRole` or the `data` field.'
+      required:
+      - from
+      - to
+      - relationRole
+    RecordProperties:
+      type: object
+      properties:
+        directOrIndirect:
+          type: string
+          description: The reference of the record
+        role:
+          type: string
+          description: The role of the record in the relation
+        percentage:
+          type: string
+          description: The percentage of ownership in the relation
+        ownership:
+          type: string
+          description: The ownership type of the record
+    CreateClientRecordRelationsResponseItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Relation ID
+        subject:
+          type: string
+          description: Subject record ID
+        interestedParty:
+          type: string
+          description: Interested party record ID
+        directOrIndirect:
+          type: string
+          enum:
+          - direct
+          - indirect
+          description: Relation type
+        relationRole:
+          type: string
+          description: Role of the interested party in the relation
+        data:
+          type: object
+          description: Arbitrary relation metadata
+        positions:
+          description: Entity positions associated with the relation
+          type: array
+          items:
+            type: string
+        entityRoles:
+          deprecated: true
+          description: '@deprecated Not present on v2 relations. Use `relationRole` instead.'
+          type: array
+          items:
+            type: string
+        entityPositions:
+          deprecated: true
+          description: '@deprecated Not present on v2 relations. Use `positions` instead.'
+          type: array
+          items:
+            type: string
+        hasSignatoryPower:
+          type: boolean
+          deprecated: true
+          description: '@deprecated Not present on v2 relations.'
+        createdAt:
+          type: number
+          description: Creation timestamp
+        updatedAt:
+          type: number
+          description: Last update timestamp
+      required:
+      - id
+      - subject
+      - interestedParty
+      - directOrIndirect
+      - relationRole
+      - data
+      - positions
+      - createdAt
+      - updatedAt
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ProcessVersion:
+      type: object
+      properties:
+        currentVersion:
+          type: number
+          description: The current version of the process
+          example: 9
+        latestVersion:
+          type: number
+          description: The latest version of the process
+          example: 11
+      required:
+      - currentVersion
+      - latestVersion
+    RecordResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the record
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+        status:
+          type: string
+          description: The status of the record
+          enum:
+          - pending
+          - approved
+          - rejected
+        createdAt:
+          type: number
+          description: Creation timestamp
+        updatedAt:
+          type: number
+          description: Last update timestamp
+        tags:
+          description: Tags of the record
+          type: array
+          items:
+            type: string
+        reference:
+          type: string
+          description: Reference of the record
+        data:
+          type: object
+          description: Record data
+        files:
+          description: Files associated with the record
+          type: array
+          items:
+            type: string
+        entities:
+          description: Relations and UBOs associated with the record
+          type: array
+          items:
+            type: string
+        relationProps:
+          description: Relation properties of the record
+          allOf:
+          - $ref: '#/components/schemas/RecordProperties'
+      required:
+      - id
+      - datasetId
+      - status
+      - createdAt
+      - updatedAt
+      - tags
+    ProcessRunResponse:
+      type: object
+      properties:
+        executionContextId:
+          type: string
+          description: The ID of the execution context
+        spektrId:
+          type: string
+          description: The Spektr ID
+        processId:
+          type: string
+          description: The ID of the process
+        processName:
+          type: string
+          description: The name of the process
+        processType:
+          type: string
+          description: The type of the process
+        version:
+          description: The version information of the process
+          allOf:
+          - $ref: '#/components/schemas/ProcessVersion'
+        status:
+          type: string
+          description: The status of the execution context
+        reference:
+          type: string
+          description: The reference of the process run
+        token:
+          type: string
+          description: The token of the process run
+        header:
+          type: string
+          description: The header of the process run
+        description:
+          type: string
+          description: The description of the process run
+        triggerSource:
+          description: The source that triggered the process
+          allOf:
+          - $ref: '#/components/schemas/ProcessTriggerSource'
+        triggerTime:
+          type: number
+          description: The timestamp when the process was triggered
+        isExpired:
+          type: boolean
+          description: Whether the process run is expired
+      required:
+      - executionContextId
+      - spektrId
+      - processId
+      - processName
+      - processType
+      - version
+      - status
+      - isExpired
+    UpdateInput:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+          description: A list of records, where each record represents an individual entry. Each record is a dictionary with specific key-value pairs. The value can be a string, number, boolean, or array of strings.
+        createdAt:
+          type: number
+          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
+        updatedAt:
+          type: number
+          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
+      required:
+      - data
+    ProcessTriggerSource:
+      type: object
+      properties:
+        sourceType:
+          type: string
+          description: The source type that triggered the process
+          example: spektr_process
+          enum:
+          - spektr_process
+          - external
+          - manual
+          - unknown
+        processId:
+          type: string
+          description: The ID of the process (required for spektr_process source type)
+        userId:
+          type: string
+          description: The ID of the user who triggered the process (required for manual source type)
+        userName:
+          type: string
+          description: The name of the user who triggered the process (required for manual source type)
+      required:
+      - sourceType
+    RecordsResponse:
+      type: object
+      properties:
+        records:
+          description: The records
+          type: array
+          items:
+            type: string
+        files:
+          type: object
+          description: The file details of the files containing the records
+        token:
+          type: string
+          description: Pagination token for fetching the next page
+    UpdateInputV2:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+          description: Golden-record fields to merge into the customer. Optional when sending status. Must not be an empty object when provided.
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+          - archived
+          description: 'Workflow status: pending, approved, rejected, or archived. Optional when sending non-empty data.'
+        createdAt:
+          type: number
+          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
+        updatedAt:
+          type: number
+          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ClientRecordRelationEndpointDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - spektrId
+          - reference
+          description: Type of the record identifier
+        value:
+          type: string
+          description: Spektr ID or client reference value
+      required:
+      - type
+      - value
+    UpdateClientRecordRelationItemDto:
+      type: object
+      properties:
+        from:
+          description: Subject of the relation to update (from). Immutable.
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        to:
+          description: Interested party of the relation to update (to). Immutable.
+          allOf:
+          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
+        relationRole:
+          type: string
+          enum:
+          - beneficial_owners
+          - shareholders
+          - ultimate_beneficial_owners
+          - senior_management
+          - board_of_directors
+          - controlling_entities
+          - subsidiaries
+          - authorized_signatories
+          - signatories
+          - contact_info
+          - person_with_significant_control
+          description: Role of the interested party in the relation. Used together with `from` and `to` to identify the relation. Immutable.
+        direct:
+          type: boolean
+          description: Whether the relation is direct. Optional.
+        positions:
+          description: Entity positions. Replaces the stored array when provided.
+          type: array
+          items:
+            type: string
+        data:
+          type: object
+          description: Arbitrary relation metadata. Shallow-merged with the stored value when provided.
+      required:
+      - from
+      - to
+      - relationRole
     VendorSearchResponse:
       type: object
       properties:
@@ -542,6 +1008,21 @@ components:
       - createdAt
       - updatedAt
       - response
+    ClientRecordId:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the customer record
+        type:
+          type: string
+          description: The type of the customer record ID. Either spektrId or reference.
+          enum:
+          - spektrId
+          - reference
+      required:
+      - id
+      - type
     RecordFormSubmitResponse:
       type: object
       properties:
@@ -572,367 +1053,6 @@ components:
         createdAt:
           type: number
           description: Moment in time when the event happened, in milliseconds since epoch
-    ProcessRunResponse:
-      type: object
-      properties:
-        executionContextId:
-          type: string
-          description: The ID of the execution context
-        spektrId:
-          type: string
-          description: The Spektr ID
-        processId:
-          type: string
-          description: The ID of the process
-        processName:
-          type: string
-          description: The name of the process
-        processType:
-          type: string
-          description: The type of the process
-        version:
-          description: The version information of the process
-          allOf:
-          - $ref: '#/components/schemas/ProcessVersion'
-        status:
-          type: string
-          description: The status of the execution context
-        reference:
-          type: string
-          description: The reference of the process run
-        token:
-          type: string
-          description: The token of the process run
-        header:
-          type: string
-          description: The header of the process run
-        description:
-          type: string
-          description: The description of the process run
-        triggerSource:
-          description: The source that triggered the process
-          allOf:
-          - $ref: '#/components/schemas/ProcessTriggerSource'
-        triggerTime:
-          type: number
-          description: The timestamp when the process was triggered
-        isExpired:
-          type: boolean
-          description: Whether the process run is expired
-      required:
-      - executionContextId
-      - spektrId
-      - processId
-      - processName
-      - processType
-      - version
-      - status
-      - isExpired
-    ClientRecordRelationEndpointDto:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - spektrId
-          - reference
-          description: Type of the record identifier
-        value:
-          type: string
-          description: Spektr ID or client reference value
-      required:
-      - type
-      - value
-    DataParseError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Error parsing data as JSON
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - data_parse_error
-          description: The error code
-      required:
-      - message
-      - errorCode
-    RecordProperties:
-      type: object
-      properties:
-        directOrIndirect:
-          type: string
-          description: The reference of the record
-        role:
-          type: string
-          description: The role of the record in the relation
-        percentage:
-          type: string
-          description: The percentage of ownership in the relation
-        ownership:
-          type: string
-          description: The ownership type of the record
-    ProcessVersion:
-      type: object
-      properties:
-        currentVersion:
-          type: number
-          description: The current version of the process
-          example: 9
-        latestVersion:
-          type: number
-          description: The latest version of the process
-          example: 11
-      required:
-      - currentVersion
-      - latestVersion
-    CreateClientRecordRelationsResponseDto:
-      type: object
-      properties:
-        relations:
-          description: Created relations
-          type: array
-          items:
-            $ref: '#/components/schemas/CreateClientRecordRelationsResponseItemDto'
-      required:
-      - relations
-    RecordsResponse:
-      type: object
-      properties:
-        records:
-          description: The records
-          type: array
-          items:
-            type: string
-        files:
-          type: object
-          description: The file details of the files containing the records
-        token:
-          type: string
-          description: Pagination token for fetching the next page
-    CreateClientRecordRelationsResponseItemDto:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Relation ID
-        subject:
-          type: string
-          description: Subject record ID
-        interestedParty:
-          type: string
-          description: Interested party record ID
-        directOrIndirect:
-          type: string
-          enum:
-          - direct
-          - indirect
-          description: Relation type
-        relationRole:
-          type: string
-          description: Role of the interested party in the relation
-        data:
-          type: object
-          description: Arbitrary relation metadata
-        positions:
-          description: Entity positions associated with the relation
-          type: array
-          items:
-            type: string
-        entityRoles:
-          deprecated: true
-          description: '@deprecated Not present on v2 relations. Use `relationRole` instead.'
-          type: array
-          items:
-            type: string
-        entityPositions:
-          deprecated: true
-          description: '@deprecated Not present on v2 relations. Use `positions` instead.'
-          type: array
-          items:
-            type: string
-        hasSignatoryPower:
-          type: boolean
-          deprecated: true
-          description: '@deprecated Not present on v2 relations.'
-        createdAt:
-          type: number
-          description: Creation timestamp
-        updatedAt:
-          type: number
-          description: Last update timestamp
-      required:
-      - id
-      - subject
-      - interestedParty
-      - directOrIndirect
-      - relationRole
-      - data
-      - positions
-      - createdAt
-      - updatedAt
-    UpdateClientRecordRelationItemDto:
-      type: object
-      properties:
-        from:
-          description: Subject of the relation to update (from). Immutable.
-          allOf:
-          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
-        to:
-          description: Interested party of the relation to update (to). Immutable.
-          allOf:
-          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
-        relationRole:
-          type: string
-          enum:
-          - beneficial_owners
-          - shareholders
-          - ultimate_beneficial_owners
-          - senior_management
-          - board_of_directors
-          - controlling_entities
-          - subsidiaries
-          - authorized_signatories
-          - signatories
-          - contact_info
-          - person_with_significant_control
-          description: Role of the interested party in the relation. Used together with `from` and `to` to identify the relation. Immutable.
-        direct:
-          type: boolean
-          description: Whether the relation is direct. Optional.
-        positions:
-          description: Entity positions. Replaces the stored array when provided.
-          type: array
-          items:
-            type: string
-        data:
-          type: object
-          description: Arbitrary relation metadata. Shallow-merged with the stored value when provided.
-      required:
-      - from
-      - to
-      - relationRole
-    CreateClientRecordRelationItemDto:
-      type: object
-      properties:
-        from:
-          description: Subject of the relation (from)
-          allOf:
-          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
-        to:
-          description: Interested party of the relation (to)
-          allOf:
-          - $ref: '#/components/schemas/ClientRecordRelationEndpointDto'
-        relationRole:
-          type: string
-          enum:
-          - beneficial_owners
-          - shareholders
-          - ultimate_beneficial_owners
-          - senior_management
-          - board_of_directors
-          - controlling_entities
-          - subsidiaries
-          - authorized_signatories
-          - signatories
-          - contact_info
-          - person_with_significant_control
-          description: Role of the interested party in the relation. Must be one of the supported role keys (e.g. `beneficial_owners`, `shareholders`, `ultimate_beneficial_owners`).
-        direct:
-          type: boolean
-          default: false
-          description: Whether the relation is direct
-        positions:
-          default: []
-          description: Entity positions
-          type: array
-          items:
-            type: string
-        data:
-          type: object
-          default: {}
-          description: Arbitrary metadata for the relation
-        hasSignatoryPower:
-          type: boolean
-          default: false
-          deprecated: true
-          description: '@deprecated No longer used. Signatory power should be expressed via `relationRole` or the `data` field.'
-      required:
-      - from
-      - to
-      - relationRole
-    RecordResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The ID of the record
-        datasetId:
-          type: string
-          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
-          description: The ID of the dataset
-        status:
-          type: string
-          description: The status of the record
-          enum:
-          - pending
-          - approved
-          - rejected
-        createdAt:
-          type: number
-          description: Creation timestamp
-        updatedAt:
-          type: number
-          description: Last update timestamp
-        tags:
-          description: Tags of the record
-          type: array
-          items:
-            type: string
-        reference:
-          type: string
-          description: Reference of the record
-        data:
-          type: object
-          description: Record data
-        files:
-          description: Files associated with the record
-          type: array
-          items:
-            type: string
-        entities:
-          description: Relations and UBOs associated with the record
-          type: array
-          items:
-            type: string
-        relationProps:
-          description: Relation properties of the record
-          allOf:
-          - $ref: '#/components/schemas/RecordProperties'
-      required:
-      - id
-      - datasetId
-      - status
-      - createdAt
-      - updatedAt
-      - tags
-    ClientRecordId:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The ID of the customer record
-        type:
-          type: string
-          description: The type of the customer record ID. Either spektrId or reference.
-          enum:
-          - spektrId
-          - reference
-      required:
-      - id
-      - type
     ClientRecordIds:
       type: object
       properties:
@@ -949,117 +1069,6 @@ components:
             $ref: '#/components/schemas/ClientRecordId'
       required:
       - ids
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
-    RecordFormSubmitsResponse:
-      type: object
-      properties:
-        docs:
-          description: The form submits
-          type: array
-          items:
-            $ref: '#/components/schemas/RecordFormSubmitResponse'
-    ProcessTriggerSource:
-      type: object
-      properties:
-        sourceType:
-          type: string
-          description: The source type that triggered the process
-          example: spektr_process
-          enum:
-          - spektr_process
-          - external
-          - manual
-          - unknown
-        processId:
-          type: string
-          description: The ID of the process (required for spektr_process source type)
-        userId:
-          type: string
-          description: The ID of the user who triggered the process (required for manual source type)
-        userName:
-          type: string
-          description: The name of the user who triggered the process (required for manual source type)
-      required:
-      - sourceType
-    UpdateInputV2:
-      type: object
-      properties:
-        data:
-          type: object
-          additionalProperties:
-            oneOf:
-            - type: string
-            - type: number
-            - type: boolean
-            - type: array
-              items:
-                type: string
-          description: Golden-record fields to merge into the customer. Optional when sending status. Must not be an empty object when provided.
-        status:
-          type: string
-          enum:
-          - pending
-          - approved
-          - rejected
-          - archived
-          description: 'Workflow status: pending, approved, rejected, or archived. Optional when sending non-empty data.'
-        createdAt:
-          type: number
-          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
-        updatedAt:
-          type: number
-          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
-    NotFoundError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Not Found Exception
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - not_found
-          description: The error code
-      required:
-      - message
-      - errorCode
-    UpdateInput:
-      type: object
-      properties:
-        data:
-          type: object
-          additionalProperties:
-            oneOf:
-            - type: string
-            - type: number
-            - type: boolean
-            - type: array
-              items:
-                type: string
-          description: A list of records, where each record represents an individual entry. Each record is a dictionary with specific key-value pairs. The value can be a string, number, boolean, or array of strings.
-        createdAt:
-          type: number
-          description: Optional creation time (Unix ms). When provided and different from the stored value, it is persisted.
-        updatedAt:
-          type: number
-          description: Optional last update time (Unix ms). When provided and different from the stored value, it is persisted.
-      required:
-      - data
   securitySchemes:
     x-api-key:
       type: apiKey
