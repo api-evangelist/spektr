@@ -165,87 +165,6 @@ paths:
       - Events API
 components:
   schemas:
-    EventsDto:
-      type: object
-      properties:
-        events:
-          example:
-          - workspaceId: string
-            spektrId: string
-            eventData:
-              changes:
-              - type: street_updated
-                field: street
-                oldValue: s1
-                newValue: s2
-                changedBy: user
-                note: optional random note
-            type: recordUpdated
-          description: The list of events to import
-          type: array
-          items:
-            $ref: '#/components/schemas/EventDto'
-      required:
-      - events
-    EventsImportResponse:
-      type: object
-      properties:
-        eventIds:
-          description: IDs of the created events, in the same order as the input.
-          example:
-          - 507f1f77bcf86cd799439011
-          - 507f1f77bcf86cd799439012
-          type: array
-          items:
-            type: string
-      required:
-      - eventIds
-    DataParseError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Error parsing data as JSON
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - data_parse_error
-          description: The error code
-      required:
-      - message
-      - errorCode
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Internal Server Error
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - internal_server_error
-          description: The error code
-      required:
-      - message
-      - errorCode
     EventDto:
       type: object
       properties:
@@ -281,6 +200,87 @@ components:
       - eventData
       - type
       - createdAt
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    EventsImportResponse:
+      type: object
+      properties:
+        eventIds:
+          description: IDs of the created events, in the same order as the input.
+          example:
+          - 507f1f77bcf86cd799439011
+          - 507f1f77bcf86cd799439012
+          type: array
+          items:
+            type: string
+      required:
+      - eventIds
+    DataParseError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Error parsing data as JSON
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    EventsDto:
+      type: object
+      properties:
+        events:
+          example:
+          - workspaceId: string
+            spektrId: string
+            eventData:
+              changes:
+              - type: street_updated
+                field: street
+                oldValue: s1
+                newValue: s2
+                changedBy: user
+                note: optional random note
+            type: recordUpdated
+          description: The list of events to import
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDto'
+      required:
+      - events
   securitySchemes:
     x-api-key:
       type: apiKey

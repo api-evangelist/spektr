@@ -589,988 +589,6 @@ paths:
       - Orchestration API
 components:
   schemas:
-    StringField:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The field type (e.g., input, select, checkbox)
-          example: input
-        validation:
-          description: The field validation rules
-          example:
-          - type: required
-            value: true
-            message: This field is required
-          - type: regex
-            value: ^[a-zA-Z0-9 ]+$
-            message: Only alphanumeric characters and spaces are allowed
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/RequiredValidation'
-              title: required
-            - $ref: '#/components/schemas/RegexValidation'
-              title: regex
-        attributes:
-          description: The field attributes
-          example:
-            type: text
-            placeholder: Acme Inc.
-            internalId: ''
-            label: Company name
-            name: Company name
-            maxLength: 100
-          allOf:
-          - $ref: '#/components/schemas/InputAttributeObject'
-        dataType:
-          type: string
-          description: The data type of the field
-          example: string
-          enum:
-          - string
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: company_name
-            value: Test APS
-          allOf:
-          - $ref: '#/components/schemas/StringFieldConfig'
-      required:
-      - type
-      - validation
-      - attributes
-      - dataType
-      - config
-    UnauthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Unauthorized Exception
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - unauthorized
-          description: The error code
-      required:
-      - message
-      - errorCode
-    EndStep:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The step type
-          example: endStep
-        redirectUrl:
-          type: string
-          description: The redirect url
-          example: https://your-redirect-url.com/success
-        formText:
-          type: string
-          description: The form content or an optional message to display at the end
-          example: Thank you for completing your onboarding!
-      required:
-      - type
-      - redirectUrl
-      - formText
-    BooleanFieldConfig:
-      type: object
-      properties:
-        spektrDataField:
-          type: string
-          description: The Spektr field identifier
-          example: company_name
-        value:
-          type: boolean
-          description: The default value of the field either prefilled or submitted previously
-          example: true
-      required:
-      - spektrDataField
-    MaxFileSizeValidation:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message for validation failure
-          example: This field is required
-        type:
-          type: string
-          description: Type of validation rule
-          example: maxFileSize
-          enum:
-          - maxFileSize
-        value:
-          type: number
-          description: Maximum file size in bytes
-          example: 5242880
-      required:
-      - message
-      - type
-      - value
-    DateAttributeObject:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Label for the field
-          example: Company name
-        name:
-          type: string
-          description: Name for the field
-          example: Company name
-        type:
-          type: string
-          description: Type of the input
-          example: text
-        placeholder:
-          type: string
-          description: Placeholder text for the field
-          example: Acme Inc.
-        internalId:
-          type: string
-          description: Internal ID for the field
-          example: ''
-        maxLength:
-          type: number
-          description: Max length of the input value (characters)
-          example: 100
-        minDate:
-          type: string
-          description: Minimum allowed date for date fields
-          example: '1900-01-01'
-        maxDate:
-          type: string
-          description: Maximum allowed date for date fields
-          example: '2100-12-31'
-        maxDaysInPast:
-          type: number
-          description: Maximum number of days in the past allowed for date fields
-          example: 3650
-        maxDaysInFuture:
-          type: number
-          description: Maximum number of days in the future allowed for date fields
-          example: 30
-      required:
-      - label
-      - name
-      - type
-      - placeholder
-      - internalId
-      - maxLength
-      - minDate
-      - maxDate
-      - maxDaysInPast
-      - maxDaysInFuture
-    HitHorizonVendor:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The step type
-          example: hithorizon
-        searchTerm:
-          type: string
-          description: The search term submitted
-          example: spektr
-        results:
-          type: string
-          description: The results from the vendor company search
-      required:
-      - type
-      - searchTerm
-      - results
-    SubmitV3CompletedResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - completed
-          description: Submission completed immediately (no files to upload)
-      required:
-      - status
-    SubmitVeriff:
-      type: object
-      properties:
-        params:
-          type: string
-          description: The results parameters
-      required:
-      - params
-    VeriffVendor:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The step type
-          example: veriff
-        params:
-          type: string
-          description: The parameters required to run a veriff session
-      required:
-      - type
-      - params
-    InputAttributeObject:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Label for the field
-          example: Company name
-        name:
-          type: string
-          description: Name for the field
-          example: Company name
-        type:
-          type: string
-          description: Type of the input
-          example: text
-        placeholder:
-          type: string
-          description: Placeholder text for the field
-          example: Acme Inc.
-        internalId:
-          type: string
-          description: Internal ID for the field
-          example: ''
-        maxLength:
-          type: number
-          description: Max length of the input value (characters)
-          example: 100
-      required:
-      - label
-      - name
-      - type
-      - placeholder
-      - internalId
-      - maxLength
-    FileUploadPresignedUrlDto:
-      type: object
-      properties:
-        entityReference:
-          type: string
-          description: Entity reference. Only present for role-entity submissions.
-          example: 507f1f77bcf86cd799439011
-        fileName:
-          type: string
-          description: The name of the file to be uploaded
-          example: utility_bill.pdf
-        spektrDataField:
-          type: string
-          description: The spektr data field key associated with the file
-          example: pdf_document
-        url:
-          type: string
-          description: The presigned URL for uploading the file to S3
-          example: https://s3.amazonaws.com/bucket/...
-        fields:
-          type: object
-          description: Form fields required for the S3 presigned POST upload. Include these as form data when uploading.
-          example:
-            key: workspace/endClient/123/file.pdf
-            Content-Type: application/pdf
-            policy: '...'
-            x-amz-signature: '...'
-      required:
-      - fileName
-      - spektrDataField
-      - url
-      - fields
-    DateFieldConfig:
-      type: object
-      properties:
-        spektrDataField:
-          type: string
-          description: The Spektr field identifier
-          example: company_name
-        value:
-          type: number
-          description: The default value of the field either prefilled or submitted previously
-          example: 1622505600
-      required:
-      - spektrDataField
-    UiField:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The field type (e.g., heading, paragraph, divider)
-          example: heading
-        dataType:
-          type: string
-          description: The data type of the field
-          example: ui
-          enum:
-          - ui
-        attributes:
-          description: The field attributes
-          example:
-            label: Section Title
-            name: section_title
-            content: This is a section heading
-          allOf:
-          - $ref: '#/components/schemas/UiAttributeObject'
-      required:
-      - type
-      - dataType
-      - attributes
-    StringFieldConfig:
-      type: object
-      properties:
-        spektrDataField:
-          type: string
-          description: The Spektr field identifier
-          example: company_name
-        value:
-          type: string
-          description: The default value of the field either prefilled or submitted previously
-          example: Test APS
-      required:
-      - spektrDataField
-    GeneratePresignedUrlResponse:
-      type: object
-      properties:
-        fileName:
-          type: string
-          description: The name of the file to be uploaded
-          example: utility_bill.pdf
-        spektrDataField:
-          type: string
-          description: The spektr data field key associated with the file
-          example: pdf_document
-        url:
-          type: string
-          description: The presigned URL for uploading the file
-          example: https://s3.amazonaws.com/...
-        fields:
-          type: object
-          description: The fields required for the presigned URL upload
-          example:
-            key: '...'
-            AWSAccessKeyId: '...'
-            policy: '...'
-            signature: '...'
-      required:
-      - fileName
-      - spektrDataField
-      - url
-      - fields
-    BooleanAttributeObject:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Label for the field
-          example: Company name
-        name:
-          type: string
-          description: Name for the field
-          example: Company name
-        internalId:
-          type: string
-          description: Internal ID for the field
-          example: ''
-      required:
-      - label
-      - name
-      - internalId
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
-    UiAttributeObject:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Label for the field
-          example: Company name
-        name:
-          type: string
-          description: Name for the field
-          example: Company name
-        content:
-          type: string
-          description: Plain text content for the UI element (HTML tags stripped)
-          example: This is a paragraph
-        contentHtml:
-          type: string
-          description: HTML content for the UI element (contains HTML tags)
-          example: <p>This is a <strong>paragraph</strong></p>
-        labelHtml:
-          type: string
-          description: HTML label for the UI element (contains HTML tags)
-          example: <p>This is a <strong>paragraph</strong></p>
-        path:
-          type: string
-          description: Image path or URL for the External Media Field
-          example: /images/onboarding/welcome.png or https://example.com/image.png
-        componentType:
-          type: string
-          description: Component type for the Call to Action Field
-          example: popup
-          enum:
-          - popup
-          - accordion
-      required:
-      - label
-      - name
-      - content
-      - contentHtml
-      - labelHtml
-      - path
-      - componentType
-    SubmitBankId:
-      type: object
-      properties:
-        params:
-          type: string
-          description: The results parameters
-      required:
-      - params
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Internal Server Error
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - internal_server_error
-          description: The error code
-      required:
-      - message
-      - errorCode
-    SubmitMitId:
-      type: object
-      properties:
-        params:
-          type: string
-          description: The results parameters
-      required:
-      - params
-    MitIDVendor:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The step type
-          example: mitId
-        params:
-          type: string
-          description: The parameters required to run a mitId session
-      required:
-      - type
-      - params
-    RequiredValidation:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message for validation failure
-          example: This field is required
-        type:
-          type: string
-          description: Type of validation rule
-          example: required
-          enum:
-          - required
-        value:
-          type: boolean
-          description: Whether the field is required
-          example: true
-      required:
-      - message
-      - type
-      - value
-    NumberFieldConfig:
-      type: object
-      properties:
-        spektrDataField:
-          type: string
-          description: The Spektr field identifier
-          example: company_name
-        value:
-          type: number
-          description: The default value of the field either prefilled or submitted previously
-          example: 123
-      required:
-      - spektrDataField
-    BankIDVendor:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The step type
-          example: bankId
-        params:
-          type: string
-          description: The parameters required to run a bankId session
-      required:
-      - type
-      - params
-    SubmitHitHorizon:
-      type: object
-      properties:
-        searchTerm:
-          type: string
-          description: The search term for company search
-          example: spektr
-        searchIdentifier:
-          type: string
-          description: The identifier of the company that is chosen
-          example: H-DK02xxxxxxx
-      required:
-      - searchTerm
-      - searchIdentifier
-    ConfirmPendingResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - pending
-          description: Some files are missing, presigned URLs provided for retry
-        fileUploads:
-          description: Presigned URLs for missing files
-          type: array
-          items:
-            $ref: '#/components/schemas/FileUploadPresignedUrlDto'
-      required:
-      - status
-      - fileUploads
-    CountryListField:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The field type (e.g., input, select, checkbox)
-          example: input
-        validation:
-          description: The field validation rules
-          example:
-          - type: required
-            value: true
-            message: This field is required
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/RequiredValidation'
-        attributes:
-          description: The field attributes
-          example:
-            type: countryMultiselect
-            placeholder: Select countries
-            label: Countries
-            name: Countries
-          allOf:
-          - $ref: '#/components/schemas/InputAttributeObject'
-        dataType:
-          type: string
-          description: The data type of the field
-          example: countryList
-          enum:
-          - countryList
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: countries
-            value: '["US", "GB"]'
-          allOf:
-          - $ref: '#/components/schemas/StringFieldConfig'
-      required:
-      - type
-      - validation
-      - attributes
-      - dataType
-      - config
-    ExternalDataExpectedFieldSchema:
-      type: object
-      properties:
-        spektrDataField:
-          type: string
-          description: The Spektr data field that will be populated from the submitted payload
-          example: company_name
-        type:
-          type: string
-          description: The expected data type for the submitted value
-          enum:
-          - string
-          - number
-          - date
-          - country
-          - boolean
-          - stringList
-          - countryList
-          - currencyList
-          - object
-          example: string
-        required:
-          type: boolean
-          description: Whether this field must be included in the submit payload
-          example: true
-      required:
-      - spektrDataField
-      - type
-      - required
-    ConfirmCompletedResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - completed
-          description: All files verified, execution resumed
-      required:
-      - status
-    GeneratePresignedUrlRequest:
-      type: object
-      properties:
-        fileName:
-          type: string
-          description: The name of the file to be uploaded
-          example: utility_bill.pdf
-        spektrDataField:
-          type: string
-          description: The spektr data field key associated with the file
-          example: pdf_document
-      required:
-      - fileName
-      - spektrDataField
-    SubmitV3AcceptedResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - accepted
-          description: Submission accepted, files need to be uploaded using presigned URLs
-        fileUploads:
-          description: Presigned URLs for uploading files to S3
-          type: array
-          items:
-            $ref: '#/components/schemas/FileUploadPresignedUrlDto'
-      required:
-      - status
-      - fileUploads
-    FileAttributeObject:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Label for the field
-          example: Company name
-        name:
-          type: string
-          description: Name for the field
-          example: Company name
-        internalId:
-          type: string
-          description: Internal ID for the field
-          example: ''
-        accept:
-          type: string
-          description: Allowed file types
-          example: .pdf,.jpg,.png
-        maxLength:
-          type: number
-          description: Max file name length (characters)
-          example: 120
-      required:
-      - label
-      - name
-      - internalId
-      - accept
-      - maxLength
-    EntityAttributeObject:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Label for the field
-          example: Company name
-        name:
-          type: string
-          description: Name for the field
-          example: Company name
-        helperText:
-          type: string
-          description: Helper text providing additional information about the field
-          example: Add all individuals who own 25% or more of the company
-        helperTextHtml:
-          type: string
-          description: Helper text providing additional information about the field (contains HTML tags)
-          example: <p>Add all individuals who own 25% or more of the company</p>
-        buttonText:
-          type: string
-          description: Text displayed on the button to add an entity
-          example: Add Owner
-        labelField:
-          type: string
-          description: The field to use as a label for identifying each entity
-          example: first_name
-        internalId:
-          type: string
-          description: Internal ID for the field
-          example: ''
-        category:
-          type: string
-          description: Category of the entity relationship
-          example: UBO
-      required:
-      - label
-      - name
-      - helperText
-      - helperTextHtml
-      - buttonText
-      - labelField
-      - internalId
-      - category
-    FileField:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The field type (e.g., input, select, checkbox)
-          example: input
-        validation:
-          description: The field validation rules
-          example:
-          - type: required
-            value: true
-            message: This file is required
-          - type: maxFileSize
-            value: 5242880
-            message: File size too large
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/RequiredValidation'
-              title: required
-            - $ref: '#/components/schemas/MaxFileSizeValidation'
-              title: maxFileSize
-        attributes:
-          description: The field attributes
-          example:
-            label: Upload Document
-            name: Upload Document
-            accept: .pdf,.jpg,.png
-            maxLength: '15'
-          allOf:
-          - $ref: '#/components/schemas/FileAttributeObject'
-        dataType:
-          type: string
-          description: The data type of the field
-          example: file
-          enum:
-          - file
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: document
-            value: file-123
-          allOf:
-          - $ref: '#/components/schemas/StringFieldConfig'
-      required:
-      - type
-      - validation
-      - attributes
-      - dataType
-      - config
-    EntityField:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The field type (e.g., input, entity)
-          example: entity
-        dataType:
-          type: string
-          description: The data type of the field
-          example: entity
-          enum:
-          - entity
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: entity
-            value: entity-data
-          allOf:
-          - $ref: '#/components/schemas/StringFieldConfig'
-        attributes:
-          description: The entity field attributes
-          allOf:
-          - $ref: '#/components/schemas/EntityAttributeObject'
-        validation:
-          description: The field validation rules
-          example:
-          - type: required
-            value: true
-            message: At least one owner is required
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/RequiredValidation'
-              title: required
-        form:
-          type: object
-          description: The form definition containing fields and their order
-      required:
-      - type
-      - dataType
-      - config
-      - attributes
-      - validation
-      - form
-    CurrentStepResponse:
-      type: object
-      properties:
-        node:
-          oneOf:
-          - $ref: '#/components/schemas/FormResponse'
-            title: form
-          - $ref: '#/components/schemas/EndStep'
-            title: endStep
-          - $ref: '#/components/schemas/HitHorizonVendor'
-            title: hitHorizon
-          - $ref: '#/components/schemas/VeriffVendor'
-            title: veriff
-          - $ref: '#/components/schemas/MitIDVendor'
-            title: mitId
-          - $ref: '#/components/schemas/BankIDVendor'
-            title: bankId
-          - $ref: '#/components/schemas/ExternalDataPayloadSchema'
-            title: externalData
-          description: The current step of the process, determined by the session state
-        execution:
-          description: Metadata for the execution
-          allOf:
-          - $ref: '#/components/schemas/Execution'
-      required:
-      - node
-      - execution
-    AgeValidation:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message for validation failure
-          example: This field is required
-        type:
-          type: string
-          description: Type of validation rule
-          example: age
-          enum:
-          - age
-        minimumAge:
-          type: number
-          description: Minimum age required
-          example: 18
-        maximumAge:
-          type: number
-          description: Maximum age allowed
-          example: 65
-      required:
-      - message
-      - type
-    BooleanField:
-      type: object
-      properties:
-        type:
-          type: string
-          description: The field type (e.g., input, select, checkbox)
-          example: input
-        validation:
-          description: The field validation rules
-          example:
-          - type: required
-            value: true
-            message: This field is required
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/RequiredValidation'
-              title: required
-        attributes:
-          description: The field attributes
-          example:
-            label: Is Active
-            name: Is Active
-          allOf:
-          - $ref: '#/components/schemas/BooleanAttributeObject'
-        dataType:
-          type: string
-          description: The data type of the field
-          example: boolean
-          enum:
-          - boolean
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: is_active
-            value: true
-          allOf:
-          - $ref: '#/components/schemas/BooleanFieldConfig'
-      required:
-      - type
-      - validation
-      - attributes
-      - dataType
-      - config
-    Execution:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Represents an id for this execution
-        parentId:
-          type: string
-          description: Represents the parent execution id
-        status:
-          type: string
-          description: Status of the execution, used for the polling mechanism
-          example: pending
-        error:
-          type: string
-          description: The error message if the execution failed
-          example: Error message
-        currentStep:
-          type: number
-          description: The current step of the execution, starting from 1
-          example: 4
-        maxStep:
-          type: number
-          description: The maximum total steps in any reachable path from the current position (counting from step 1)
-          example: 6
-        minStep:
-          type: number
-          description: The minimum total steps in any reachable path from the current position (counting from step 1)
-          example: 6
-      required:
-      - id
-      - parentId
-      - status
-      - error
-      - currentStep
-      - maxStep
-      - minStep
     FormResponse:
       type: object
       properties:
@@ -1750,89 +768,78 @@ components:
       required:
       - type
       - fields
-    ConditionalField:
+    BooleanAttributeObject:
       type: object
       properties:
-        type:
+        label:
           type: string
-          description: The field type (e.g., input, select, checkbox)
-          example: conditional
-        dataType:
+          description: Label for the field
+          example: Company name
+        name:
           type: string
-          description: The data type of the field
-          example: conditional
-          enum:
-          - conditional
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: condition_field
-            value: condition_value
-          allOf:
-          - $ref: '#/components/schemas/StringFieldConfig'
-        segment:
-          type: object
-          description: The segment configuration for the conditional field
-        output:
+          description: Name for the field
+          example: Company name
+        internalId:
           type: string
-          description: The output mode, either "show" or "hide"
-          enum:
-          - show
-          - hide
-          default: hide
-        form:
-          type: object
-          description: The form definition containing fields and their order
-          example:
-            fields:
-              field-id-1: {}
-              field-id-2: {}
-            order:
-            - field-id-1
-            - field-id-2
+          description: Internal ID for the field
+          example: ''
       required:
-      - type
-      - dataType
-      - config
-      - segment
-      - output
-      - form
-    ExternalDataPayloadSchema:
+      - label
+      - name
+      - internalId
+    DateFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: number
+          description: The default value of the field either prefilled or submitted previously
+          example: 1622505600
+      required:
+      - spektrDataField
+    BankIDVendor:
       type: object
       properties:
         type:
           type: string
           description: The step type
-          example: externalData
-        nodeId:
+          example: bankId
+        params:
           type: string
-          description: Unique identifier of the external data node awaiting payload submission
-          example: 680f2e7f8b3f4b01d2c9e0ab
-        submitUrl:
-          type: string
-          description: Relative endpoint the client should call to submit the payload for this step
-          example: public/actions/<token>
-        expectedFields:
-          description: Fields expected in the submit payload. Submit each value under its spektrDataField key.
-          example:
-          - spektrDataField: company_name
-            type: string
-            required: true
-          - spektrDataField: company_country
-            type: country
-            required: false
-          type: array
-          items:
-            $ref: '#/components/schemas/ExternalDataExpectedFieldSchema'
-        expiresAt:
-          type: number
-          description: Unix timestamp in milliseconds after which the external data request expires
-          example: 1735732800000
+          description: The parameters required to run a bankId session
       required:
       - type
-      - nodeId
-      - submitUrl
-      - expectedFields
+      - params
+    NumberFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: number
+          description: The default value of the field either prefilled or submitted previously
+          example: 123
+      required:
+      - spektrDataField
+    GeneratePresignedUrlRequest:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The name of the file to be uploaded
+          example: utility_bill.pdf
+        spektrDataField:
+          type: string
+          description: The spektr data field key associated with the file
+          example: pdf_document
+      required:
+      - fileName
+      - spektrDataField
     CurrencyListField:
       type: object
       properties:
@@ -1878,51 +885,43 @@ components:
       - attributes
       - dataType
       - config
-    StringListField:
+    Execution:
       type: object
       properties:
-        type:
+        id:
           type: string
-          description: The field type (e.g., input, select, checkbox)
-          example: input
-        validation:
-          description: The field validation rules
-          example:
-          - type: required
-            value: true
-            message: This field is required
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/RequiredValidation'
-        attributes:
-          description: The field attributes
-          example:
-            type: select
-            placeholder: Select categories
-            label: Categories
-            name: Categories
-          allOf:
-          - $ref: '#/components/schemas/InputAttributeObject'
-        dataType:
+          description: Represents an id for this execution
+        parentId:
           type: string
-          description: The data type of the field
-          example: stringList
-          enum:
-          - stringList
-        config:
-          description: The field configuration including the value
-          example:
-            spektrDataField: categories
-            value: category1,category2
-          allOf:
-          - $ref: '#/components/schemas/StringFieldConfig'
+          description: Represents the parent execution id
+        status:
+          type: string
+          description: Status of the execution, used for the polling mechanism
+          example: pending
+        error:
+          type: string
+          description: The error message if the execution failed
+          example: Error message
+        currentStep:
+          type: number
+          description: The current step of the execution, starting from 1
+          example: 4
+        maxStep:
+          type: number
+          description: The maximum total steps in any reachable path from the current position (counting from step 1)
+          example: 6
+        minStep:
+          type: number
+          description: The minimum total steps in any reachable path from the current position (counting from step 1)
+          example: 6
       required:
-      - type
-      - validation
-      - attributes
-      - dataType
-      - config
+      - id
+      - parentId
+      - status
+      - error
+      - currentStep
+      - maxStep
+      - minStep
     DateField:
       type: object
       properties:
@@ -1978,7 +977,86 @@ components:
       - attributes
       - dataType
       - config
-    RegexValidation:
+    ConditionalField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: conditional
+        dataType:
+          type: string
+          description: The data type of the field
+          example: conditional
+          enum:
+          - conditional
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: condition_field
+            value: condition_value
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+        segment:
+          type: object
+          description: The segment configuration for the conditional field
+        output:
+          type: string
+          description: The output mode, either "show" or "hide"
+          enum:
+          - show
+          - hide
+          default: hide
+        form:
+          type: object
+          description: The form definition containing fields and their order
+          example:
+            fields:
+              field-id-1: {}
+              field-id-2: {}
+            order:
+            - field-id-1
+            - field-id-2
+      required:
+      - type
+      - dataType
+      - config
+      - segment
+      - output
+      - form
+    FileUploadPresignedUrlDto:
+      type: object
+      properties:
+        entityReference:
+          type: string
+          description: Entity reference. Only present for role-entity submissions.
+          example: 507f1f77bcf86cd799439011
+        fileName:
+          type: string
+          description: The name of the file to be uploaded
+          example: utility_bill.pdf
+        spektrDataField:
+          type: string
+          description: The spektr data field key associated with the file
+          example: pdf_document
+        url:
+          type: string
+          description: The presigned URL for uploading the file to S3
+          example: https://s3.amazonaws.com/bucket/...
+        fields:
+          type: object
+          description: Form fields required for the S3 presigned POST upload. Include these as form data when uploading.
+          example:
+            key: workspace/endClient/123/file.pdf
+            Content-Type: application/pdf
+            policy: '...'
+            x-amz-signature: '...'
+      required:
+      - fileName
+      - spektrDataField
+      - url
+      - fields
+    RequiredValidation:
       type: object
       properties:
         message:
@@ -1988,17 +1066,211 @@ components:
         type:
           type: string
           description: Type of validation rule
-          example: regex
+          example: required
           enum:
-          - regex
+          - required
         value:
-          type: string
-          description: Regular expression pattern
-          example: ^[a-zA-Z0-9]+$
+          type: boolean
+          description: Whether the field is required
+          example: true
       required:
       - message
       - type
       - value
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Unauthorized Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - unauthorized
+          description: The error code
+      required:
+      - message
+      - errorCode
+    VeriffVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: veriff
+        params:
+          type: string
+          description: The parameters required to run a veriff session
+      required:
+      - type
+      - params
+    ExternalDataExpectedFieldSchema:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr data field that will be populated from the submitted payload
+          example: company_name
+        type:
+          type: string
+          description: The expected data type for the submitted value
+          enum:
+          - string
+          - number
+          - date
+          - country
+          - boolean
+          - stringList
+          - countryList
+          - currencyList
+          - object
+          example: string
+        required:
+          type: boolean
+          description: Whether this field must be included in the submit payload
+          example: true
+      required:
+      - spektrDataField
+      - type
+      - required
+    UiField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., heading, paragraph, divider)
+          example: heading
+        dataType:
+          type: string
+          description: The data type of the field
+          example: ui
+          enum:
+          - ui
+        attributes:
+          description: The field attributes
+          example:
+            label: Section Title
+            name: section_title
+            content: This is a section heading
+          allOf:
+          - $ref: '#/components/schemas/UiAttributeObject'
+      required:
+      - type
+      - dataType
+      - attributes
+    InputAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        type:
+          type: string
+          description: Type of the input
+          example: text
+        placeholder:
+          type: string
+          description: Placeholder text for the field
+          example: Acme Inc.
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        maxLength:
+          type: number
+          description: Max length of the input value (characters)
+          example: 100
+      required:
+      - label
+      - name
+      - type
+      - placeholder
+      - internalId
+      - maxLength
+    SubmitVeriff:
+      type: object
+      properties:
+        params:
+          type: string
+          description: The results parameters
+      required:
+      - params
+    HitHorizonVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: hithorizon
+        searchTerm:
+          type: string
+          description: The search term submitted
+          example: spektr
+        results:
+          type: string
+          description: The results from the vendor company search
+      required:
+      - type
+      - searchTerm
+      - results
+    FileField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This file is required
+          - type: maxFileSize
+            value: 5242880
+            message: File size too large
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+            - $ref: '#/components/schemas/MaxFileSizeValidation'
+              title: maxFileSize
+        attributes:
+          description: The field attributes
+          example:
+            label: Upload Document
+            name: Upload Document
+            accept: .pdf,.jpg,.png
+            maxLength: '15'
+          allOf:
+          - $ref: '#/components/schemas/FileAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: file
+          enum:
+          - file
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: document
+            value: file-123
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
     NumberField:
       type: object
       properties:
@@ -2044,6 +1316,734 @@ components:
             value: 30
           allOf:
           - $ref: '#/components/schemas/NumberFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    EntityAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        helperText:
+          type: string
+          description: Helper text providing additional information about the field
+          example: Add all individuals who own 25% or more of the company
+        helperTextHtml:
+          type: string
+          description: Helper text providing additional information about the field (contains HTML tags)
+          example: <p>Add all individuals who own 25% or more of the company</p>
+        buttonText:
+          type: string
+          description: Text displayed on the button to add an entity
+          example: Add Owner
+        labelField:
+          type: string
+          description: The field to use as a label for identifying each entity
+          example: first_name
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        category:
+          type: string
+          description: Category of the entity relationship
+          example: UBO
+      required:
+      - label
+      - name
+      - helperText
+      - helperTextHtml
+      - buttonText
+      - labelField
+      - internalId
+      - category
+    StringFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: string
+          description: The default value of the field either prefilled or submitted previously
+          example: Test APS
+      required:
+      - spektrDataField
+    SubmitBankId:
+      type: object
+      properties:
+        params:
+          type: string
+          description: The results parameters
+      required:
+      - params
+    SubmitMitId:
+      type: object
+      properties:
+        params:
+          type: string
+          description: The results parameters
+      required:
+      - params
+    ConfirmCompletedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - completed
+          description: All files verified, execution resumed
+      required:
+      - status
+    UiAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        content:
+          type: string
+          description: Plain text content for the UI element (HTML tags stripped)
+          example: This is a paragraph
+        contentHtml:
+          type: string
+          description: HTML content for the UI element (contains HTML tags)
+          example: <p>This is a <strong>paragraph</strong></p>
+        labelHtml:
+          type: string
+          description: HTML label for the UI element (contains HTML tags)
+          example: <p>This is a <strong>paragraph</strong></p>
+        path:
+          type: string
+          description: Image path or URL for the External Media Field
+          example: /images/onboarding/welcome.png or https://example.com/image.png
+        componentType:
+          type: string
+          description: Component type for the Call to Action Field
+          example: popup
+          enum:
+          - popup
+          - accordion
+      required:
+      - label
+      - name
+      - content
+      - contentHtml
+      - labelHtml
+      - path
+      - componentType
+    DateAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        type:
+          type: string
+          description: Type of the input
+          example: text
+        placeholder:
+          type: string
+          description: Placeholder text for the field
+          example: Acme Inc.
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        maxLength:
+          type: number
+          description: Max length of the input value (characters)
+          example: 100
+        minDate:
+          type: string
+          description: Minimum allowed date for date fields
+          example: '1900-01-01'
+        maxDate:
+          type: string
+          description: Maximum allowed date for date fields
+          example: '2100-12-31'
+        maxDaysInPast:
+          type: number
+          description: Maximum number of days in the past allowed for date fields
+          example: 3650
+        maxDaysInFuture:
+          type: number
+          description: Maximum number of days in the future allowed for date fields
+          example: 30
+      required:
+      - label
+      - name
+      - type
+      - placeholder
+      - internalId
+      - maxLength
+      - minDate
+      - maxDate
+      - maxDaysInPast
+      - maxDaysInFuture
+    SubmitV3CompletedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - completed
+          description: Submission completed immediately (no files to upload)
+      required:
+      - status
+    MaxFileSizeValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: maxFileSize
+          enum:
+          - maxFileSize
+        value:
+          type: number
+          description: Maximum file size in bytes
+          example: 5242880
+      required:
+      - message
+      - type
+      - value
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    GeneratePresignedUrlResponse:
+      type: object
+      properties:
+        fileName:
+          type: string
+          description: The name of the file to be uploaded
+          example: utility_bill.pdf
+        spektrDataField:
+          type: string
+          description: The spektr data field key associated with the file
+          example: pdf_document
+        url:
+          type: string
+          description: The presigned URL for uploading the file
+          example: https://s3.amazonaws.com/...
+        fields:
+          type: object
+          description: The fields required for the presigned URL upload
+          example:
+            key: '...'
+            AWSAccessKeyId: '...'
+            policy: '...'
+            signature: '...'
+      required:
+      - fileName
+      - spektrDataField
+      - url
+      - fields
+    EndStep:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: endStep
+        redirectUrl:
+          type: string
+          description: The redirect url
+          example: https://your-redirect-url.com/success
+        formText:
+          type: string
+          description: The form content or an optional message to display at the end
+          example: Thank you for completing your onboarding!
+      required:
+      - type
+      - redirectUrl
+      - formText
+    CountryListField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+        attributes:
+          description: The field attributes
+          example:
+            type: countryMultiselect
+            placeholder: Select countries
+            label: Countries
+            name: Countries
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: countryList
+          enum:
+          - countryList
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: countries
+            value: '["US", "GB"]'
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    ConfirmPendingResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          description: Some files are missing, presigned URLs provided for retry
+        fileUploads:
+          description: Presigned URLs for missing files
+          type: array
+          items:
+            $ref: '#/components/schemas/FileUploadPresignedUrlDto'
+      required:
+      - status
+      - fileUploads
+    AgeValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: age
+          enum:
+          - age
+        minimumAge:
+          type: number
+          description: Minimum age required
+          example: 18
+        maximumAge:
+          type: number
+          description: Maximum age allowed
+          example: 65
+      required:
+      - message
+      - type
+    RegexValidation:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message for validation failure
+          example: This field is required
+        type:
+          type: string
+          description: Type of validation rule
+          example: regex
+          enum:
+          - regex
+        value:
+          type: string
+          description: Regular expression pattern
+          example: ^[a-zA-Z0-9]+$
+      required:
+      - message
+      - type
+      - value
+    BooleanField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+        attributes:
+          description: The field attributes
+          example:
+            label: Is Active
+            name: Is Active
+          allOf:
+          - $ref: '#/components/schemas/BooleanAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: boolean
+          enum:
+          - boolean
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: is_active
+            value: true
+          allOf:
+          - $ref: '#/components/schemas/BooleanFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    SubmitHitHorizon:
+      type: object
+      properties:
+        searchTerm:
+          type: string
+          description: The search term for company search
+          example: spektr
+        searchIdentifier:
+          type: string
+          description: The identifier of the company that is chosen
+          example: H-DK02xxxxxxx
+      required:
+      - searchTerm
+      - searchIdentifier
+    StringListField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+        attributes:
+          description: The field attributes
+          example:
+            type: select
+            placeholder: Select categories
+            label: Categories
+            name: Categories
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: stringList
+          enum:
+          - stringList
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: categories
+            value: category1,category2
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+      required:
+      - type
+      - validation
+      - attributes
+      - dataType
+      - config
+    ExternalDataPayloadSchema:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: externalData
+        nodeId:
+          type: string
+          description: Unique identifier of the external data node awaiting payload submission
+          example: 680f2e7f8b3f4b01d2c9e0ab
+        submitUrl:
+          type: string
+          description: Relative endpoint the client should call to submit the payload for this step
+          example: public/actions/<token>
+        expectedFields:
+          description: Fields expected in the submit payload. Submit each value under its spektrDataField key.
+          example:
+          - spektrDataField: company_name
+            type: string
+            required: true
+          - spektrDataField: company_country
+            type: country
+            required: false
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalDataExpectedFieldSchema'
+        expiresAt:
+          type: number
+          description: Unix timestamp in milliseconds after which the external data request expires
+          example: 1735732800000
+      required:
+      - type
+      - nodeId
+      - submitUrl
+      - expectedFields
+    FileAttributeObject:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label for the field
+          example: Company name
+        name:
+          type: string
+          description: Name for the field
+          example: Company name
+        internalId:
+          type: string
+          description: Internal ID for the field
+          example: ''
+        accept:
+          type: string
+          description: Allowed file types
+          example: .pdf,.jpg,.png
+        maxLength:
+          type: number
+          description: Max file name length (characters)
+          example: 120
+      required:
+      - label
+      - name
+      - internalId
+      - accept
+      - maxLength
+    CurrentStepResponse:
+      type: object
+      properties:
+        node:
+          oneOf:
+          - $ref: '#/components/schemas/FormResponse'
+            title: form
+          - $ref: '#/components/schemas/EndStep'
+            title: endStep
+          - $ref: '#/components/schemas/HitHorizonVendor'
+            title: hitHorizon
+          - $ref: '#/components/schemas/VeriffVendor'
+            title: veriff
+          - $ref: '#/components/schemas/MitIDVendor'
+            title: mitId
+          - $ref: '#/components/schemas/BankIDVendor'
+            title: bankId
+          - $ref: '#/components/schemas/ExternalDataPayloadSchema'
+            title: externalData
+          description: The current step of the process, determined by the session state
+        execution:
+          description: Metadata for the execution
+          allOf:
+          - $ref: '#/components/schemas/Execution'
+      required:
+      - node
+      - execution
+    MitIDVendor:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The step type
+          example: mitId
+        params:
+          type: string
+          description: The parameters required to run a mitId session
+      required:
+      - type
+      - params
+    SubmitV3AcceptedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - accepted
+          description: Submission accepted, files need to be uploaded using presigned URLs
+        fileUploads:
+          description: Presigned URLs for uploading files to S3
+          type: array
+          items:
+            $ref: '#/components/schemas/FileUploadPresignedUrlDto'
+      required:
+      - status
+      - fileUploads
+    BooleanFieldConfig:
+      type: object
+      properties:
+        spektrDataField:
+          type: string
+          description: The Spektr field identifier
+          example: company_name
+        value:
+          type: boolean
+          description: The default value of the field either prefilled or submitted previously
+          example: true
+      required:
+      - spektrDataField
+    EntityField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, entity)
+          example: entity
+        dataType:
+          type: string
+          description: The data type of the field
+          example: entity
+          enum:
+          - entity
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: entity
+            value: entity-data
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
+        attributes:
+          description: The entity field attributes
+          allOf:
+          - $ref: '#/components/schemas/EntityAttributeObject'
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: At least one owner is required
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+        form:
+          type: object
+          description: The form definition containing fields and their order
+      required:
+      - type
+      - dataType
+      - config
+      - attributes
+      - validation
+      - form
+    StringField:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The field type (e.g., input, select, checkbox)
+          example: input
+        validation:
+          description: The field validation rules
+          example:
+          - type: required
+            value: true
+            message: This field is required
+          - type: regex
+            value: ^[a-zA-Z0-9 ]+$
+            message: Only alphanumeric characters and spaces are allowed
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/RequiredValidation'
+              title: required
+            - $ref: '#/components/schemas/RegexValidation'
+              title: regex
+        attributes:
+          description: The field attributes
+          example:
+            type: text
+            placeholder: Acme Inc.
+            internalId: ''
+            label: Company name
+            name: Company name
+            maxLength: 100
+          allOf:
+          - $ref: '#/components/schemas/InputAttributeObject'
+        dataType:
+          type: string
+          description: The data type of the field
+          example: string
+          enum:
+          - string
+        config:
+          description: The field configuration including the value
+          example:
+            spektrDataField: company_name
+            value: Test APS
+          allOf:
+          - $ref: '#/components/schemas/StringFieldConfig'
       required:
       - type
       - validation
