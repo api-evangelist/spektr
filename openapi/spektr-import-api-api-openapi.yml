@@ -175,6 +175,54 @@ paths:
       - Import API
 components:
   schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataUpdateResponseDataFileItem:
+      type: object
+      properties:
+        file:
+          type: string
+          description: The file name
+        url:
+          type: string
+          description: A presigned URL for uploading the file associated with the file field.
+        fields:
+          description: An array of headers needed for the file upload
+          type: array
+          items:
+            type: object
+      required:
+      - file
+      - url
+      - fields
     DataImportResponse:
       type: object
       properties:
@@ -184,25 +232,20 @@ components:
           description: The ID of the dataset
       required:
       - datasetId
-    DataUpdateResponse:
+    DataUpdateResponseDataItem:
       type: object
       properties:
-        data:
-          example:
-          - spektrId: UUID
-            files:
-            - file: passport
-              url: https://spektr.com/presigned-url
-              fields:
-                header1: value1
-                header2: value2
-          - spektrId: UUID
-          description: The API responds with an array of objects corresponding to each data entry submitted. Each object includes "spektrId" and "files" array if the entry includes file fields.
+        spektrId:
+          type: string
+          description: The spektr unique identifier for one entry
+        files:
+          description: An array of files if set on the request
           type: array
           items:
-            $ref: '#/components/schemas/DataUpdateResponseDataItem'
+            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
       required:
-      - data
+      - spektrId
+      - files
     ImportCreateInput:
       type: object
       properties:
@@ -234,100 +277,6 @@ components:
       required:
       - name
       - dataType
-    DataUpdateResponseDataFileItem:
-      type: object
-      properties:
-        file:
-          type: string
-          description: The file name
-        url:
-          type: string
-          description: A presigned URL for uploading the file associated with the file field.
-        fields:
-          description: An array of headers needed for the file upload
-          type: array
-          items:
-            type: object
-      required:
-      - file
-      - url
-      - fields
-    DataUpdateResponseDataItem:
-      type: object
-      properties:
-        spektrId:
-          type: string
-          description: The spektr unique identifier for one entry
-        files:
-          description: An array of files if set on the request
-          type: array
-          items:
-            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
-      required:
-      - spektrId
-      - files
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Internal Server Error
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - internal_server_error
-          description: The error code
-      required:
-      - message
-      - errorCode
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
-    NotFoundError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Not Found Exception
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - not_found
-          description: The error code
-      required:
-      - message
-      - errorCode
-    DataConflictError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Cannot delete dataset that is linked to processes
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - dataset_linked_to_process
-          description: The error code
-      required:
-      - message
-      - errorCode
     DataParseError:
       type: object
       properties:
@@ -344,6 +293,25 @@ components:
       required:
       - message
       - errorCode
+    DataUpdateResponse:
+      type: object
+      properties:
+        data:
+          example:
+          - spektrId: UUID
+            files:
+            - file: passport
+              url: https://spektr.com/presigned-url
+              fields:
+                header1: value1
+                header2: value2
+          - spektrId: UUID
+          description: The API responds with an array of objects corresponding to each data entry submitted. Each object includes "spektrId" and "files" array if the entry includes file fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataItem'
+      required:
+      - data
     DataUpdateInput:
       type: object
       properties:
@@ -371,6 +339,38 @@ components:
             type: object
       required:
       - data
+    DataConflictError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Cannot delete dataset that is linked to processes
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - dataset_linked_to_process
+          description: The error code
+      required:
+      - message
+      - errorCode
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
   securitySchemes:
     x-api-key:
       type: apiKey

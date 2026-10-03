@@ -142,7 +142,131 @@ paths:
       - Execution API
 components:
   schemas:
+    ExecutionResponseDataItemV3:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID
+        token:
+          type: string
+          description: The execution token
+        idType:
+          type: string
+          enum:
+          - spektrId
+          - reference
+          description: The type of ID
+      required:
+      - id
+      - idType
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Internal Server Error
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ExecutionResponseV2:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The execution token
+              idType:
+                type: string
+                enum:
+                - spektrId
+                - reference
+                description: The type of ID
+          description: A record of spektr IDs and their corresponding execution tokens
+          example:
+            spektrId:
+              token: exec_token_1
+              idType: spektrId
+            reference:
+              token: exec_token_2
+              idType: reference
+      required:
+      - data
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    ExecutionInput:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        spektrIds:
+          description: An array spektr IDs
+          type: array
+          items:
+            type: string
+      required:
+      - processId
+      - spektrIds
     ExecutionInputV3:
+      type: object
+      properties:
+        processId:
+          type: string
+          description: The process ID
+        ids:
+          description: An array of spektr IDs and reference IDs
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRecordId'
+        refreshTokenOnVersionMismatch:
+          type: boolean
+          description: Whether to refresh the token on version mismatch
+        emailInput:
+          description: The email input
+          allOf:
+          - $ref: '#/components/schemas/EmailInput'
+      required:
+      - processId
+      - ids
+    ExecutionResponseV3:
+      type: object
+      properties:
+        data:
+          description: A list of execution results
+          example:
+          - id: '10307116'
+            token: exec_token
+            idType: reference
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionResponseDataItemV3'
+      required:
+      - data
+    ExecutionInputV2:
       type: object
       properties:
         processId:
@@ -178,142 +302,6 @@ components:
       required:
       - id
       - type
-    ExecutionResponseV3:
-      type: object
-      properties:
-        data:
-          description: A list of execution results
-          example:
-          - id: '10307116'
-            token: exec_token
-            idType: reference
-          type: array
-          items:
-            $ref: '#/components/schemas/ExecutionResponseDataItemV3'
-      required:
-      - data
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Internal Server Error
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - internal_server_error
-          description: The error code
-      required:
-      - message
-      - errorCode
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
-    NotFoundError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Not Found Exception
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - not_found
-          description: The error code
-      required:
-      - message
-      - errorCode
-    ExecutionResponseDataItemV3:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The ID
-        token:
-          type: string
-          description: The execution token
-        idType:
-          type: string
-          enum:
-          - spektrId
-          - reference
-          description: The type of ID
-      required:
-      - id
-      - idType
-    ExecutionInput:
-      type: object
-      properties:
-        processId:
-          type: string
-          description: The process ID
-        spektrIds:
-          description: An array spektr IDs
-          type: array
-          items:
-            type: string
-      required:
-      - processId
-      - spektrIds
-    ExecutionResponse:
-      type: object
-      properties:
-        data:
-          type: object
-          additionalProperties:
-            type: object
-            properties:
-              token:
-                type: string
-                description: The execution token
-          description: A record of spektr IDs and their corresponding execution tokens
-          example:
-            spektrId:
-              token: exec_token_1
-      required:
-      - data
-    ExecutionResponseV2:
-      type: object
-      properties:
-        data:
-          type: object
-          additionalProperties:
-            type: object
-            properties:
-              token:
-                type: string
-                description: The execution token
-              idType:
-                type: string
-                enum:
-                - spektrId
-                - reference
-                description: The type of ID
-          description: A record of spektr IDs and their corresponding execution tokens
-          example:
-            spektrId:
-              token: exec_token_1
-              idType: spektrId
-            reference:
-              token: exec_token_2
-              idType: reference
-      required:
-      - data
     DataParseError:
       type: object
       properties:
@@ -344,27 +332,39 @@ components:
           description: The email body
       required:
       - email
-    ExecutionInputV2:
+    ExecutionResponse:
       type: object
       properties:
-        processId:
-          type: string
-          description: The process ID
-        ids:
-          description: An array of spektr IDs and reference IDs
-          type: array
-          items:
-            $ref: '#/components/schemas/ClientRecordId'
-        refreshTokenOnVersionMismatch:
-          type: boolean
-          description: Whether to refresh the token on version mismatch
-        emailInput:
-          description: The email input
-          allOf:
-          - $ref: '#/components/schemas/EmailInput'
+        data:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              token:
+                type: string
+                description: The execution token
+          description: A record of spektr IDs and their corresponding execution tokens
+          example:
+            spektrId:
+              token: exec_token_1
       required:
-      - processId
-      - ids
+      - data
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
   securitySchemes:
     x-api-key:
       type: apiKey

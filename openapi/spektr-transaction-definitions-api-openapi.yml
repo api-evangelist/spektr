@@ -157,22 +157,6 @@ paths:
       - Transaction Definitions
 components:
   schemas:
-    NotFoundError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Not Found Exception
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - not_found
-          description: The error code
-      required:
-      - message
-      - errorCode
     InternalServerError:
       type: object
       properties:
@@ -185,6 +169,22 @@ components:
           type: string
           enum:
           - internal_server_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Not Found Exception
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - not_found
           description: The error code
       required:
       - message
