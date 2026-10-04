@@ -669,73 +669,6 @@ paths:
       - Workspace Fields API
 components:
   schemas:
-    DataValidationError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
-      required:
-      - message
-      - errorCode
-    SubFieldDefinitionDto:
-      type: object
-      properties:
-        fieldName:
-          type: string
-          description: Unique name identifier of the sub-field
-          example: street_address
-        fieldLabel:
-          type: string
-          description: Display label for the sub-field
-          example: Street Address
-        fieldHelp:
-          type: string
-          description: Help text for the sub-field
-          example: Enter the full street address including number
-        required:
-          type: boolean
-          description: Whether the sub-field is required
-          example: true
-        type:
-          type: string
-          description: Input type of the sub-field
-          example: input
-          enum:
-          - input
-          - radio
-          - select
-          - checkbox
-          - file
-          - optionSwitch
-          - consent
-          - multiSelectDropdown
-          - multipleValuesInput
-          - object
-        attributes:
-          description: Attributes for the sub-field
-          allOf:
-          - $ref: '#/components/schemas/FieldAttributesDto'
-        validation:
-          description: Validation rules for the sub-field
-          type: array
-          items:
-            $ref: '#/components/schemas/FieldValidationDto'
-        subFields:
-          description: Nested sub-fields for recursive object structures. Required when the sub-field type is "object", must be omitted otherwise. On PATCH this array is **replaced wholesale** — partial merges are not supported.
-          type: array
-          items:
-            $ref: '#/components/schemas/SubFieldDefinitionDto'
-      required:
-      - fieldName
-      - fieldLabel
-      - required
-      - type
     CreateWorkspaceFieldBody:
       type: object
       properties:
@@ -799,47 +732,112 @@ components:
       - attributes
       - config
       - locked
-    FieldValidationDto:
+    FieldConfigDto:
       type: object
       properties:
-        type:
+        spektrDataField:
           type: string
-          description: Type of validation rule
-          example: required
-          enum:
-          - required
-          - regex
-          - age
-          - maxNumberOfEntries
-          - maxNumberOfSignatories
-          - minNumberOfSignatories
-          - maxLength
-          - maxFileSize
-          - fileType
-          - maxFileNameLength
-        message:
+          description: The Spektr data field key this field maps to
+          example: company_name
+        prefillDefaultValue:
+          type: boolean
+          description: Whether to prefill the default value
+          example: true
+        source:
           type: string
-          description: Error message when validation fails
-          example: This field is required
+          description: Source field for prefilling
+          example: workspace
+        prefillSpektrDataField:
+          type: string
+          description: Spektr data field to use for prefilling
+          example: company_name
+        hideRoleDropdown:
+          type: boolean
+          description: Whether to hide the role dropdown
+          example: false
         value:
           type: object
-          description: Validation value (type depends on validation type)
-          example: true
-        preset:
-          type: string
-          description: Regex preset identifier
-          example: email
-        minimumAge:
-          type: number
-          description: Minimum age (for age validation)
-          example: 18
-        maximumAge:
-          type: number
-          description: Maximum age (for age validation)
-          example: 65
+          description: Default or current value of the field
+          example: Acme Inc.
+        defaultValue:
+          type: object
+          description: Default value for the field
+          example: Default Company
+        prefillPreference:
+          type: object
+          description: Prefill preference configuration. `processSourceNodeIds` is optional; when omitted or empty, prefill considers all eligible upstream vendor nodes (current behavior). When set, prefill is restricted to the listed vendor node ids.
+          example:
+            process: true
+            record: true
+            processSourceNodeIds:
+            - 507f1f77bcf86cd799439011
       required:
-      - type
-      - message
+      - spektrDataField
+    FieldAttributesDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the field
+          example: Company Name
+        label:
+          type: string
+          description: Label shown to users
+          example: Company Name
+        helperText:
+          type: string
+          description: Helper text providing additional guidance
+          example: Enter the registered company name
+        placeholder:
+          type: string
+          description: Placeholder text for the input
+          example: Acme Inc.
+        type:
+          type: string
+          description: Input type (e.g. text, number, date, country)
+          example: text
+        fileType:
+          type: string
+          description: Accepted file types for file fields
+        options:
+          description: Options for select/radio fields
+          example:
+          - value: option1
+            label: Option 1
+          - value: option2
+            label: Option 2
+          type: array
+          items:
+            type: object
+        internalId:
+          type: string
+          description: Internal identifier for the field
+          example: company_name_field
+        currency:
+          type: object
+          description: Currency configuration
+          example:
+            symbol: $
+            code: USD
+        minDate:
+          type: string
+          description: Minimum allowed date for date fields (ISO format)
+          example: '1900-01-01'
+        maxDate:
+          type: string
+          description: Maximum allowed date for date fields (ISO format)
+          example: '2100-12-31'
+        maxDaysInPast:
+          type: number
+          description: Maximum number of days in the past allowed
+          example: 3650
+        maxDaysInFuture:
+          type: number
+          description: Maximum number of days in the future allowed
+          example: 30
+      required:
+      - name
+      - label
     UpdateWorkspaceFieldBody:
       type: object
       properties:
@@ -998,112 +996,6 @@ components:
       - createdBy
       - createdAt
       - updatedAt
-    FieldAttributesDto:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Display name of the field
-          example: Company Name
-        label:
-          type: string
-          description: Label shown to users
-          example: Company Name
-        helperText:
-          type: string
-          description: Helper text providing additional guidance
-          example: Enter the registered company name
-        placeholder:
-          type: string
-          description: Placeholder text for the input
-          example: Acme Inc.
-        type:
-          type: string
-          description: Input type (e.g. text, number, date, country)
-          example: text
-        fileType:
-          type: string
-          description: Accepted file types for file fields
-        options:
-          description: Options for select/radio fields
-          example:
-          - value: option1
-            label: Option 1
-          - value: option2
-            label: Option 2
-          type: array
-          items:
-            type: object
-        internalId:
-          type: string
-          description: Internal identifier for the field
-          example: company_name_field
-        currency:
-          type: object
-          description: Currency configuration
-          example:
-            symbol: $
-            code: USD
-        minDate:
-          type: string
-          description: Minimum allowed date for date fields (ISO format)
-          example: '1900-01-01'
-        maxDate:
-          type: string
-          description: Maximum allowed date for date fields (ISO format)
-          example: '2100-12-31'
-        maxDaysInPast:
-          type: number
-          description: Maximum number of days in the past allowed
-          example: 3650
-        maxDaysInFuture:
-          type: number
-          description: Maximum number of days in the future allowed
-          example: 30
-      required:
-      - name
-      - label
-    FieldConfigDto:
-      type: object
-      properties:
-        spektrDataField:
-          type: string
-          description: The Spektr data field key this field maps to
-          example: company_name
-        prefillDefaultValue:
-          type: boolean
-          description: Whether to prefill the default value
-          example: true
-        source:
-          type: string
-          description: Source field for prefilling
-          example: workspace
-        prefillSpektrDataField:
-          type: string
-          description: Spektr data field to use for prefilling
-          example: company_name
-        hideRoleDropdown:
-          type: boolean
-          description: Whether to hide the role dropdown
-          example: false
-        value:
-          type: object
-          description: Default or current value of the field
-          example: Acme Inc.
-        defaultValue:
-          type: object
-          description: Default value for the field
-          example: Default Company
-        prefillPreference:
-          type: object
-          description: Prefill preference configuration. `processSourceNodeIds` is optional; when omitted or empty, prefill considers all eligible upstream vendor nodes (current behavior). When set, prefill is restricted to the listed vendor node ids.
-          example:
-            process: true
-            record: true
-            processSourceNodeIds:
-            - 507f1f77bcf86cd799439011
-      required:
-      - spektrDataField
     DataParseError:
       type: object
       properties:
@@ -1120,6 +1012,114 @@ components:
       required:
       - message
       - errorCode
+    SubFieldDefinitionDto:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Unique name identifier of the sub-field
+          example: street_address
+        fieldLabel:
+          type: string
+          description: Display label for the sub-field
+          example: Street Address
+        fieldHelp:
+          type: string
+          description: Help text for the sub-field
+          example: Enter the full street address including number
+        required:
+          type: boolean
+          description: Whether the sub-field is required
+          example: true
+        type:
+          type: string
+          description: Input type of the sub-field
+          example: input
+          enum:
+          - input
+          - radio
+          - select
+          - checkbox
+          - file
+          - optionSwitch
+          - consent
+          - multiSelectDropdown
+          - multipleValuesInput
+          - object
+        attributes:
+          description: Attributes for the sub-field
+          allOf:
+          - $ref: '#/components/schemas/FieldAttributesDto'
+        validation:
+          description: Validation rules for the sub-field
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidationDto'
+        subFields:
+          description: Nested sub-fields for recursive object structures. Required when the sub-field type is "object", must be omitted otherwise. On PATCH this array is **replaced wholesale** — partial merges are not supported.
+          type: array
+          items:
+            $ref: '#/components/schemas/SubFieldDefinitionDto'
+      required:
+      - fieldName
+      - fieldLabel
+      - required
+      - type
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
+          description: The error code
+      required:
+      - message
+      - errorCode
+    FieldValidationDto:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of validation rule
+          example: required
+          enum:
+          - required
+          - regex
+          - age
+          - maxNumberOfEntries
+          - maxNumberOfSignatories
+          - minNumberOfSignatories
+          - maxLength
+          - maxFileSize
+          - fileType
+          - maxFileNameLength
+        message:
+          type: string
+          description: Error message when validation fails
+          example: This field is required
+        value:
+          type: object
+          description: Validation value (type depends on validation type)
+          example: true
+        preset:
+          type: string
+          description: Regex preset identifier
+          example: email
+        minimumAge:
+          type: number
+          description: Minimum age (for age validation)
+          example: 18
+        maximumAge:
+          type: number
+          description: Maximum age (for age validation)
+          example: 65
+      required:
+      - type
+      - message
     NotFoundError:
       type: object
       properties:

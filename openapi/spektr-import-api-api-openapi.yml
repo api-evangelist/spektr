@@ -175,6 +175,15 @@ paths:
       - Import API
 components:
   schemas:
+    DataImportResponse:
+      type: object
+      properties:
+        datasetId:
+          type: string
+          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
+          description: The ID of the dataset
+      required:
+      - datasetId
     InternalServerError:
       type: object
       properties:
@@ -191,20 +200,20 @@ components:
       required:
       - message
       - errorCode
-    DataValidationError:
+    DataUpdateResponseDataItem:
       type: object
       properties:
-        message:
+        spektrId:
           type: string
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - invalid_request_body
-          description: The error code
+          description: The spektr unique identifier for one entry
+        files:
+          description: An array of files if set on the request
+          type: array
+          items:
+            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
       required:
-      - message
-      - errorCode
+      - spektrId
+      - files
     DataUpdateResponseDataFileItem:
       type: object
       properties:
@@ -223,29 +232,6 @@ components:
       - file
       - url
       - fields
-    DataImportResponse:
-      type: object
-      properties:
-        datasetId:
-          type: string
-          example: 5455e496-9f03-4d27-8cbc-5ccfbeb688a2
-          description: The ID of the dataset
-      required:
-      - datasetId
-    DataUpdateResponseDataItem:
-      type: object
-      properties:
-        spektrId:
-          type: string
-          description: The spektr unique identifier for one entry
-        files:
-          description: An array of files if set on the request
-          type: array
-          items:
-            $ref: '#/components/schemas/DataUpdateResponseDataFileItem'
-      required:
-      - spektrId
-      - files
     ImportCreateInput:
       type: object
       properties:
@@ -289,6 +275,20 @@ components:
           type: string
           enum:
           - data_parse_error
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - invalid_request_body
           description: The error code
       required:
       - message
@@ -339,22 +339,6 @@ components:
             type: object
       required:
       - data
-    DataConflictError:
-      type: object
-      properties:
-        message:
-          type: string
-          enum:
-          - Cannot delete dataset that is linked to processes
-          description: The error message
-        errorCode:
-          type: string
-          enum:
-          - dataset_linked_to_process
-          description: The error code
-      required:
-      - message
-      - errorCode
     NotFoundError:
       type: object
       properties:
@@ -367,6 +351,22 @@ components:
           type: string
           enum:
           - not_found
+          description: The error code
+      required:
+      - message
+      - errorCode
+    DataConflictError:
+      type: object
+      properties:
+        message:
+          type: string
+          enum:
+          - Cannot delete dataset that is linked to processes
+          description: The error message
+        errorCode:
+          type: string
+          enum:
+          - dataset_linked_to_process
           description: The error code
       required:
       - message
