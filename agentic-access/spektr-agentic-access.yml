@@ -1,19 +1,112 @@
-generated: '2026-07-21'
+generated: '2026-09-23'
 method: generated
-source: openapi/spektr-openapi.yml
+source: openapi/spektr-action-api-api-openapi.yml, openapi/spektr-events-api-api-openapi.yml,
+  openapi/spektr-execution-api-api-openapi.yml, openapi/spektr-import-api-api-openapi.yml, openapi/spektr-orchestration-api-api-openapi.yml,
+  openapi/spektr-records-api-api-openapi.yml, openapi/spektr-transaction-definitions-api-openapi.yml,
+  openapi/spektr-transactions-api-openapi.yml, openapi/spektr-workspace-fields-api-api-openapi.yml
 description: Recommended x-agentic-access execution contracts, classified heuristically from
   the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
   audience per deployment. See research/curity/agentic-governance/.
 summary:
   operations: 35
   by_action_class:
-    acting: 25
-    connected: 10
+    acting: 24
+    connected: 11
   by_consequence:
-    safety-critical: 25
-    read: 10
-  human_in_the_loop_required: 25
+    safety-critical: 24
+    read: 11
+  human_in_the_loop_required: 24
 operations:
+- path: /v1/public/actions/processId/{processId}/workspaceId/{workspaceId}
+  method: post
+  operationId: ActionTicketController_createOnboarding_v1
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v1/events
+  method: get
+  operationId: EventsController_list_v1
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v1/events
+  method: post
+  operationId: EventsController_import_v1
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v1/execution
+  method: post
+  operationId: ExecutionController_triggerProcess_v1
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v2/execution
+  method: post
+  operationId: ExecutionController_executionV2_v2
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v3/execution
+  method: post
+  operationId: ExecutionController_executionV3_v3
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
 - path: /v1/data
   method: post
   operationId: DataImportController_create_v1
@@ -62,9 +155,9 @@ operations:
     escalation:
       human-in-the-loop: required
     audit: required
-- path: /v1/record/listOpenLoops
+- path: /v2/public/actions/processId/{processId}/workspaceId/{workspaceId}
   method: post
-  operationId: RecordController_listOpenLoops_v1
+  operationId: OrchestrationController_createOnboarding_v2
   x-agentic-access:
     action-class: acting
     consequence: safety-critical
@@ -78,6 +171,106 @@ operations:
     escalation:
       human-in-the-loop: required
     audit: required
+- path: /v2/public/actions/{token}
+  method: get
+  operationId: OrchestrationController_get_v2
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /v2/public/actions/{token}
+  method: post
+  operationId: OrchestrationController_submit_v2
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v2/public/actions/{token}/go-back
+  method: post
+  operationId: OrchestrationController_goBack_v2
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v2/public/actions/{token}/submit-files
+  method: post
+  operationId: OrchestrationController_submitFiles_v2
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v3/public/actions/{token}
+  method: post
+  operationId: OrchestrationController_submitV3_v3
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v3/public/actions/{token}/confirm
+  method: post
+  operationId: OrchestrationController_confirmSubmission_v3
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /v1/record/listOpenLoops
+  method: post
+  operationId: RecordController_listOpenLoops_v1
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
 - path: /v1/record/{spektrId}
   method: get
   operationId: RecordController_fetchRecord_v1
@@ -202,9 +395,9 @@ operations:
     token:
       max-ttl: 3600
     audit: none
-- path: /v1/execution
+- path: /v1/transaction-definitions
   method: post
-  operationId: ExecutionController_triggerProcess_v1
+  operationId: TransactionDefinitionController_create_v1
   x-agentic-access:
     action-class: acting
     consequence: safety-critical
@@ -218,9 +411,9 @@ operations:
     escalation:
       human-in-the-loop: required
     audit: required
-- path: /v2/execution
-  method: post
-  operationId: ExecutionController_executionV2_v2
+- path: /v1/transaction-definitions/{id}
+  method: delete
+  operationId: TransactionDefinitionController_delete_v1
   x-agentic-access:
     action-class: acting
     consequence: safety-critical
@@ -234,157 +427,9 @@ operations:
     escalation:
       human-in-the-loop: required
     audit: required
-- path: /v3/execution
+- path: /v1/transactions/batch
   method: post
-  operationId: ExecutionController_executionV3_v3
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v1/public/actions/processId/{processId}/workspaceId/{workspaceId}
-  method: post
-  operationId: ActionTicketController_createOnboarding_v1
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v1/events
-  method: get
-  operationId: EventsController_list_v1
-  x-agentic-access:
-    action-class: connected
-    consequence: read
-    subject: optional
-    token:
-      max-ttl: 3600
-    audit: none
-- path: /v1/events
-  method: post
-  operationId: EventsController_import_v1
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v2/public/actions/processId/{processId}/workspaceId/{workspaceId}
-  method: post
-  operationId: OrchestrationController_createOnboarding_v2
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v2/public/actions/{token}
-  method: get
-  operationId: OrchestrationController_get_v2
-  x-agentic-access:
-    action-class: connected
-    consequence: read
-    subject: optional
-    token:
-      max-ttl: 3600
-    audit: none
-- path: /v2/public/actions/{token}
-  method: post
-  operationId: OrchestrationController_submit_v2
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v2/public/actions/{token}/go-back
-  method: post
-  operationId: OrchestrationController_goBack_v2
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v2/public/actions/{token}/submit-files
-  method: post
-  operationId: OrchestrationController_submitFiles_v2
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v3/public/actions/{token}
-  method: post
-  operationId: OrchestrationController_submitV3_v3
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v3/public/actions/{token}/confirm
-  method: post
-  operationId: OrchestrationController_confirmSubmission_v3
+  operationId: TransactionsController_ingestBatch_v1
   x-agentic-access:
     action-class: acting
     consequence: safety-critical
@@ -453,54 +498,6 @@ operations:
 - path: /v1/fields/{id}
   method: delete
   operationId: WorkspaceFieldsController_delete_v1
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v1/transaction-definitions
-  method: post
-  operationId: TransactionDefinitionController_create_v1
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v1/transaction-definitions/{id}
-  method: delete
-  operationId: TransactionDefinitionController_delete_v1
-  x-agentic-access:
-    action-class: acting
-    consequence: safety-critical
-    subject: required
-    audience: null
-    token:
-      max-ttl: 120
-      exchange: true
-      purpose-required: true
-      proof-of-possession: true
-    escalation:
-      human-in-the-loop: required
-    audit: required
-- path: /v1/transactions/batch
-  method: post
-  operationId: TransactionsController_ingestBatch_v1
   x-agentic-access:
     action-class: acting
     consequence: safety-critical
